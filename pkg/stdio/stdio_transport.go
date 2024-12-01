@@ -17,6 +17,8 @@ func NewTransport() server.Transport {
 	tp := &stdioTransport{
 		shuttingDown:            make(chan struct{}),
 		stoppedReadingResponses: make(chan struct{}),
+		stoppedReadingInput:     make(chan struct{}),
+		stopped:                 make(chan struct{}),
 	}
 
 	return tp
@@ -25,6 +27,8 @@ func NewTransport() server.Transport {
 type stdioTransport struct {
 	shuttingDown            chan struct{}
 	stoppedReadingResponses chan struct{}
+	stoppedReadingInput     chan struct{}
+	stopped                 chan struct{}
 }
 
 func (s *stdioTransport) Run(
@@ -42,8 +46,11 @@ func (s *stdioTransport) run(
 	reader := bufio.NewReader(os.Stdin)
 
 	go func() {
+	out:
 		for {
 			select {
+			case <-s.shuttingDown:
+				break out
 			case res := <-srv.GetResponses():
 				data, err := jsonrpc2.Marshal(res.Id, res.Result, res.Error)
 				if err != nil {
@@ -51,41 +58,46 @@ func (s *stdioTransport) run(
 				}
 				os.Stdout.Write(data)
 				os.Stdout.Write([]byte("\n"))
-			case <-s.shuttingDown:
-				close(s.stoppedReadingResponses)
-				return
 			}
 		}
+		close(s.stoppedReadingResponses)
 	}()
 
 	go func() {
+	out:
 		for {
 			select {
 			case <-s.shuttingDown:
-				return
+				close(s.stoppedReadingInput)
+				break out
 			default:
 				input, err := reader.ReadBytes('\n')
 				if err != nil {
 					if !errors.Is(err, io.EOF) {
 						srv.GetLogger().LogEvent(foxyevent.StdioFailedReadingInput{Err: err})
 					}
-					break
+					break out
 				}
 				srv.Handle(input)
 			}
 		}
+		close(s.stoppedReadingInput)
 	}()
 
 	<-s.shuttingDown
 	<-s.stoppedReadingResponses
+	<-s.stoppedReadingInput
+
+	close(s.stopped)
 
 	return nil
 }
 
 func (s *stdioTransport) Shutdown(ctx context.Context) error {
 	close(s.shuttingDown)
+
 	select {
-	case <-s.stoppedReadingResponses:
+	case <-s.stopped:
 		return nil
 	case <-ctx.Done():
 		return ctx.Err()
