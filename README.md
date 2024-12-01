@@ -20,7 +20,6 @@ npx @modelcontextprotocol/inspector go run main.go
 
 Here's the code of that example:
 
-
 ```go
 package main
 
@@ -41,58 +40,51 @@ import (
 	"k8s.io/client-go/tools/clientcmd/api"
 )
 
+func NewListK8sContextsTool() fxctx.Tool {
+	// Here we define a tool that lists k8s contexts using client-go
+
+	return fxctx.NewTool(
+		// This information about the tool would be used when it is listed:
+		"list-k8s-contexts",
+		"List Kubernetes contexts from configuration files such as kubeconfig",
+		mcp.ToolInputSchema{
+			Type:       "object",
+			Properties: map[string]map[string]interface{}{},
+			Required:   []string{},
+		},
+
+		// This is the callback that would be executed when the tool is called:
+		func(args map[string]interface{}) fxctx.ToolResponse {
+			loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
+			kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, nil)
+			cfg, err := kubeConfig.RawConfig()
+			if err != nil {
+				log.Printf("failed to get kubeconfig: %v", err)
+				return fxctx.ToolResponse{
+					IsError: Ptr(true),
+					Meta:    map[string]interface{}{},
+					Content: []interface{}{
+						mcp.TextContent{
+							Type: "text",
+							Text: fmt.Sprintf("failed to get kubeconfig: %v", err),
+						},
+					},
+				}
+			}
+
+			return fxctx.ToolResponse{
+				Meta:    map[string]interface{}{},
+				Content: getListContextsToolContent(cfg),
+				IsError: Ptr(false),
+			}
+		},
+	)
+}
+
 func main() {
-	// This example defines list-k8s-contexts tool for MCP server, that uses k8s client-go to list available contexts
-	// and returns them as a response, run it with:
-	// npx @modelcontextprotocol/inspector go run main.go
-	// , then in browser open http://localhost:5173
-	// , then click Connect
-	// , then click List Tools
-	// , then click list-k8s-contexts
-
 	fx.New(
-		// Here we define a tool that lists k8s contexts using client-go
-		fx.Provide(fxctx.AsTool(
-			func() fxctx.Tool {
-
-				return fxctx.NewTool(
-					// This information about the tool would be used when it is listed:
-					"list-k8s-contexts",
-					"List Kubernetes contexts from configuration files such as kubeconfig",
-					mcp.ToolInputSchema{
-						Type:       "object",
-						Properties: map[string]map[string]interface{}{},
-						Required:   []string{},
-					},
-
-					// This is the callback that would be executed when the tool is called:
-					func(args map[string]interface{}) fxctx.ToolResponse {
-						loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
-						kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, nil)
-						cfg, err := kubeConfig.RawConfig()
-						if err != nil {
-							log.Printf("failed to get kubeconfig: %v", err)
-							return fxctx.ToolResponse{
-								IsError: Ptr(true),
-								Meta:    map[string]interface{}{},
-								Content: []interface{}{
-									mcp.TextContent{
-										Type: "text",
-										Text: fmt.Sprintf("failed to get kubeconfig: %v", err),
-									},
-								},
-							}
-						}
-
-						return fxctx.ToolResponse{
-							Meta:    map[string]interface{}{},
-							Content: getListContextsToolContent(cfg),
-							IsError: Ptr(false),
-						}
-					},
-				)
-			},
-		)),
+		// Registering the tool with fx
+		fx.Provide(fxctx.AsTool(NewListK8sContextsTool)),
 
 		// ToolMux registers tools and provides them to the server for listing tools and calling them
 		fxctx.ProvideToolMux(),
