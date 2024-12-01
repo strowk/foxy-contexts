@@ -18,7 +18,7 @@ npx @modelcontextprotocol/inspector go run main.go
 ```
 , then in browser open http://localhost:5173 and try to use list-k8s-contexts tool, then check out implementation in [examples/list_k8s_contexts_tool/main.go](./examples/list_k8s_contexts_tool/main.go).
 
-Here's the code of that example:
+Here's the code of that example. Note that in real world application you would probably want to split it into multiple files:
 
 ```go
 package main
