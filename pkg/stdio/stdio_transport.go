@@ -68,7 +68,6 @@ func (s *stdioTransport) run(
 		for {
 			select {
 			case <-s.shuttingDown:
-				close(s.stoppedReadingInput)
 				break out
 			default:
 				input, err := reader.ReadBytes('\n')
