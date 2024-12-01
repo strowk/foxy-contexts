@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
 )
 
@@ -23,7 +24,7 @@ func TestRouter(t *testing.T) {
 		},
 	)
 
-	t.Run("Unmarshal list resources and check that result pointer is different every time", func(t *testing.T) {
+	t.Run("Handle list resources and check that result pointer is different every time", func(t *testing.T) {
 		data := `{"method":"resources/list","params":{}, "id":1}`
 		res := r.Handle([]byte(data))
 		if res.Error != nil {
@@ -45,6 +46,60 @@ func TestRouter(t *testing.T) {
 		if addr1 == addr2 {
 			t.Fatalf("expected different pointers, got the same")
 		}
+	})
+
+	t.Run("Handle empty request", func(t *testing.T) {
+		data := `{}`
+		res := r.Handle([]byte(data))
+		if res.Error == nil {
+			t.Fatalf("expected error, got nil")
+		}
+		if res.Error.Code != -32600 {
+			t.Fatalf("expected code -32600, got %d", res.Error.Code)
+		}
+	})
+
+	t.Run("Handle unparseable request", func(t *testing.T) {
+		data := `not a json`
+		res := r.Handle([]byte(data))
+		if res.Error == nil {
+			t.Fatalf("expected error, got nil")
+		}
+		assert.Equal(t, -32700, res.Error.Code)
+		assert.Equal(t, "Parse error", res.Error.Message)
+		assert.Equal(t, "invalid character 'o' in literal null (expecting 'u')", res.Error.Data)
+	})
+
+	t.Run("Handle null request", func(t *testing.T) {
+		data := `null`
+		res := r.Handle([]byte(data))
+		if res.Error == nil {
+			t.Fatalf("expected error, got nil")
+		}
+		assert.Equal(t, -32600, res.Error.Code)
+		assert.Equal(t, "Invalid Request", res.Error.Message)
+		assert.Equal(t, "Request is null, but must be an object", res.Error.Data)
+	})
+
+	t.Run("Handle unknown method", func(t *testing.T) {
+		data := `{"method":"unknown","params":{}, "id":1}`
+		res := r.Handle([]byte(data))
+		if res.Error == nil {
+			t.Fatalf("expected error, got nil")
+		}
+		assert.Equal(t, -32601, res.Error.Code)
+		assert.Equal(t, "Method not found", res.Error.Message)
+		assert.Equal(t, "request for method unknown not found in registry", res.Error.Data)
+	})
+
+	t.Run("Handle invalid method type", func(t *testing.T) {
+		data := `{"method":1,"params":{}, "id":1}`
+		res := r.Handle([]byte(data))
+		if res.Error == nil {
+			t.Fatalf("expected error, got nil")
+		}
+		assert.Equal(t, -32600, res.Error.Code)
+		assert.Equal(t, "field method in request must be a string, but got float64", res.Error.Data)
 	})
 }
 

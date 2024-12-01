@@ -173,7 +173,7 @@ func (r *router) handleRequest(buf []byte) (Result, RequestId, *Error) {
 	}
 
 	if raw == nil {
-		return nil, NewNullRequestId(), invalidRequest("Request is empty")
+		return nil, NewNullRequestId(), invalidRequest("Request is null, but must be an object")
 	}
 
 	id, err := getId(raw)
@@ -197,7 +197,7 @@ func (r *router) handleRequest(buf []byte) (Result, RequestId, *Error) {
 		}
 
 	} else {
-		return nil, *id, methodNotFound("Method is required, but is missing")
+		return nil, *id, invalidRequest("Method is required, but is missing")
 	}
 }
 
