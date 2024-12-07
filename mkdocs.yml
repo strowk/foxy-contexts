@@ -1,0 +1,73 @@
+site_name: Build MCP Servers Declaratively in Golang
+
+nav:
+  - Overview: index.md
+  - Development:
+    - Tools: tools.md
+    - Resources: resources.md
+    - Prompts: prompts.md
+  - Testing: testing.md
+
+extra_css:
+  - static/css/extra.css
+
+plugins:
+  - search
+  - tags:
+      tags_file: links.md
+
+
+repo_name: strowk/foxy-contexts
+repo_url: https://github.com/strowk/foxy-contexts
+
+theme:
+  name: material
+
+  logo: assets/logo.png
+  favicon: assets/favicon.png
+
+  palette:
+    primary: blue
+    scheme: slate
+    
+  features:
+    - navigation.tracking
+    - announce.dismiss
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.sections
+    - navigation.expand
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - toc.integrate
+    - navigation.indexes
+    - search.suggest
+    - header.autohide
+
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.snippets:
+      auto_append:
+        - includes/abbreviations.md
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+
+
+watch:
+  - README.md
