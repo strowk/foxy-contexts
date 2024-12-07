@@ -132,12 +132,12 @@ func main() {
 				OnStart: func(ctx context.Context) error {
 					go func() {
 						transport.Run(
-							mcp.ServerCapabilities{
+							&mcp.ServerCapabilities{
 								Prompts: &mcp.ServerCapabilitiesPrompts{
 									ListChanged: Ptr(false),
 								},
 							},
-							mcp.Implementation{
+							&mcp.Implementation{
 								Name:    "my-mcp-k8s-server",
 								Version: "0.0.1",
 							},

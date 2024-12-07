@@ -1,4 +1,4 @@
-module github.com/strowk/foxy-contexts/list_k8s_namespaces_prompt
+module github.com/strowk/foxy-contexts/examples/list_k8s_namespaces_prompt
 
 go 1.23.3
 
