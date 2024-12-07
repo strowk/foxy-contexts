@@ -1,0 +1,54 @@
+case: List resources
+
+# reading resource of the current git repository
+in: { "jsonrpc": "2.0", "method": "resources/list", "params": {}, "id": 1 }
+
+# expect the current git repository resource
+out:
+  {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result":
+      {
+        "resources":
+          [
+            {
+              "uri": "git://current-git-repository",
+              "name": "current-git-repository",
+              "description": "Shows information about a current git repository",
+              "mimeType": "application/json",
+              "annotations": { "audience": ["assistant", "user"] },
+            },
+          ],
+      },
+  }
+
+---
+case: Read current git repository resource
+
+# reading resource of the current git repository
+in:
+  {
+    "jsonrpc": "2.0",
+    "method": "resources/read",
+    "params": { "uri": "git://current-git-repository" },
+    "id": 2,
+  }
+
+# expect the current git repository resource
+out:
+  {
+    "jsonrpc": "2.0",
+    "result":
+      {
+        "contents":
+          [
+            {
+              "uri": "git://current-git-repository",
+              "mimeType": "application/json",
+              "text": '[{"name":"origin","urls":["https://github.com/strowk/foxy-contexts.git"]}]',
+            },
+          ],
+      },
+    "id": 2,
+  }
