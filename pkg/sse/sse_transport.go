@@ -50,8 +50,8 @@ func newResponseEvent(res jsonrpc2.JsonRpcResponse) (*Event, error) {
 }
 
 func (s *sseTransport) Run(
-	capabilities mcp.ServerCapabilities,
-	serverInfo mcp.Implementation,
+	capabilities *mcp.ServerCapabilities,
+	serverInfo *mcp.Implementation,
 	options ...server.ServerOption,
 ) error {
 	e := echo.New()

@@ -24,8 +24,8 @@ type server struct {
 }
 
 func NewServer(
-	capabilities mcp.ServerCapabilities,
-	serverInfo mcp.Implementation,
+	capabilities *mcp.ServerCapabilities,
+	serverInfo *mcp.Implementation,
 	options ...ServerOption,
 ) Server {
 	s := &server{
@@ -62,8 +62,8 @@ func (s *server) SetNotificationHandler(request jsonrpc2.Request, handler func(r
 }
 
 func (s *server) initialize(
-	capabilities mcp.ServerCapabilities,
-	serverInfo mcp.Implementation,
+	capabilities *mcp.ServerCapabilities,
+	serverInfo *mcp.Implementation,
 ) {
 	s.SetRequestHandler(&mcp.InitializeRequest{},
 		func(req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
@@ -77,8 +77,8 @@ func (s *server) initialize(
 
 func (*server) handleInitialize(
 	req jsonrpc2.Request,
-	capabilities mcp.ServerCapabilities,
-	serverInfo mcp.Implementation,
+	capabilities *mcp.ServerCapabilities,
+	serverInfo *mcp.Implementation,
 ) jsonrpc2.Result {
 	requestedVersion := req.(*mcp.InitializeRequest).Params.ProtocolVersion
 
@@ -93,8 +93,8 @@ func (*server) handleInitialize(
 
 	return &mcp.InitializeResult{
 		ProtocolVersion: supportedVersion,
-		Capabilities:    capabilities,
-		ServerInfo:      serverInfo,
+		Capabilities:    *capabilities,
+		ServerInfo:      *serverInfo,
 	}
 }
 

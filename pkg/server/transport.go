@@ -8,8 +8,8 @@ import (
 
 type Transport interface {
 	Run(
-		capabilities mcp.ServerCapabilities,
-		serverInfo mcp.Implementation,
+		capabilities *mcp.ServerCapabilities,
+		serverInfo *mcp.Implementation,
 		serverOptions ...ServerOption,
 	) error
 
