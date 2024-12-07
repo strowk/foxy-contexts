@@ -13,12 +13,27 @@ import (
 	"github.com/strowk/foxy-contexts/pkg/server"
 )
 
-func NewTransport() server.Transport {
+func NewTransport(options ...StdioTransportOption) server.Transport {
 	tp := &stdioTransport{
 		shuttingDown:            make(chan struct{}),
 		stoppedReadingResponses: make(chan struct{}),
 		stoppedReadingInput:     make(chan struct{}),
 		stopped:                 make(chan struct{}),
+
+		in:  os.Stdin,
+		out: os.Stdout,
+
+		newServer: func(
+			capabilities *mcp.ServerCapabilities,
+			serverInfo *mcp.Implementation,
+			options ...server.ServerOption,
+		) server.Server {
+			return server.NewServer(capabilities, serverInfo, options...)
+		},
+	}
+
+	for _, o := range options {
+		o.apply(tp)
 	}
 
 	return tp
@@ -29,22 +44,30 @@ type stdioTransport struct {
 	stoppedReadingResponses chan struct{}
 	stoppedReadingInput     chan struct{}
 	stopped                 chan struct{}
+
+	in  io.Reader
+	out io.Writer
+
+	newServer func(
+		capabilities *mcp.ServerCapabilities,
+		serverInfo *mcp.Implementation,
+		options ...server.ServerOption,
+	) server.Server
 }
 
 func (s *stdioTransport) Run(
-	capabilities mcp.ServerCapabilities,
-	serverInfo mcp.Implementation,
+	capabilities *mcp.ServerCapabilities,
+	serverInfo *mcp.Implementation,
 	options ...server.ServerOption,
 ) error {
-	server := server.NewServer(capabilities, serverInfo, options...)
+	server := s.newServer(capabilities, serverInfo, options...)
 	return s.run(server)
 }
 
 func (s *stdioTransport) run(
 	srv server.Server,
 ) error {
-	reader := bufio.NewReader(os.Stdin)
-
+	reader := bufio.NewReader(s.in)
 	go func() {
 	out:
 		for {
@@ -56,8 +79,9 @@ func (s *stdioTransport) run(
 				if err != nil {
 					srv.GetLogger().LogEvent(foxyevent.StdioFailedMarhalResponse{Err: err})
 				}
-				os.Stdout.Write(data)
-				os.Stdout.Write([]byte("\n"))
+				srv.GetLogger().LogEvent(foxyevent.StdioSendingResponse{Data: data})
+				s.out.Write(data)
+				s.out.Write([]byte("\n"))
 			}
 		}
 		close(s.stoppedReadingResponses)
