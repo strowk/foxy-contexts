@@ -7,25 +7,25 @@ import (
 
 type Resource interface {
 	GetResource() mcp.Resource
-	ReadResource(uri string) mcp.ReadResourceResult
+	ReadResource(uri string) (*mcp.ReadResourceResult, error)
 }
 
 type resource struct {
 	mcp.Resource
-	readFunc func(uri string) mcp.ReadResourceResult
+	readFunc func(uri string) (*mcp.ReadResourceResult, error)
 }
 
 func (t *resource) GetResource() mcp.Resource {
 	return t.Resource
 }
 
-func (t *resource) ReadResource(uri string) mcp.ReadResourceResult {
+func (t *resource) ReadResource(uri string) (*mcp.ReadResourceResult, error) {
 	return t.readFunc(uri)
 }
 
 func NewResource(
 	mcpResource mcp.Resource,
-	callback func(uri string) mcp.ReadResourceResult) Resource {
+	callback func(uri string) (*mcp.ReadResourceResult, error)) Resource {
 	return &resource{
 		Resource: mcpResource,
 		readFunc: callback,

@@ -72,8 +72,7 @@ func (m *resourceMux) ReadResource(uri string) (*mcp.ReadResourceResult, error) 
 		return &mcp.ReadResourceResult{}, nil
 	}
 
-	read := res.ReadResource(uri)
-	return &read, nil
+	return res.ReadResource(uri)
 }
 
 func (m *resourceMux) RegisterHandlers(s server.Server) {
