@@ -96,23 +96,29 @@ func main() {
 		// ResourceMux registers resources and resource providers and serves that data for listing resources and reading them
 		fxctx.ProvideResourceMux(),
 
+		// ToolMux registers tools and provides them to the server for listing tools and calling them
+		// TODO: this normally does not need to be here, we should teach server to provide empty list of tools
+		// without actually registering the tool mux?
+		fxctx.ProvideToolMux(),
+
 		// Start the server using stdio transport
 		fx.Invoke((func(
 			lc fx.Lifecycle,
 			resourceMux fxctx.ResourceMux,
+			toolsMux fxctx.ToolMux,
 		) {
 			transport := stdio.NewTransport()
 			lc.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {
 					go func() {
 						transport.Run(
-							mcp.ServerCapabilities{
+							&mcp.ServerCapabilities{
 								Resources: &mcp.ServerCapabilitiesResources{
 									ListChanged: Ptr(false),
 									Subscribe:   Ptr(false),
 								},
 							},
-							mcp.Implementation{
+							&mcp.Implementation{
 								Name:    "my-mcp-k8s-server",
 								Version: "0.0.1",
 							},
@@ -121,6 +127,7 @@ func main() {
 									// This makes sure that server is aware of the tools
 									// we have registered and both can list and call them
 									resourceMux.RegisterHandlers(s)
+									toolsMux.RegisterHandlers(s)
 								},
 							},
 						)

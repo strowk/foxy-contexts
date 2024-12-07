@@ -1,0 +1,3 @@
+case: Empty tools list
+in_list_tools: {"jsonrpc":"2.0","method":"tools/list","id":1}
+out_no_tools: {"jsonrpc":"2.0","result":{"tools":[]},"id":1}
