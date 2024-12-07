@@ -24,7 +24,7 @@ func main() {
 	// , then click list-current-dir-files
 
 	fx.New(
-		// Here we define a tool that lists k8s contexts using client-go
+		// Here we define a tool that lists files in the current directory
 		fx.Provide(fxctx.AsTool(
 			func() fxctx.Tool {
 
@@ -84,12 +84,12 @@ func main() {
 				OnStart: func(ctx context.Context) error {
 					go func() {
 						transport.Run(
-							mcp.ServerCapabilities{
+							&mcp.ServerCapabilities{
 								Tools: &mcp.ServerCapabilitiesTools{
 									ListChanged: Ptr(false),
 								},
 							},
-							mcp.Implementation{
+							&mcp.Implementation{
 								Name:    "my-mcp-server",
 								Version: "0.0.1",
 							},

@@ -1,0 +1,38 @@
+# This is a foxytest file. It contains a list of test cases in YAML format.
+# Each test case has variable number of inputs (keyst starting with 'in') and outputs (keys starting with 'out').
+# The test cases are separated by '---' (three dashes) on a new line, making it multi-document YAML file.
+# File name must end with '_test.yaml' to be recognized as a foxytest file.
+
+case: List tools
+
+# requesting list of tools
+in: {"jsonrpc": "2.0", "method": "tools/list", "id": 1}
+
+# expect one tool in the list
+out: {"jsonrpc": "2.0", "result":{ "tools": [{"description": "Lists files in the current directory", "inputSchema": {"type": "object"}, "name": "list-current-dir-files"}] }, "id": 1}
+
+---
+
+case: Call current dir files tool
+
+# requesting list of files in the current directory
+in: {"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "list-current-dir-files", "arguments": {}}, "id": 1}
+
+# expect list of files returned as text content without error
+out: {
+  "jsonrpc": "2.0", 
+  "id": 1,
+  "result": {
+    "content": [
+      {"type": "text", "text": ".gitignore"},
+      {"type": "text", "text": "README.md"},
+      {"type": "text", "text": "go.mod"},
+      {"type": "text", "text": "go.sum"},
+      {"type": "text", "text": "main.go"},
+      {"type": "text", "text": "main_test.go"},
+      {"type": "text", "text": "testdata"},
+    ],
+    "isError": false
+  }, 
+}
+

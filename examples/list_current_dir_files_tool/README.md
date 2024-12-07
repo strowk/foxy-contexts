@@ -27,6 +27,8 @@ Firstly you would need to run in this folder:
 go install
 ```
 
+, and make sure that you have configured golang bin directory in your PATH.
+
 Now in your Claude Desktop configuration file add the following:
 
 ```json
@@ -44,4 +46,18 @@ Now when you run Claude Desktop, you can ask Claude to list files in current dir
 It is probably not very useful, as you would see files in whatever directory Claude is running from.
 
 
+## Auto test
 
+To run integration test, firstly build and install it:
+
+```bash
+go install
+```
+
+, and make sure that you have configured golang bin directory in your PATH.
+
+Then run:
+
+```bash
+go test
+```
