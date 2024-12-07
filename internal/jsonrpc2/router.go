@@ -32,6 +32,25 @@ type RequestId struct {
 	IdIsMissing bool
 }
 
+func NewStringRequestId(id string) RequestId {
+	return RequestId{
+		IdString: id,
+	}
+}
+
+func NewIntRequestId(id int) RequestId {
+	return RequestId{
+		IdNumber: id,
+		IdIsNum:  true,
+	}
+}
+
+func NewMissingRequestId() RequestId {
+	return RequestId{
+		IdIsMissing: true,
+	}
+}
+
 func (r RequestId) MarshalJSON() ([]byte, error) {
 	if r.IdIsMissing {
 		return nil, fmt.Errorf("id is missing, this is not supposed to be marshaled")
