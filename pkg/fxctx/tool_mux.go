@@ -1,6 +1,8 @@
 package fxctx
 
 import (
+	"sort"
+
 	"github.com/strowk/foxy-contexts/internal/jsonrpc2"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
 	"github.com/strowk/foxy-contexts/pkg/server"
@@ -52,6 +54,10 @@ func (t *toolMux) GetMcpTools() []mcp.Tool {
 			},
 		)
 	}
+
+	sort.Slice(tools, func(i, j int) bool {
+		return tools[i].Name < tools[j].Name
+	})
 
 	return tools
 }
