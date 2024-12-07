@@ -50,5 +50,7 @@ func (l SlogLogger) LogEvent(e Event) {
 		l.logError("failed marshalling stdio response", slog.String("err", e.Err.Error()))
 	case StdioFailedReadingInput:
 		l.logError("failed reading stdio input", slog.String("err", e.Err.Error()))
+	case StdioSendingResponse:
+		l.logEvent("sending stdio response", slog.String("data", string(e.Data)))
 	}
 }
