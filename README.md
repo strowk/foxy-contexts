@@ -6,7 +6,7 @@ This library only supports server side of the protocol. Using it you can build c
 
 With this approach you can easily colocate call/read/get logic and definitions of your tools/resources/prompts in a way that every tool/resource/prompt is placed in a separate place, but related code is colocated.
 
-Check [examples](https://github.com/strowk/foxy-contexts/tree/main/examples) to know more.
+Check [docs](https://foxy-contexts.str4.io/) and [examples](https://github.com/strowk/foxy-contexts/tree/main/examples) to know more.
 
 ## List current directory files tool example
 
