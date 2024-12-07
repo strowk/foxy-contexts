@@ -1,0 +1,29 @@
+name: publish-to-github-pages
+run-name: Publishing to Github Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm ci
+        shell: bash
+      # install mkdocs with material theme
+      - run: pip install mkdocs mkdocs-material
+        shell: bash
+      # build the site
+      - run: mkdocs build
+        shell: bash
+      - run: touch site/.nojekyll # this to make Github not treat this as Jekyll
+      - run: echo 'foxy-contexts.str4.io' > ./site/CNAME
+      # following I took from gh-pages docs:
+      - name: Deploy to Github Pages
+        run: |
+          git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+          npm run deploy -- -u "github-actions-bot <support+actions@github.com>"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
