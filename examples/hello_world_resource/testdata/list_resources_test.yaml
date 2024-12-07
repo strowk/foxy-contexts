@@ -1,0 +1,54 @@
+case: List resources
+
+# reading resource of the current git repository
+in: { "jsonrpc": "2.0", "method": "resources/list", "params": {}, "id": 1 }
+
+# expect hello world resource
+out:
+  {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result":
+      {
+        "resources":
+          [
+            {
+              "uri": "hello-world://hello-world",
+              "name": "hello-world",
+              "description": "Hello World Resource",
+              "mimeType": "application/json",
+              "annotations": { "audience": ["assistant", "user"] },
+            },
+          ],
+      },
+  }
+
+---
+case: Read hello world resource
+
+# reading resource of the hello world
+in:
+  {
+    "jsonrpc": "2.0",
+    "method": "resources/read",
+    "params": { "uri": "hello-world://hello-world" },
+    "id": 2,
+  }
+
+# expect hello-world://hello-world resource
+out:
+  {
+    "jsonrpc": "2.0",
+    "result":
+      {
+        "contents":
+          [
+            {
+              "uri": "hello-world://hello-world",
+              "mimeType": "application/json",
+              "text": '{"hello": "world"}',
+            },
+          ],
+      },
+    "id": 2,
+  }
