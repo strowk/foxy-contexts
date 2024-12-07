@@ -59,7 +59,7 @@ markdown_extensions:
       alternate_style: true
   - pymdownx.snippets:
       auto_append:
-        - includes/abbreviations.md
+        - docs/includes/abbreviations.md
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
