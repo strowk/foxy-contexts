@@ -34,6 +34,12 @@ type StdioFailedMarhalResponse struct {
 
 func (StdioFailedMarhalResponse) event() {}
 
+type StdioSendingResponse struct {
+	Data []byte
+}
+
+func (StdioSendingResponse) event() {}
+
 type StdioFailedReadingInput struct {
 	Err error
 }
