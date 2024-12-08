@@ -1,0 +1,19 @@
+name: test
+run-name: Running tests
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.3'
+      - run: cd examples/git_repository_resource && go test
+      - run: cd examples/hello_world_resource && go test
+      - run: cd examples/k8s_contexts_resources && go test
+      - run: cd examples/list_current_dir_files_tool && go test
