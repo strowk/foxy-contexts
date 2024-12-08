@@ -1,5 +1,5 @@
 name: publish-to-github-pages
-run-name: Publishing to Github Pages
+run-name: Publishing docs to Github Pages
 on:
   push:
     branches: [main]
