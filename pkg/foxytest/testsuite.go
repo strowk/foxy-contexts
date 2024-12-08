@@ -518,8 +518,26 @@ func (ts *testSuite) startExecutable(t TestRunner) *exec.Cmd {
 	}
 	ts.targetOutput = out
 
-	// pipe stderr, so everything logged to stderr simply goes to the test output
 	// cmd.Stderr = os.Stderr
+	// Tried to pipe stderr, so everything logged to stderr simply goes to the test output
+	// This, however, makes certain CI runs in Github Actions fail, with this error:
+	// exec: WaitDelay expired before I/O complete
+	// and this only happens when using go test ./... , while not happening with simple go test
+	// So would instead send stderr to the test log output
+
+	go func() {
+		errReader, err := cmd.StderrPipe()
+		if err != nil {
+			t.Fatalf("error creating stderr pipe: %v", err)
+		}
+		scanner := bufio.NewScanner(errReader)
+		for scanner.Scan() {
+			t.Logf("stderr: %s", scanner.Text())
+		}
+		if ts.logging {
+			t.Log("finished reading stderr")
+		}
+	}()
 
 	if ts.logging {
 		t.Logf("running command: %s %s", ts.command, strings.Join(ts.args, " "))
