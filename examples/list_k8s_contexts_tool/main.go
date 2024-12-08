@@ -30,22 +30,24 @@ func NewListK8sContextsTool() fxctx.Tool {
 
 	return fxctx.NewTool(
 		// This information about the tool would be used when it is listed:
-		"list-k8s-contexts",
-		"List Kubernetes contexts from configuration files such as kubeconfig",
-		mcp.ToolInputSchema{
-			Type:       "object",
-			Properties: map[string]map[string]interface{}{},
-			Required:   []string{},
+		&mcp.Tool{
+			Name:        "list-k8s-contexts",
+			Description: Ptr("List Kubernetes contexts from configuration files such as kubeconfig"),
+			InputSchema: mcp.ToolInputSchema{
+				Type:       "object",
+				Properties: map[string]map[string]interface{}{},
+				Required:   []string{},
+			},
 		},
 
 		// This is the callback that would be executed when the tool is called:
-		func(args map[string]interface{}) fxctx.ToolResponse {
+		func(args map[string]interface{}) *mcp.CallToolResult {
 			loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
 			kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, nil)
 			cfg, err := kubeConfig.RawConfig()
 			if err != nil {
 				log.Printf("failed to get kubeconfig: %v", err)
-				return fxctx.ToolResponse{
+				return &mcp.CallToolResult{
 					IsError: Ptr(true),
 					Meta:    map[string]interface{}{},
 					Content: []interface{}{
@@ -57,7 +59,7 @@ func NewListK8sContextsTool() fxctx.Tool {
 				}
 			}
 
-			return fxctx.ToolResponse{
+			return &mcp.CallToolResult{
 				Meta:    map[string]interface{}{},
 				Content: getListContextsToolContent(cfg),
 				IsError: Ptr(false),

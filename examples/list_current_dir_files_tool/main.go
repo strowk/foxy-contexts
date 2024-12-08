@@ -30,19 +30,21 @@ func main() {
 
 				return fxctx.NewTool(
 					// This information about the tool would be used when it is listed:
-					"list-current-dir-files",
-					"Lists files in the current directory",
-					mcp.ToolInputSchema{
-						Type:       "object",
-						Properties: map[string]map[string]interface{}{},
-						Required:   []string{},
+					&mcp.Tool{
+						Name:        "list-current-dir-files",
+						Description: Ptr("Lists files in the current directory"),
+						InputSchema: mcp.ToolInputSchema{
+							Type:       "object",
+							Properties: map[string]map[string]interface{}{},
+							Required:   []string{},
+						},
 					},
 
 					// This is the callback that would be executed when the tool is called:
-					func(args map[string]interface{}) fxctx.ToolResponse {
+					func(args map[string]interface{}) *mcp.CallToolResult {
 						files, err := os.ReadDir(".")
 						if err != nil {
-							return fxctx.ToolResponse{
+							return &mcp.CallToolResult{
 								IsError: Ptr(true),
 								Meta:    map[string]interface{}{},
 								Content: []interface{}{
@@ -61,7 +63,7 @@ func main() {
 							}
 						}
 
-						return fxctx.ToolResponse{
+						return &mcp.CallToolResult{
 							Meta:    map[string]interface{}{},
 							Content: contents,
 							IsError: Ptr(false),

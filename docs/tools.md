@@ -14,19 +14,26 @@ In order to create new tool you shall use `fxctx.NewTool` function. It accepts t
 func NewGreatTool() fxctx.Tool {
     return fxctx.NewTool(
         // This information about the tool would be used when it is listed:
-        "my-great-tool",
-        "Does something great",
-        mcp.ToolInputSchema{ // here we tell client what we expect as input
-            Type:       "object",
-            Properties: map[string]map[string]interface{}{},
-            Required:   []string{},
-        },
+        &mcp.Tool{
+            Name: "my-great-tool",
+            Description: Ptr("Lists files in the current directory"),
+            InputSchema: mcp.ToolInputSchema{ // here we tell client what we expect as input
+                Type:       "object",
+                Properties: map[string]map[string]interface{}{},
+                Required:   []string{},
+            },
+        }
 
         // This is the callback that would be executed when the tool is called:
-        func(args map[string]interface{}) fxctx.ToolResponse {
+        func(args map[string]interface{}) *mcp.CallToolResult {
             // here we can do anything we want
-            return fxctx.ToolResponse{
-                Result: "Hello, World!",
+            return &mcp.CallToolResult{
+                Content: []interface{}{
+                    mcp.TextContent{
+                        Type: "text",
+                        Text: fmt.Sprintf("Hello, World!"),
+                    },
+                },
             }
         },
     )

@@ -1,6 +1,8 @@
 package fxctx
 
 import (
+	"errors"
+	"fmt"
 	"sort"
 
 	"github.com/strowk/foxy-contexts/internal/jsonrpc2"
@@ -9,9 +11,13 @@ import (
 	"go.uber.org/fx"
 )
 
+var (
+	ErrToolNotFound = errors.New("tool not found")
+)
+
 type ToolMux interface {
 	GetMcpTools() []mcp.Tool
-	CallToolNamed(name string, args map[string]interface{}) ToolResponse
+	CallToolNamed(name string, args map[string]interface{}) (*mcp.CallToolResult, error)
 	RegisterHandlers(s server.Server)
 }
 
@@ -25,7 +31,7 @@ func NewToolMux(
 	m := map[string]Tool{}
 
 	for _, tool := range tools {
-		m[tool.GetName()] = tool
+		m[tool.GetMcpTool().Name] = tool
 	}
 
 	return &toolMux{
@@ -33,13 +39,13 @@ func NewToolMux(
 	}
 }
 
-func (t *toolMux) CallToolNamed(name string, args map[string]interface{}) ToolResponse {
+func (t *toolMux) CallToolNamed(name string, args map[string]interface{}) (*mcp.CallToolResult, error) {
 	tool, ok := t.tools[name]
 	if !ok {
-		return ToolResponse{}
+		return nil, ErrToolNotFound
 	}
 
-	return tool.Callback(args)
+	return tool.Callback(args), nil
 }
 
 func (t *toolMux) GetMcpTools() []mcp.Tool {
@@ -47,11 +53,7 @@ func (t *toolMux) GetMcpTools() []mcp.Tool {
 
 	for _, tool := range t.tools {
 		tools = append(tools,
-			mcp.Tool{
-				Name:        tool.GetName(),
-				Description: tool.GetDescription(),
-				InputSchema: tool.GetInputSchema(),
-			},
+			*tool.GetMcpTool(),
 		)
 	}
 
@@ -87,7 +89,11 @@ func (t *toolMux) setCallToolHandler(s server.Server) {
 	s.SetRequestHandler(&mcp.CallToolRequest{}, func(r jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
 		req := r.(*mcp.CallToolRequest)
 		toolName := req.Params.Name
-		res := t.CallToolNamed(toolName, req.Params.Arguments)
+		res, err := t.CallToolNamed(toolName, req.Params.Arguments)
+		if err != nil {
+			return nil, jsonrpc2.NewServerError(ToolNotFound, fmt.Sprintf("tool not found: %s", toolName))
+		}
+
 		return &mcp.CallToolResult{
 			Meta:    res.Meta,
 			Content: res.Content,

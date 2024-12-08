@@ -6,32 +6,20 @@ import (
 )
 
 type Tool interface {
-	GetName() string
-	GetDescription() *string
-	GetInputSchema() mcp.ToolInputSchema
-	Callback(args map[string]interface{}) ToolResponse
+	GetMcpTool() *mcp.Tool
+	Callback(args map[string]interface{}) *mcp.CallToolResult
 }
 
 type tool struct {
-	name        string
-	description string
-	inputSchema mcp.ToolInputSchema
-	callback    func(args map[string]interface{}) ToolResponse
+	mcpTool  *mcp.Tool
+	callback func(args map[string]interface{}) *mcp.CallToolResult
 }
 
-func (t *tool) GetName() string {
-	return t.name
+func (t *tool) GetMcpTool() *mcp.Tool {
+	return t.mcpTool
 }
 
-func (t *tool) GetDescription() *string {
-	return &t.description
-}
-
-func (t *tool) GetInputSchema() mcp.ToolInputSchema {
-	return t.inputSchema
-}
-
-func (t *tool) Callback(args map[string]interface{}) ToolResponse {
+func (t *tool) Callback(args map[string]interface{}) *mcp.CallToolResult {
 	return t.callback(args)
 }
 
@@ -42,15 +30,11 @@ type ToolResponse struct {
 }
 
 func NewTool(
-	name string,
-	description string,
-	inputSchema mcp.ToolInputSchema,
-	callback func(args map[string]interface{}) ToolResponse) Tool {
+	mcpTool *mcp.Tool,
+	callback func(args map[string]interface{}) *mcp.CallToolResult) Tool {
 	return &tool{
-		name:        name,
-		description: description,
-		inputSchema: inputSchema,
-		callback:    callback,
+		mcpTool:  mcpTool,
+		callback: callback,
 	}
 }
 
