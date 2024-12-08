@@ -13,7 +13,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: '1.23.3'
-      - run: cd examples/git_repository_resource && go test
+      - run: cd examples/git_repository_resource && go test ./...
       - run: cd examples/hello_world_resource && go test
       - run: cd examples/k8s_contexts_resources && go test
       - run: cd examples/list_current_dir_files_tool && go test
