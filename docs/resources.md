@@ -61,7 +61,7 @@ fx.New(
 
 `fxctx.AsResource` is a helper function that wraps your resource into fx DI container and adds a certain tags, that would be used later to find all resources and register them in MCP server.
 
-Head further to [ResourceMux](#ResourceMux) to see how to register such resource in MCP server, or see next section to learn how to provide dynamic resources.
+Head further to [ResourceMux](#resourcemux) to see how to register such resource in MCP server, or see next section to learn how to provide dynamic resources.
 
 ## NewResourceProvider
 
