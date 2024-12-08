@@ -11,7 +11,6 @@ func TestWithFoxytest(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// ts.WithExecutable("list_current_dir_files_tool", []string{})
 	ts.WithExecutable("go", []string{"run", "main.go"})
 	cntrl := foxytest.NewTestRunner(t)
 	ts.Run(cntrl)

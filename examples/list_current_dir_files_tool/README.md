@@ -48,16 +48,10 @@ It is probably not very useful, as you would see files in whatever directory Cla
 
 ## Auto test
 
-To run integration test, firstly build and install it:
-
-```bash
-go install
-```
-
-, and make sure that you have configured golang bin directory in your PATH.
-
-Then run:
+This will run integration test:
 
 ```bash
 go test
 ```
+
+Check out testcase in [testdata/list_and_call_test.yaml](testdata/list_and_call_test.yaml) and test runner setup in [main_test.go](main_test.go).
