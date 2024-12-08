@@ -8,9 +8,9 @@ With this approach you can easily colocate call/read/get logic and definitions o
 
 Check [docs](https://foxy-contexts.str4.io/) and [examples](https://github.com/strowk/foxy-contexts/tree/main/examples) to know more.
 
-## List current directory files tool example
+## Tool Example
 
-Fox example:
+For example try following
 
 ```bash
 git clone https://github.com/strowk/foxy-contexts

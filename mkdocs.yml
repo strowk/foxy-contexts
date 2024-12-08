@@ -2,10 +2,9 @@ site_name: Build MCP Servers Declaratively in Golang
 
 nav:
   - Overview: index.md
-  - Development:
-    - Tools: tools.md
-    - Resources: resources.md
-    - Prompts: prompts.md
+  - Tools: tools.md
+  - Resources: resources.md
+  - Prompts: prompts.md
   - Testing: testing.md
 
 extra_css:
