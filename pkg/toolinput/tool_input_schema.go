@@ -47,6 +47,9 @@ func (t *toolInput) Boolean(name string) (bool, error) {
 			return b, nil
 		}
 		if s, ok := v.(string); ok {
+			if s == "" {
+				return false, nil
+			}
 			srtParsedBool, err := strconv.ParseBool(s)
 			if err != nil {
 				return false, fmt.Errorf("%w %s: %w", ErrCouldNotParseProperty, name, err)
