@@ -71,7 +71,7 @@ func NewListCurrentDirFilesTool() fxctx.Tool {
 func main() {
 	fx.New(
 		// Here we register the tool within fx context
-		fx.Provide(fxctx.AsTool(NewListCurrentDirFilesTool())),
+		fx.Provide(fxctx.AsTool(NewListCurrentDirFilesTool)),
 
 		// ToolMux registers tools and provides them to the server for listing tools and calling them
 		fxctx.ProvideToolMux(),
