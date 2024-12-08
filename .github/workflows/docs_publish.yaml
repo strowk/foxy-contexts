@@ -3,6 +3,12 @@ run-name: Publishing docs to Github Pages
 on:
   push:
     branches: [main]
+    paths:
+      - 'docs/**'
+      - README.md
+      - mkdocs.yml
+      - package.json
+      - package-lock.json
   workflow_dispatch:
   
 jobs:
