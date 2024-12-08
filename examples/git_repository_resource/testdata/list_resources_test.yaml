@@ -46,7 +46,7 @@ out:
             {
               "uri": "git://current-git-repository",
               "mimeType": "application/json",
-              "text": '[{"name":"origin","urls":["https://github.com/strowk/foxy-contexts.git"]}]',
+              "text": '[{"name":"origin","urls":["https://github.com/strowk/foxy-contexts"]}]',
             },
           ],
       },
