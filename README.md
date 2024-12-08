@@ -1,6 +1,6 @@
 # Foxy Contexts
 
-Foxy contexts is a library for building context servers supporting [Model Context Protocol](https://modelcontextprotocol.io/).
+Foxy contexts is a Golang library for building context servers supporting [Model Context Protocol](https://modelcontextprotocol.io/).
 
 This library only supports server side of the protocol. Using it you can build context servers using declarative approach, by defining [tools](https://modelcontextprotocol.io/docs/concepts/tools), [resources](https://modelcontextprotocol.io/docs/concepts/resources) and [prompts](https://modelcontextprotocol.io/docs/concepts/prompts) and then registering them within DI using [uber's fx](https://github.com/uber-go/fx).
 
