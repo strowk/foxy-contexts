@@ -82,6 +82,8 @@ type TestSuite interface {
 }
 
 type testSuite struct {
+	path string
+
 	beforeAll  []func() error
 	afterAll   []func() error
 	beforeEach []func() error
@@ -207,6 +209,9 @@ func (ts *testSuite) Run(t TestRunner) {
 	}
 
 	<-ts.completed
+	if ts.logging {
+		t.Logf("test suite %s completed", ts.path)
+	}
 }
 
 type Test interface {
@@ -392,6 +397,7 @@ func Read(path string) (TestSuite, error) {
 		outputChan: make(chan string),
 		testsDone:  make(chan struct{}),
 		completed:  make(chan struct{}),
+		path:       path,
 	}
 
 	dir, err := os.Open(path)
