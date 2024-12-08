@@ -37,9 +37,8 @@ theme:
     - navigation.instant.progress
     - navigation.sections
     - navigation.expand
-    - navigation.tabs
-    - navigation.tabs.sticky
     - navigation.top
+    - navigation.footer
     - toc.integrate
     - navigation.indexes
     - search.suggest
