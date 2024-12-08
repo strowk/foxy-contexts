@@ -63,4 +63,8 @@ If you need more information from test run, and have configured logging with `ts
 --- PASS: TestWithFoxytest (1.39s)
 ```
 
-
+See following examples with tests:
+- [examples/git_repository_resource/main_test.go](https://github.com/strowk/foxy-contexts/blob/main/examples/git_repository_resource/main_test.go)
+- [examples/hello_world_resource/main_test.go](https://github.com/strowk/foxy-contexts/blob/main/examples/hello_world_resource/main_test.go)
+- [examples/k8s_contexts_resources/main_test.go](https://github.com/strowk/foxy-contexts/blob/main/examples/k8s_contexts_resources/main_test.go)
+- [examples/list_current_dir_files_tool/main_test.go](https://github.com/strowk/foxy-contexts/blob/main/examples/list_current_dir_files_tool/main_test.go)
