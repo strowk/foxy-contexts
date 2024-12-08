@@ -525,11 +525,13 @@ func (ts *testSuite) startExecutable(t TestRunner) *exec.Cmd {
 	// and this only happens when using go test ./... , while not happening with simple go test
 	// So would instead send stderr to the test log output
 
+	stderrPipeCreated := make(chan struct{})
 	go func() {
 		errReader, err := cmd.StderrPipe()
 		if err != nil {
 			t.Fatalf("error creating stderr pipe: %v", err)
 		}
+		close(stderrPipeCreated)
 		scanner := bufio.NewScanner(errReader)
 		for scanner.Scan() {
 			t.Logf("stderr: %s", scanner.Text())
@@ -538,6 +540,8 @@ func (ts *testSuite) startExecutable(t TestRunner) *exec.Cmd {
 			t.Log("finished reading stderr")
 		}
 	}()
+
+	<-stderrPipeCreated
 
 	if ts.logging {
 		t.Logf("running command: %s %s", ts.command, strings.Join(ts.args, " "))
