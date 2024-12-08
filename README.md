@@ -39,64 +39,64 @@ import (
 	"go.uber.org/zap"
 )
 
-func main() {
-	// This example defines list-current-dir-files tool for MCP server, that prints files in the current directory
-	// , run it with:
-	// npx @modelcontextprotocol/inspector go run main.go
-	// , then in browser open http://localhost:5173
-	// , then click Connect
-	// , then click List Tools
-	// , then click list-current-dir-files
+// This example defines list-current-dir-files tool for MCP server, that prints files in the current directory
+// , run it with:
+// npx @modelcontextprotocol/inspector go run main.go
+// , then in browser open http://localhost:5173
+// , then click Connect
+// , then click List Tools
+// , then click list-current-dir-files
 
-	fx.New(
-		// Here we define a tool that lists files in the current directory
-		fx.Provide(fxctx.AsTool(
-			func() fxctx.Tool {
+// NewListCurrentDirFilesTool defines a tool that lists files in the current directory
+func NewListCurrentDirFilesTool() fxctx.Tool {
+	return fxctx.NewTool(
+		// This information about the tool would be used when it is listed:
+		&mcp.Tool{
+			Name:        "list-current-dir-files",
+			Description: Ptr("Lists files in the current directory"),
+			InputSchema: mcp.ToolInputSchema{
+				Type:       "object",
+				Properties: map[string]map[string]interface{}{},
+				Required:   []string{},
+			},
+		},
 
-				return fxctx.NewTool(
-					// This information about the tool would be used when it is listed:
-					&mcp.Tool{
-						Name:        "list-current-dir-files",
-						Description: Ptr("Lists files in the current directory"),
-						InputSchema: mcp.ToolInputSchema{
-							Type:       "object",
-							Properties: map[string]map[string]interface{}{},
-							Required:   []string{},
+		// This is the callback that would be executed when the tool is called:
+		func(args map[string]interface{}) *mcp.CallToolResult {
+			files, err := os.ReadDir(".")
+			if err != nil {
+				return &mcp.CallToolResult{
+					IsError: Ptr(true),
+					Meta:    map[string]interface{}{},
+					Content: []interface{}{
+						mcp.TextContent{
+							Type: "text",
+							Text: fmt.Sprintf("failed to read dir: %v", err),
 						},
 					},
+				}
+			}
+			var contents []interface{} = make([]interface{}, len(files))
+			for i, f := range files {
+				contents[i] = mcp.TextContent{
+					Type: "text",
+					Text: f.Name(),
+				}
+			}
 
-					// This is the callback that would be executed when the tool is called:
-					func(args map[string]interface{}) *mcp.CallToolResult {
-						files, err := os.ReadDir(".")
-						if err != nil {
-							return &mcp.CallToolResult{
-								IsError: Ptr(true),
-								Meta:    map[string]interface{}{},
-								Content: []interface{}{
-									mcp.TextContent{
-										Type: "text",
-										Text: fmt.Sprintf("failed to read dir: %v", err),
-									},
-								},
-							}
-						}
-						var contents []interface{} = make([]interface{}, len(files))
-						for i, f := range files {
-							contents[i] = mcp.TextContent{
-								Type: "text",
-								Text: f.Name(),
-							}
-						}
+			return &mcp.CallToolResult{
+				Meta:    map[string]interface{}{},
+				Content: contents,
+				IsError: Ptr(false),
+			}
+		},
+	)
+}
 
-						return &mcp.CallToolResult{
-							Meta:    map[string]interface{}{},
-							Content: contents,
-							IsError: Ptr(false),
-						}
-					},
-				)
-			},
-		)),
+func main() {
+	fx.New(
+		// Here we register the tool within fx context
+		fx.Provide(fxctx.AsTool(NewListCurrentDirFilesTool())),
 
 		// ToolMux registers tools and provides them to the server for listing tools and calling them
 		fxctx.ProvideToolMux(),
