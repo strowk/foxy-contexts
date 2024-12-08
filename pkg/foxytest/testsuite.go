@@ -519,7 +519,7 @@ func (ts *testSuite) startExecutable(t TestRunner) *exec.Cmd {
 	ts.targetOutput = out
 
 	// pipe stderr, so everything logged to stderr simply goes to the test output
-	cmd.Stderr = os.Stderr
+	// cmd.Stderr = os.Stderr
 
 	if ts.logging {
 		t.Logf("running command: %s %s", ts.command, strings.Join(ts.args, " "))
