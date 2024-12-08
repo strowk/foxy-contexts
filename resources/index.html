@@ -557,7 +557,7 @@
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">)</span>
 </span></code></pre></div>
 <p><code>fxctx.AsResource</code> is a helper function that wraps your resource into fx DI container and adds a certain tags, that would be used later to find all resources and register them in <abbr title="Model Context Protocol">MCP</abbr> server.</p>
-<p>Head further to <a href="#ResourceMux">ResourceMux</a> to see how to register such resource in <abbr title="Model Context Protocol">MCP</abbr> server, or see next section to learn how to provide dynamic resources.</p>
+<p>Head further to <a href="#resourcemux">ResourceMux</a> to see how to register such resource in <abbr title="Model Context Protocol">MCP</abbr> server, or see next section to learn how to provide dynamic resources.</p>
 <h2 id="newresourceprovider">NewResourceProvider<a class="headerlink" href="#newresourceprovider" title="Permanent link">&para;</a></h2>
 <p>In order to create new resource provider that would be returning resources dynamically, you shall use <code>fxctx.NewResourceProvider</code> function. It would then take two functions - one in order to list resources and another to read them.</p>
 <div class="language-go highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">NewGreatResourceProvider</span><span class="p">()</span><span class="w"> </span><span class="nx">fxctx</span><span class="p">.</span><span class="nx">ResourceProvider</span><span class="w"> </span><span class="p">{</span>
