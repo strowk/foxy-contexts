@@ -441,6 +441,9 @@ func (ts *testSuite) pipeInput(t TestRunner) {
 	for {
 		select {
 		case <-ts.testsDone:
+			if ts.logging {
+				t.Log("finished reading inputs")
+			}
 			return
 		case in := <-ts.inputChan:
 			// write the input to the target process
