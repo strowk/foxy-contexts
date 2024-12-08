@@ -271,9 +271,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#list-current-directory-files-tool-example" class="md-nav__link">
+  <a href="#tool-example" class="md-nav__link">
     <span class="md-ellipsis">
-      List current directory files tool example
+      Tool Example
     </span>
   </a>
   
@@ -293,56 +293,6 @@
   
   
   
-    
-    
-      
-        
-      
-        
-      
-        
-      
-    
-    
-      
-        
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
-            
-  
-  <span class="md-ellipsis">
-    Development
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            Development
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
       <a href="tools/" class="md-nav__link">
         
@@ -356,10 +306,9 @@
     </li>
   
 
-              
-            
-              
-                
+    
+      
+      
   
   
   
@@ -377,10 +326,9 @@
     </li>
   
 
-              
-            
-              
-                
+    
+      
+      
   
   
   
@@ -395,14 +343,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -451,8 +391,8 @@
 <p>This library only supports server side of the protocol. Using it you can build context servers using declarative approach, by defining <a href="https://modelcontextprotocol.io/docs/concepts/tools">tools</a>, <a href="https://modelcontextprotocol.io/docs/concepts/resources">resources</a> and <a href="https://modelcontextprotocol.io/docs/concepts/prompts">prompts</a> and then registering them within DI using <a href="https://github.com/uber-go/fx">uber's fx</a>.</p>
 <p>With this approach you can easily colocate call/read/get logic and definitions of your tools/resources/prompts in a way that every tool/resource/prompt is placed in a separate place, but related code is colocated.</p>
 <p>Check <a href="https://foxy-contexts.str4.io/">docs</a> and <a href="https://github.com/strowk/foxy-contexts/tree/main/examples">examples</a> to know more.</p>
-<h2 id="list-current-directory-files-tool-example">List current directory files tool example<a class="headerlink" href="#list-current-directory-files-tool-example" title="Permanent link">&para;</a></h2>
-<p>Fox example:</p>
+<h2 id="tool-example">Tool Example<a class="headerlink" href="#tool-example" title="Permanent link">&para;</a></h2>
+<p>For example try following</p>
 <p><div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/strowk/foxy-contexts
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>foxy-contexts/examples/list_current_dir_files_tool
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>npx<span class="w"> </span>@modelcontextprotocol/inspector<span class="w"> </span>go<span class="w"> </span>run<span class="w"> </span>main.go
