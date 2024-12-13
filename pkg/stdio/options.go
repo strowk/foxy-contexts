@@ -54,3 +54,9 @@ type stdioInOption struct {
 func (o *stdioInOption) apply(s *stdioTransport) {
 	s.in = o.in
 }
+
+func WithIn(in io.Reader) StdioTransportOption {
+	return &stdioInOption{
+		in: in,
+	}
+}
