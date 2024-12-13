@@ -1,4 +1,4 @@
-# Foxy Contexts
+# Foxy Contexts - Build MCP Servers Declaratively in Golang
 
 Foxy contexts is a Golang library for building context servers supporting [Model Context Protocol](https://modelcontextprotocol.io/).
 
