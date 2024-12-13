@@ -5,4 +5,5 @@ const (
 	ReadResourceFailed
 	GetPromptFailed
 	ToolNotFound
+	CompleteFailed
 )

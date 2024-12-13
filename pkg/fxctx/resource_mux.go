@@ -4,12 +4,14 @@ import (
 	"fmt"
 
 	"github.com/strowk/foxy-contexts/internal/jsonrpc2"
+	"github.com/strowk/foxy-contexts/internal/utils"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
 	"github.com/strowk/foxy-contexts/pkg/server"
 	"go.uber.org/fx"
 )
 
 type ResourceMux interface {
+	Completer
 	GetResources() ([]mcp.Resource, error)
 	ReadResource(uri string) (*mcp.ReadResourceResult, error)
 	RegisterHandlers(s server.Server)
@@ -18,6 +20,17 @@ type ResourceMux interface {
 type resourceMux struct {
 	resources         map[string]Resource
 	resourceProviders []ResourceProvider
+}
+
+func (m *resourceMux) Complete(req *mcp.CompleteRequest, uri string) (*mcp.CompleteResult, error) {
+	// TODO: this has to be implemented when the URI templates are implemented
+	return &mcp.CompleteResult{
+		Completion: mcp.CompleteResultCompletion{
+			HasMore: utils.Ptr(false),
+			Total:   utils.Ptr(0),
+			Values:  []string{},
+		},
+	}, nil
 }
 
 func NewResourceMux(

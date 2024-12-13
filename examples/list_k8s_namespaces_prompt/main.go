@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/strowk/foxy-contexts/pkg/fxctx"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
@@ -110,8 +111,40 @@ func main() {
 										Type: "text",
 										Text: string(marshalled),
 									},
-									Role: mcp.RoleAssistant,
+									Role: mcp.RoleUser,
 								},
+							},
+						}, nil
+					},
+				).WithCompleter(
+					func(arg *mcp.PromptArgument, value string) (*mcp.CompleteResult, error) {
+						loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
+						configOverrides := &clientcmd.ConfigOverrides{}
+
+						kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+							loadingRules,
+							configOverrides,
+						)
+
+						rawCfg, err := kubeConfig.RawConfig()
+						if err != nil {
+							log.Printf("failed to read kubeconfig: %v", err)
+							return nil, fmt.Errorf("failed to read kubeconfig: %w", err)
+						}
+
+						var contexts []string = []string{}
+
+						for ctxName := range rawCfg.Contexts {
+							if strings.HasPrefix(ctxName, value) {
+								contexts = append(contexts, ctxName)
+							}
+						}
+
+						return &mcp.CompleteResult{
+							Completion: mcp.CompleteResultCompletion{
+								HasMore: Ptr(false),
+								Total:   Ptr(len(contexts)),
+								Values:  contexts,
 							},
 						}, nil
 					},
@@ -121,11 +154,13 @@ func main() {
 
 		// PromptMux registers prompts and provides them to the server for listing and getting
 		fxctx.ProvidePromptMux(),
+		fxctx.ProvideCompleteMux(),
 
 		// Start the server using stdio transport
 		fx.Invoke((func(
 			lc fx.Lifecycle,
 			promptMux fxctx.PromptMux,
+			completeMux fxctx.CompleteMux,
 		) {
 			transport := stdio.NewTransport()
 			lc.Append(fx.Hook{
@@ -146,6 +181,7 @@ func main() {
 									// This makes sure that server is aware of the prompts
 									// we have registered and both can list and call them
 									promptMux.RegisterHandlers(s)
+									completeMux.RegisterHandlers(s)
 								},
 							},
 						)
