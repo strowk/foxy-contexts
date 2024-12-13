@@ -60,7 +60,9 @@ func (tc *stdRunner) Logf(format string, args ...interface{}) {
 }
 
 func (tc *stdRunner) Run(name string, f func(t TestRunner)) bool {
-	f(tc)
+	tc.t.Run(name, func(t *testing.T) {
+		f(NewTestRunner(t))
+	})
 	return true
 }
 
