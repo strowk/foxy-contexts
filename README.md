@@ -2,9 +2,32 @@
 
 Foxy contexts is a Golang library for building context servers supporting [Model Context Protocol](https://modelcontextprotocol.io/).
 
-This library only supports server side of the protocol. Using it you can build context servers using declarative approach, by defining [tools](https://modelcontextprotocol.io/docs/concepts/tools), [resources](https://modelcontextprotocol.io/docs/concepts/resources) and [prompts](https://modelcontextprotocol.io/docs/concepts/prompts) and then registering them within DI using [uber's fx](https://github.com/uber-go/fx).
+This library only supports server side of the protocol. Using it you can build context servers using declarative approach, by defining [tools](https://modelcontextprotocol.io/docs/concepts/tools), [resources](https://modelcontextprotocol.io/docs/concepts/resources) and [prompts](https://modelcontextprotocol.io/docs/concepts/prompts) and then registering them with your FoxyApp, which is using [uber's fx](https://github.com/uber-go/fx) under the hood and you can inject into its container as well.
 
 With this approach you can easily colocate call/read/get logic and definitions of your tools/resources/prompts in a way that every tool/resource/prompt is placed in a separate place, but related code is colocated.
+
+Here is list of features that are already implemented and that are planned:
+
+- [x] Base (lifecycle/ping)
+- [ ] Progress (planned)
+- [x] Stdio Transport
+- [x] SSE Transport
+- [x] Tools
+- [x] Package toolinput helps define tools input schema and validate arriving input
+- [x] Resources - static
+- [x] Resources - dynamic via Resource Providers
+- [ ] Resources - dynamic via Resource Templates (planned)
+- [ ] Resource Templates completion (planned)
+- [ ] Resource subscriptions
+- [x] Prompts
+- [x] Prompts Completion
+- [x] Functional Testing package foxytest
+- [x] Simple building of your MCP server with the power of Dependency Injection
+- [ ] Logging via MCP (planned)
+- [ ] Sampling (planned)
+- [ ] Roots (planned)
+- [ ] Pagination (planned)
+- [ ] Notifications list_changed (planned)
 
 Check [docs](https://foxy-contexts.str4.io/) and [examples](https://github.com/strowk/foxy-contexts/tree/main/examples) to know more.
 
