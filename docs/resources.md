@@ -70,8 +70,6 @@ func NewGreatResourceProvider() fxctx.ResourceProvider {
 }
 ```
 
-
-
 ### Examples
 
 Check out complete examples of MCP Servers with resources:
