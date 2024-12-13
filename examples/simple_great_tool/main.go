@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/strowk/foxy-contexts/pkg/app"
 	"github.com/strowk/foxy-contexts/pkg/fxctx"
@@ -13,22 +12,22 @@ import (
 	"go.uber.org/zap"
 )
 
-// This example defines list-current-dir-files tool for MCP server, that prints files in the current directory
+// This example defines my-great-tool tool for MCP server
 // , run it with:
 // npx @modelcontextprotocol/inspector go run main.go
 // , then in browser open http://localhost:5173
 // , then click Connect
 // , then click List Tools
-// , then click list-current-dir-files
+// , then click my-great-tool
 
-// NewListCurrentDirFilesTool defines a tool that lists files in the current directory
-func NewListCurrentDirFilesTool() fxctx.Tool {
+// --8<-- [start:tool]
+func NewGreatTool() fxctx.Tool {
 	return fxctx.NewTool(
 		// This information about the tool would be used when it is listed:
 		&mcp.Tool{
-			Name:        "list-current-dir-files",
-			Description: Ptr("Lists files in the current directory"),
-			InputSchema: mcp.ToolInputSchema{
+			Name:        "my-great-tool",
+			Description: Ptr("The great tool"),
+			InputSchema: mcp.ToolInputSchema{ // here we tell client what we expect as input
 				Type:       "object",
 				Properties: map[string]map[string]interface{}{},
 				Required:   []string{},
@@ -37,43 +36,29 @@ func NewListCurrentDirFilesTool() fxctx.Tool {
 
 		// This is the callback that would be executed when the tool is called:
 		func(args map[string]interface{}) *mcp.CallToolResult {
-			files, err := os.ReadDir(".")
-			if err != nil {
-				return &mcp.CallToolResult{
-					IsError: Ptr(true),
-					Meta:    map[string]interface{}{},
-					Content: []interface{}{
-						mcp.TextContent{
-							Type: "text",
-							Text: fmt.Sprintf("failed to read dir: %v", err),
-						},
-					},
-				}
-			}
-			var contents []interface{} = make([]interface{}, len(files))
-			for i, f := range files {
-				contents[i] = mcp.TextContent{
-					Type: "text",
-					Text: f.Name(),
-				}
-			}
-
+			// here we can do anything we want
 			return &mcp.CallToolResult{
-				Meta:    map[string]interface{}{},
-				Content: contents,
-				IsError: Ptr(false),
+				Content: []interface{}{
+					mcp.TextContent{
+						Type: "text",
+						Text: fmt.Sprintf("Sup"),
+					},
+				},
 			}
 		},
 	)
 }
 
+// --8<-- [end:tool]
+
+// --8<-- [start:server]
 func main() {
 	app.
 		NewFoxyApp().
 		// adding the tool to the app
-		WithTool(NewListCurrentDirFilesTool).
+		WithTool(NewGreatTool).
 		// setting up server
-		WithName("list-current-dir-files").
+		WithName("great-tool-server").
 		WithVersion("0.0.1").
 		WithTransport(stdio.NewTransport()).
 		// Configuring fx logging to only show errors
@@ -91,6 +76,8 @@ func main() {
 			)),
 		).Run()
 }
+
+// --8<-- [end:server]
 
 func Ptr[T any](v T) *T {
 	return &v

@@ -12,8 +12,8 @@ func TestWithFoxytest(t *testing.T) {
 		t.Fatal(err)
 	}
 	ts.WithExecutable("go", []string{"run", "main.go"})
-	cntrl := foxytest.NewTestRunner(t)
 	ts.WithLogging()
+	cntrl := foxytest.NewTestRunner(t)
 	ts.Run(cntrl)
 	ts.AssertNoErrors(cntrl)
 }

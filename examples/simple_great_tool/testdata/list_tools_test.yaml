@@ -1,0 +1,18 @@
+case: Empty tools list
+in: { "jsonrpc": "2.0", "method": "tools/list", "id": 1 }
+out:
+  {
+    "jsonrpc": "2.0",
+    "result":
+      {
+        "tools":
+          [
+            {
+              "description": "The great tool",
+              "name": "my-great-tool",
+              "inputSchema": { "type": "object" },
+            },
+          ],
+      },
+    "id": 1,
+  }

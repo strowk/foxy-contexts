@@ -26,13 +26,12 @@ Here's the code of that example from [examples/list_current_dir_files_tool/main.
 package main
 
 import (
-	"context"
 	"fmt"
 	"os"
 
+	"github.com/strowk/foxy-contexts/pkg/app"
 	"github.com/strowk/foxy-contexts/pkg/fxctx"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
-	"github.com/strowk/foxy-contexts/pkg/server"
 	"github.com/strowk/foxy-contexts/pkg/stdio"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
@@ -94,63 +93,28 @@ func NewListCurrentDirFilesTool() fxctx.Tool {
 }
 
 func main() {
-	fx.New(
-		// Here we register the tool within fx context
-		fx.Provide(fxctx.AsTool(NewListCurrentDirFilesTool)),
-
-		// ToolMux registers tools and provides them to the server for listing tools and calling them
-		fxctx.ProvideToolMux(),
-
-		// Start the server using stdio transport
-		fx.Invoke((func(
-			lc fx.Lifecycle,
-			toolMux fxctx.ToolMux,
-		) {
-			transport := stdio.NewTransport()
-			lc.Append(fx.Hook{
-				OnStart: func(ctx context.Context) error {
-					go func() {
-						transport.Run(
-							&mcp.ServerCapabilities{
-								Tools: &mcp.ServerCapabilitiesTools{
-									ListChanged: Ptr(false),
-								},
-							},
-							&mcp.Implementation{
-								Name:    "my-mcp-server",
-								Version: "0.0.1",
-							},
-							server.ServerStartCallbackOption{
-								Callback: func(s server.Server) {
-									// This makes sure that server is aware of the tools
-									// we have registered and both can list and call them
-									toolMux.RegisterHandlers(s)
-								},
-							},
-						)
-					}()
-					return nil
+	app.
+		NewFoxyApp().
+		// adding the tool to the app
+		WithTool(NewListCurrentDirFilesTool).
+		// setting up server
+		WithName("list-current-dir-files").
+		WithVersion("0.0.1").
+		WithTransport(stdio.NewTransport()).
+		// Configuring fx logging to only show errors
+		WithFxOptions(fx.Provide(func() *zap.Logger {
+				cfg := zap.NewDevelopmentConfig()
+				cfg.Level.SetLevel(zap.ErrorLevel)
+				logger, _ := cfg.Build()
+				return logger
+			}),
+			fx.Option(fx.WithLogger(
+				func(logger *zap.Logger) fxevent.Logger {
+					return &fxevent.ZapLogger{Logger: logger}
 				},
-				OnStop: func(ctx context.Context) error {
-					return transport.Shutdown(ctx)
-				},
-			})
-		})),
-
-		// Just configuring fx logging to only show errors
-		fx.Provide(func() *zap.Logger {
-			cfg := zap.NewDevelopmentConfig()
-			cfg.Level.SetLevel(zap.ErrorLevel)
-			logger, _ := cfg.Build()
-			return logger
-		}),
-		fx.Option(fx.WithLogger(
-			func(logger *zap.Logger) fxevent.Logger {
-				return &fxevent.ZapLogger{Logger: logger}
-			},
-		)),
-	).Run()
-
+			)),
+		).
+		Run()
 }
 
 func Ptr[T any](v T) *T {

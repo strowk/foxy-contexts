@@ -1,6 +1,6 @@
 # Testing
 
-## Integration Testing with foxytest using MCP Story format
+## Integration Testing with foxytest using MCP Cases format
 
 In order to test your server, package `foxytest` is provided that allows you to easily start your server and test it using pre-defined JSON-RPC 2.0 messages.
 
@@ -38,7 +38,7 @@ out_no_tools: {"jsonrpc":"2.0","result":{"tools":[]},"id":1}
 
 This says that when client sends `tools/list` request, server should respond with empty list of tools.
 
-Tests could be single or multi-document YAML files. Each document should be a valid MCP Story, that means it should have `case` property with name of the test case and any number of properties prefixed with `in` and `out`, which would represent JSON-RPC 2.0 messages sent from client to server (`in`) and from server to client (`out`).
+Tests could be single or multi-document YAML files. Each document should be in a valid MCP Cases format, that means it can have `case` property with name of the test case and any number of properties prefixed with `in` and `out`, which would represent JSON-RPC 2.0 messages sent from client to server (`in`) and from server to client (`out`).
 
 When you run the test by executing `go test`, the test runner will start your server (by running `go run main.go` in this case), connect to stdio transport and send the message under `in` property. 
 
