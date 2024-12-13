@@ -11,13 +11,13 @@ Foxy Contexts allows easy way to define a tool and register it within fx DI cont
 In order to create new tool you shall use `fxctx.NewTool` function. It accepts tool name, description and function that would be called when tool is called.
 
 ```go
---8<-- "examples/hello_world_tool/main.go:tool"
+--8<-- "examples/simple_great_tool/main.go:tool"
 ```
 
 ## Register tool and start server
 
 ```go
---8<-- "examples/hello_world_tool/main.go:server"
+--8<-- "examples/simple_great_tool/main.go:server"
 ```
 
 ### Examples
