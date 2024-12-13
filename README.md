@@ -6,26 +6,25 @@ This library only supports server side of the protocol. Using it you can build c
 
 With this approach you can easily colocate call/read/get logic and definitions of your tools/resources/prompts in a way that every tool/resource/prompt is placed in a separate place, but related code is colocated.
 
-Here is list of features that are already implemented:
+Here is list of features that are implemented and planned:
 
 - [x] Base (lifecycle/ping)
-- [x] Stdio Transport
-- [x] SSE Transport
+	- [ ] Progress (planned)
+- [x] Transports
+	- [x] Stdio Transport
+	- [x] SSE Transport
 - [x] Tools
-- [x] Package toolinput helps define tools input schema and validate arriving input
-- [x] Resources - static
-- [x] Resources - dynamic via Resource Providers
+    - [x] Package toolinput helps define tools input schema and validate arriving input
+- [ ] Resources
+	- [x] Resources - static
+	- [x] Resources - dynamic via Resource Providers
+	- [ ] Resources - dynamic via Resource Templates (planned)
+	- [ ] Resource Templates completion (planned)
+	- [ ] Resource subscriptions
 - [x] Prompts
 - [x] Prompts Completion
 - [x] Functional Testing package foxytest
 - [x] Simple building of your MCP server with the power of Dependency Injection
-
-And these are planned:
-
-- [ ] Progress (planned)
-- [ ] Resources - dynamic via Resource Templates (planned)
-- [ ] Resource Templates completion (planned)
-- [ ] Resource subscriptions
 - [ ] Logging via MCP (planned)
 - [ ] Sampling (planned)
 - [ ] Roots (planned)

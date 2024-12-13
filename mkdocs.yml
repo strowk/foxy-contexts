@@ -53,6 +53,8 @@ markdown_extensions:
   - md_in_html
   - toc:
       permalink: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.snippets:
