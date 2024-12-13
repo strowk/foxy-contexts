@@ -388,8 +388,31 @@
 <p><img align="left" alt="main logo" src="assets/logo.png" width="125" /></p>
 <h1 id="foxy-contexts-build-mcp-servers-declaratively-in-golang">Foxy Contexts - Build <abbr title="Model Context Protocol">MCP</abbr> Servers Declaratively in Golang<a class="headerlink" href="#foxy-contexts-build-mcp-servers-declaratively-in-golang" title="Permanent link">&para;</a></h1>
 <p>Foxy contexts is a Golang library for building context servers supporting <a href="https://modelcontextprotocol.io/">Model Context Protocol</a>.</p>
-<p>This library only supports server side of the protocol. Using it you can build context servers using declarative approach, by defining <a href="https://modelcontextprotocol.io/docs/concepts/tools">tools</a>, <a href="https://modelcontextprotocol.io/docs/concepts/resources">resources</a> and <a href="https://modelcontextprotocol.io/docs/concepts/prompts">prompts</a> and then registering them within DI using <a href="https://github.com/uber-go/fx">uber's fx</a>.</p>
+<p>This library only supports server side of the protocol. Using it you can build context servers using declarative approach, by defining <a href="https://modelcontextprotocol.io/docs/concepts/tools">tools</a>, <a href="https://modelcontextprotocol.io/docs/concepts/resources">resources</a> and <a href="https://modelcontextprotocol.io/docs/concepts/prompts">prompts</a> and then registering them with your FoxyApp, which is using <a href="https://github.com/uber-go/fx">uber's fx</a> under the hood and you can inject into its container as well.</p>
 <p>With this approach you can easily colocate call/read/get logic and definitions of your tools/resources/prompts in a way that every tool/resource/prompt is placed in a separate place, but related code is colocated.</p>
+<p>Here is list of features that are already implemented and that are planned:</p>
+<ul>
+<li>[x] Base (lifecycle/ping)</li>
+<li>[ ] Progress (planned)</li>
+<li>[x] Stdio Transport</li>
+<li>[x] SSE Transport</li>
+<li>[x] Tools</li>
+<li>[x] Package toolinput helps define tools input schema and validate arriving input</li>
+<li>[x] Resources - static</li>
+<li>[x] Resources - dynamic via Resource Providers</li>
+<li>[ ] Resources - dynamic via Resource Templates (planned)</li>
+<li>[ ] Resource Templates completion (planned)</li>
+<li>[ ] Resource subscriptions</li>
+<li>[x] Prompts</li>
+<li>[x] Prompts Completion</li>
+<li>[x] Functional Testing package foxytest</li>
+<li>[x] Simple building of your <abbr title="Model Context Protocol">MCP</abbr> server with the power of Dependency Injection</li>
+<li>[ ] Logging via <abbr title="Model Context Protocol">MCP</abbr> (planned)</li>
+<li>[ ] Sampling (planned)</li>
+<li>[ ] Roots (planned)</li>
+<li>[ ] Pagination (planned)</li>
+<li>[ ] Notifications list_changed (planned)</li>
+</ul>
 <p>Check <a href="https://foxy-contexts.str4.io/">docs</a> and <a href="https://github.com/strowk/foxy-contexts/tree/main/examples">examples</a> to know more.</p>
 <h2 id="tool-example">Tool Example<a class="headerlink" href="#tool-example" title="Permanent link">&para;</a></h2>
 <p>For example try following</p>
