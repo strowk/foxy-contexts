@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.47">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.48">
     
     
       
@@ -302,31 +302,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#provide-tool-to-fx" class="md-nav__link">
+  <a href="#register-tool-and-start-server" class="md-nav__link">
     <span class="md-ellipsis">
-      Provide tool to fx
+      Register tool and start server
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#toolmux" class="md-nav__link">
-    <span class="md-ellipsis">
-      ToolMux
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#wrapping-it-all-together" class="md-nav__link">
-    <span class="md-ellipsis">
-      Wrapping it all together
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Wrapping it all together">
+    <nav class="md-nav" aria-label="Register tool and start server">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -437,104 +419,10 @@
 <p>Foxy Contexts allows easy way to define a tool and register it within fx DI container.</p>
 <h2 id="newtool">NewTool<a class="headerlink" href="#newtool" title="Permanent link">&para;</a></h2>
 <p>In order to create new tool you shall use <code>fxctx.NewTool</code> function. It accepts tool name, description and function that would be called when tool is called.</p>
-<div class="language-go highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">NewGreatTool</span><span class="p">()</span><span class="w"> </span><span class="nx">fxctx</span><span class="p">.</span><span class="nx">Tool</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">fxctx</span><span class="p">.</span><span class="nx">NewTool</span><span class="p">(</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">        </span><span class="c1">// This information about the tool would be used when it is listed:</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">        </span><span class="o">&amp;</span><span class="nx">mcp</span><span class="p">.</span><span class="nx">Tool</span><span class="p">{</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">            </span><span class="nx">Name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;my-great-tool&quot;</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">            </span><span class="nx">Description</span><span class="p">:</span><span class="w"> </span><span class="nx">Ptr</span><span class="p">(</span><span class="s">&quot;Lists files in the current directory&quot;</span><span class="p">),</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">            </span><span class="nx">InputSchema</span><span class="p">:</span><span class="w"> </span><span class="nx">mcp</span><span class="p">.</span><span class="nx">ToolInputSchema</span><span class="p">{</span><span class="w"> </span><span class="c1">// here we tell client what we expect as input</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">                </span><span class="nx">Type</span><span class="p">:</span><span class="w">       </span><span class="s">&quot;object&quot;</span><span class="p">,</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">                </span><span class="nx">Properties</span><span class="p">:</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">interface</span><span class="p">{}{},</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">                </span><span class="nx">Required</span><span class="p">:</span><span class="w">   </span><span class="p">[]</span><span class="kt">string</span><span class="p">{},</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">            </span><span class="p">},</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">        </span><span class="p">}</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">        </span><span class="c1">// This is the callback that would be executed when the tool is called:</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">        </span><span class="kd">func</span><span class="p">(</span><span class="nx">args</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">interface</span><span class="p">{})</span><span class="w"> </span><span class="o">*</span><span class="nx">mcp</span><span class="p">.</span><span class="nx">CallToolResult</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">            </span><span class="c1">// here we can do anything we want</span>
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">mcp</span><span class="p">.</span><span class="nx">CallToolResult</span><span class="p">{</span>
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">                </span><span class="nx">Content</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="kd">interface</span><span class="p">{}{</span>
-</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">                    </span><span class="nx">mcp</span><span class="p">.</span><span class="nx">TextContent</span><span class="p">{</span>
-</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">                        </span><span class="nx">Type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;text&quot;</span><span class="p">,</span>
-</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">                        </span><span class="nx">Text</span><span class="p">:</span><span class="w"> </span><span class="nx">fmt</span><span class="p">.</span><span class="nx">Sprintf</span><span class="p">(</span><span class="s">&quot;Hello, World!&quot;</span><span class="p">),</span>
-</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">                    </span><span class="p">},</span>
-</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">                </span><span class="p">},</span>
-</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">            </span><span class="p">}</span>
-</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="w">        </span><span class="p">},</span>
-</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="w">    </span><span class="p">)</span>
-</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="p">}</span>
+<div class="language-go highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>
 </span></code></pre></div>
-<h2 id="provide-tool-to-fx">Provide tool to fx<a class="headerlink" href="#provide-tool-to-fx" title="Permanent link">&para;</a></h2>
-<p>Now in order to let <abbr title="Model Context Protocol">MCP</abbr> server know about this tool you would need to provide it to fx when creating fx app like this:</p>
-<div class="language-go highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nx">fx</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="c1">// other registered stuff ...</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="nx">fx</span><span class="p">.</span><span class="nx">Provide</span><span class="p">(</span><span class="nx">fxctx</span><span class="p">.</span><span class="nx">AsTool</span><span class="p">(</span><span class="nx">NewGreatTool</span><span class="p">)),</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="c1">// and more ...</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">)</span>
-</span></code></pre></div>
-<p><code>fxctx.AsTool</code> is a helper function that wraps your tool into fx DI container and adds a certain tags, that would be used later to find all tools and register them in <abbr title="Model Context Protocol">MCP</abbr> server.</p>
-<h2 id="toolmux">ToolMux<a class="headerlink" href="#toolmux" title="Permanent link">&para;</a></h2>
-<p>Discovery and registration of tools would be done by ToolsMux, which you can simply provide to fx all like this:</p>
-<div class="language-go highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nx">fx</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="c1">// other registered stuff ...</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nx">fxctx</span><span class="p">.</span><span class="nx">ProvideToolMux</span><span class="p">(),</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="c1">// and more ...</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="p">)</span>
-</span></code></pre></div>
-<p>To sum up you would need to provide all your tools and ToolMux to fx:</p>
-<div class="language-go highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nx">fx</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="c1">// other registered stuff ...</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="nx">fx</span><span class="p">.</span><span class="nx">Provide</span><span class="p">(</span><span class="nx">fxctx</span><span class="p">.</span><span class="nx">AsTool</span><span class="p">(</span><span class="nx">NewGreatTool</span><span class="p">)),</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="nx">fx</span><span class="p">.</span><span class="nx">Provide</span><span class="p">(</span><span class="nx">fxctx</span><span class="p">.</span><span class="nx">AsTool</span><span class="p">(</span><span class="nx">NewAnotherTool</span><span class="p">)),</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="nx">fxctx</span><span class="p">.</span><span class="nx">ProvideToolMux</span><span class="p">(),</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="c1">// and more ...</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">)</span>
-</span></code></pre></div>
-<h2 id="wrapping-it-all-together">Wrapping it all together<a class="headerlink" href="#wrapping-it-all-together" title="Permanent link">&para;</a></h2>
-<p>Finally, when starting the server, you would need to register handlers for tools in your server using <code>server.ServerStartCallbackOption</code>:</p>
-<div class="language-go highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nx">fx</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="c1">// other registered stuff ...</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="nx">fx</span><span class="p">.</span><span class="nx">Provide</span><span class="p">(</span><span class="nx">fxctx</span><span class="p">.</span><span class="nx">AsTool</span><span class="p">(</span><span class="nx">NewGreatTool</span><span class="p">)),</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="nx">fx</span><span class="p">.</span><span class="nx">Provide</span><span class="p">(</span><span class="nx">fxctx</span><span class="p">.</span><span class="nx">AsTool</span><span class="p">(</span><span class="nx">NewAnotherTool</span><span class="p">)),</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="nx">fxctx</span><span class="p">.</span><span class="nx">ProvideToolMux</span><span class="p">(),</span><span class="w"> </span><span class="c1">// this makes sure that ToolMux can get all our tools and is provided itself</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="c1">// and more ...</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="nx">fx</span><span class="p">.</span><span class="nx">Invoke</span><span class="p">((</span><span class="kd">func</span><span class="p">(</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">        </span><span class="nx">lc</span><span class="w"> </span><span class="nx">fx</span><span class="p">.</span><span class="nx">Lifecycle</span><span class="p">,</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">        </span><span class="nx">toolMux</span><span class="w"> </span><span class="nx">fxctx</span><span class="p">.</span><span class="nx">ToolMux</span><span class="p">,</span><span class="w"> </span><span class="c1">// and here we take ToolMux from fx so we can register handlers for tools</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">        </span><span class="nx">transport</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">stdio</span><span class="p">.</span><span class="nx">NewTransport</span><span class="p">()</span>
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">        </span><span class="nx">lc</span><span class="p">.</span><span class="nx">Append</span><span class="p">(</span><span class="nx">fx</span><span class="p">.</span><span class="nx">Hook</span><span class="p">{</span>
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">            </span><span class="nx">OnStart</span><span class="p">:</span><span class="w"> </span><span class="kd">func</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">                </span><span class="k">go</span><span class="w"> </span><span class="kd">func</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">                    </span><span class="nx">transport</span><span class="p">.</span><span class="nx">Run</span><span class="p">(</span>
-</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">                        </span><span class="o">&amp;</span><span class="nx">mcp</span><span class="p">.</span><span class="nx">ServerCapabilities</span><span class="p">{</span>
-</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">                            </span><span class="nx">Tools</span><span class="p">:</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">mcp</span><span class="p">.</span><span class="nx">ServerCapabilitiesTools</span><span class="p">{</span>
-</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">                                </span><span class="nx">ListChanged</span><span class="p">:</span><span class="w"> </span><span class="nx">Ptr</span><span class="p">(</span><span class="kc">false</span><span class="p">),</span>
-</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="w">                            </span><span class="p">},</span>
-</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="w">                        </span><span class="p">},</span>
-</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="w">                        </span><span class="o">&amp;</span><span class="nx">mcp</span><span class="p">.</span><span class="nx">Implementation</span><span class="p">{</span>
-</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="w">                            </span><span class="nx">Name</span><span class="p">:</span><span class="w">    </span><span class="s">&quot;my-great-server&quot;</span><span class="p">,</span>
-</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="w">                            </span><span class="nx">Version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;0.0.1&quot;</span><span class="p">,</span>
-</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="w">                        </span><span class="p">},</span>
-</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="w">                        </span><span class="nx">server</span><span class="p">.</span><span class="nx">ServerStartCallbackOption</span><span class="p">{</span>
-</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="w">                            </span><span class="nx">Callback</span><span class="p">:</span><span class="w"> </span><span class="kd">func</span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="nx">server</span><span class="p">.</span><span class="nx">Server</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="w">                                </span><span class="c1">// This makes sure that server is aware of the tools</span>
-</span><span id="__span-4-28"><a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a><span class="w">                                </span><span class="c1">// we have registered and both can list and call them</span>
-</span><span id="__span-4-29"><a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a><span class="w">                                </span><span class="c1">// serving for &quot;tools/list&quot; and &quot;tools/call&quot; requests</span>
-</span><span id="__span-4-30"><a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a><span class="w">                                </span><span class="nx">toolMux</span><span class="p">.</span><span class="nx">RegisterHandlers</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span>
-</span><span id="__span-4-31"><a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a><span class="w">                            </span><span class="p">},</span>
-</span><span id="__span-4-32"><a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a><span class="w">                        </span><span class="p">},</span>
-</span><span id="__span-4-33"><a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a><span class="w">                    </span><span class="p">)</span>
-</span><span id="__span-4-34"><a id="__codelineno-4-34" name="__codelineno-4-34" href="#__codelineno-4-34"></a><span class="w">                </span><span class="p">}()</span>
-</span><span id="__span-4-35"><a id="__codelineno-4-35" name="__codelineno-4-35" href="#__codelineno-4-35"></a><span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="kc">nil</span>
-</span><span id="__span-4-36"><a id="__codelineno-4-36" name="__codelineno-4-36" href="#__codelineno-4-36"></a><span class="w">            </span><span class="p">},</span>
-</span><span id="__span-4-37"><a id="__codelineno-4-37" name="__codelineno-4-37" href="#__codelineno-4-37"></a><span class="w">            </span><span class="nx">OnStop</span><span class="p">:</span><span class="w"> </span><span class="kd">func</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-4-38"><a id="__codelineno-4-38" name="__codelineno-4-38" href="#__codelineno-4-38"></a><span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="nx">transport</span><span class="p">.</span><span class="nx">Shutdown</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
-</span><span id="__span-4-39"><a id="__codelineno-4-39" name="__codelineno-4-39" href="#__codelineno-4-39"></a><span class="w">            </span><span class="p">},</span>
-</span><span id="__span-4-40"><a id="__codelineno-4-40" name="__codelineno-4-40" href="#__codelineno-4-40"></a><span class="w">        </span><span class="p">})</span>
-</span><span id="__span-4-41"><a id="__codelineno-4-41" name="__codelineno-4-41" href="#__codelineno-4-41"></a><span class="w">    </span><span class="p">})),</span>
-</span><span id="__span-4-42"><a id="__codelineno-4-42" name="__codelineno-4-42" href="#__codelineno-4-42"></a><span class="p">)</span>
+<h2 id="register-tool-and-start-server">Register tool and start server<a class="headerlink" href="#register-tool-and-start-server" title="Permanent link">&para;</a></h2>
+<div class="language-go highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>
 </span></code></pre></div>
 <h3 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h3>
 <p>Check out complete examples of <abbr title="Model Context Protocol">MCP</abbr> Servers with tools:</p>
