@@ -40,10 +40,6 @@ type FoxyApp struct {
 	transport      server.Transport
 
 	options []fx.Option
-
-	hasTools     bool
-	hasResources bool
-	hasPrompts   bool
 }
 
 // WithTool adds a tool to the app
@@ -52,7 +48,6 @@ type FoxyApp struct {
 // it can also take in any dependencies that you want to inject
 // into the tool, that will be resolved by the fx framework
 func (f *FoxyApp) WithTool(newTool any) *FoxyApp {
-	f.hasTools = true
 	f.options = append(f.options, fx.Provide(fxctx.AsTool(newTool)))
 	return f
 }
@@ -63,7 +58,6 @@ func (f *FoxyApp) WithTool(newTool any) *FoxyApp {
 // it can also take in any dependencies that you want to inject
 // into the resource, that will be resolved by the fx framework
 func (f *FoxyApp) WithResource(newResource any) *FoxyApp {
-	f.hasResources = true
 	f.options = append(f.options, fx.Provide(fxctx.AsResource(newResource)))
 	return f
 }
@@ -74,7 +68,6 @@ func (f *FoxyApp) WithResource(newResource any) *FoxyApp {
 // it can also take in any dependencies that you want to inject
 // into the resource provider, that will be resolved by the fx framework
 func (f *FoxyApp) WithResourceProvider(newResourceProvider any) *FoxyApp {
-	f.hasResources = true
 	f.options = append(f.options, fx.Provide(fxctx.AsResourceProvider(newResourceProvider)))
 	return f
 }
@@ -85,7 +78,6 @@ func (f *FoxyApp) WithResourceProvider(newResourceProvider any) *FoxyApp {
 // it can also take in any dependencies that you want to inject
 // into the prompt, that will be resolved by the fx framework
 func (f *FoxyApp) WithPrompt(newPrompt any) *FoxyApp {
-	f.hasPrompts = true
 	f.options = append(f.options, fx.Provide(fxctx.AsPrompt(newPrompt)))
 	return f
 }
@@ -124,21 +116,10 @@ func (f *FoxyApp) WithVersion(version string) *FoxyApp {
 
 // BuildFxApp builds the fx.App instance as configured by `With*` methods
 func (f *FoxyApp) BuildFxApp() (*fx.App, error) {
-	if f.hasTools {
-		f.options = append(f.options, fxctx.ProvideToolMux())
-	}
-
-	if f.hasResources {
-		f.options = append(f.options, fxctx.ProvideResourceMux())
-	}
-
-	if f.hasPrompts {
-		f.options = append(f.options, fxctx.ProvidePromptMux())
-	}
-
-	if f.hasPrompts || f.hasResources {
-		f.options = append(f.options, fxctx.ProvideCompleteMux())
-	}
+	f.options = append(f.options, fxctx.ProvideToolMux())
+	f.options = append(f.options, fxctx.ProvideResourceMux())
+	f.options = append(f.options, fxctx.ProvidePromptMux())
+	f.options = append(f.options, fxctx.ProvideCompleteMux())
 
 	if f.transport == nil {
 		return nil, ErrNoTransportSpecified
