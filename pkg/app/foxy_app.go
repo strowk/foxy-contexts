@@ -39,6 +39,8 @@ type FoxyApp struct {
 	implementation *mcp.Implementation
 	transport      server.Transport
 
+	capabilities *mcp.ServerCapabilities
+
 	options []fx.Option
 }
 
@@ -49,6 +51,11 @@ type FoxyApp struct {
 // into the tool, that will be resolved by the fx framework
 func (f *FoxyApp) WithTool(newTool any) *FoxyApp {
 	f.options = append(f.options, fx.Provide(fxctx.AsTool(newTool)))
+	return f
+}
+
+func (f *FoxyApp) WithServerCapabilities(serverCapabilities *mcp.ServerCapabilities) *FoxyApp {
+	f.capabilities = serverCapabilities
 	return f
 }
 
@@ -150,6 +157,9 @@ type ServerLifecycleParams struct {
 }
 
 func (f *FoxyApp) getServerCapabilities() *mcp.ServerCapabilities {
+	if f.capabilities != nil {
+		return f.capabilities
+	}
 	serverCapabilities := &mcp.ServerCapabilities{}
 	return serverCapabilities
 }
