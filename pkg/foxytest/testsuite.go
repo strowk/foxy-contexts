@@ -106,8 +106,9 @@ type testSuite struct {
 
 	logging bool
 
-	testsDone chan struct{}
-	completed chan struct{}
+	executableDone chan struct{}
+	testsDone      chan struct{}
+	completed      chan struct{}
 }
 
 func (ts *testSuite) GetTests() []Test {
@@ -158,14 +159,17 @@ func (ts *testSuite) Errors() []error {
 	return ts.errors
 }
 
-func (ts *testSuite) Run(t TestRunner) {
+func (ts *testSuite) runTests(t TestRunner) []error {
+	// signal that tests are done at the end
+	defer close(ts.testsDone)
+
 	// firstly run all before all functions,
 	// returning if any of them fails
 	for _, f := range ts.beforeAll {
 		err := f()
 		if err != nil {
 			ts.errors = append(ts.errors, err)
-			return
+			return nil
 		}
 	}
 
@@ -189,12 +193,14 @@ func (ts *testSuite) Run(t TestRunner) {
 		t.Log("tests done")
 	}
 
-	// signal that we are done
-	close(ts.testsDone)
-
 	if len(testErrors) > 0 {
 		ts.errors = append(ts.errors, testErrors...)
 	}
+	return testErrors
+}
+
+func (ts *testSuite) Run(t TestRunner) {
+	ts.runTests(t)
 
 	// run all after all functions
 	// regardless of whether the tests failed or not
@@ -252,6 +258,8 @@ type test struct {
 	inputChan  chan map[string]interface{}
 	outputChan chan string
 
+	executableDone chan struct{}
+
 	beforeEach []func() error
 	afterEach  []func() error
 	logging    bool
@@ -298,18 +306,24 @@ func (tst *test) Run(t TestRunner) {
 
 					// receive the output from the output channel
 					// and block until we get the output
-					got := <-tst.outputChan
+					// or until underlying process finishes
+					select {
+					case <-tst.executableDone:
+						// the process has finished, but output is not yet available
+						t.Errorf("process finished before output was received, expected: %s", expectedJson)
+						return
+					case got := <-tst.outputChan:
+						// TODO: do we really need to unmarshal the output? it is not like it is going to be used
+						var out map[string]interface{}
+						err = json.Unmarshal([]byte(got), &out)
+						if err != nil {
+							t.Errorf("error unmarshalling output: %v", err)
+						}
 
-					// TODO: do we really need to unmarshal the output? it is not like it is going to be used
-					var out map[string]interface{}
-					err = json.Unmarshal([]byte(got), &out)
-					if err != nil {
-						t.Errorf("error unmarshalling output: %v", err)
-					}
-
-					if assert.JSONEq(t, expectedJson, got) {
-						if tst.logging {
-							t.Logf("output matches: %s", got)
+						if assert.JSONEq(t, expectedJson, got) {
+							if tst.logging {
+								t.Logf("output matches: %s", got)
+							}
 						}
 					}
 				}
@@ -393,11 +407,12 @@ func (tst *test) read(path string) error {
 // specified by path
 func Read(path string) (TestSuite, error) {
 	suite := &testSuite{
-		inputChan:  make(chan map[string]interface{}),
-		outputChan: make(chan string),
-		testsDone:  make(chan struct{}),
-		completed:  make(chan struct{}),
-		path:       path,
+		inputChan:      make(chan map[string]interface{}),
+		outputChan:     make(chan string),
+		testsDone:      make(chan struct{}),
+		completed:      make(chan struct{}),
+		executableDone: make(chan struct{}),
+		path:           path,
 	}
 
 	dir, err := os.Open(path)
@@ -428,6 +443,8 @@ func Read(path string) (TestSuite, error) {
 
 				beforeEach: suite.beforeEach,
 				afterEach:  suite.afterEach,
+
+				executableDone: suite.executableDone,
 
 				logging: suite.logging,
 			}
@@ -527,11 +544,17 @@ func (ts *testSuite) startExecutable(t TestRunner) *exec.Cmd {
 
 	stderrPipeCreated := make(chan struct{})
 	go func() {
-		errReader, err := cmd.StderrPipe()
-		if err != nil {
-			t.Fatalf("error creating stderr pipe: %v", err)
+		var errReader io.ReadCloser
+		createPipe := func() {
+			defer close(stderrPipeCreated)
+			var err error
+			errReader, err = cmd.StderrPipe()
+			if err != nil {
+				t.Fatalf("error creating stderr pipe: %v", err)
+			}
 		}
-		close(stderrPipeCreated)
+		createPipe()
+
 		scanner := bufio.NewScanner(errReader)
 		for scanner.Scan() {
 			t.Logf("stderr: %s", scanner.Text())
@@ -561,6 +584,7 @@ func (ts *testSuite) startExecutable(t TestRunner) *exec.Cmd {
 		if ts.logging {
 			t.Log("command finished")
 		}
+		close(ts.executableDone)
 	}()
 
 	return cmd
@@ -574,6 +598,7 @@ func (ts *testSuite) setup(t TestRunner) {
 	} else {
 		cmd := ts.startExecutable(t)
 		go func() {
+			defer close(processDone)
 			// kill the process when the test suite is done
 			<-ts.testsDone
 
@@ -588,22 +613,23 @@ func (ts *testSuite) setup(t TestRunner) {
 				}
 			}
 			t.Log("executable stopped")
-			close(processDone)
 		}()
 	}
 	inPipeFinished := make(chan struct{})
 	go func() {
+		defer close(inPipeFinished)
 		ts.pipeInput(t)
-		close(inPipeFinished)
 	}()
 
 	outPipeFinished := make(chan struct{})
 	go func() {
+		defer close(outPipeFinished)
 		ts.pipeOutput(t)
-		close(outPipeFinished)
 	}()
 
 	go func() {
+		defer close(ts.completed)
+
 		<-ts.testsDone
 		// wait for all pipes to finish
 		<-inPipeFinished
@@ -611,7 +637,5 @@ func (ts *testSuite) setup(t TestRunner) {
 
 		// wait for the process to finish
 		<-processDone
-
-		close(ts.completed)
 	}()
 }
