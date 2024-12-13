@@ -1,10 +1,8 @@
-# List Kubernetes Namespaces Prompt Example
+# Simple Prompt Example
 
 This example demonstrates how MCP resource could be defined using Foxy Contexts library.
 
 Further assumes that you have installed Golang and (only for inspector) - Node.js.
-
-The assumption is that you also have some k8s contexts configured on your machine.
 
 ## Trying with inspector
 
