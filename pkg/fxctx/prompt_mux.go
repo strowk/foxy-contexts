@@ -2,6 +2,7 @@ package fxctx
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/strowk/foxy-contexts/internal/jsonrpc2"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
@@ -42,6 +43,9 @@ func (p *promptMux) ListPrompts() []mcp.Prompt {
 	for _, p := range p.prompts {
 		prompts = append(prompts, p.GetMcpPrompt())
 	}
+	sort.Slice(prompts, func(i, j int) bool {
+		return prompts[i].Name < prompts[j].Name
+	})
 	return prompts
 }
 
