@@ -64,6 +64,7 @@ If you need more information from test run, and have configured logging with `ts
 ```
 
 See following examples with tests:
+
 - [examples/git_repository_resource/main_test.go](https://github.com/strowk/foxy-contexts/blob/main/examples/git_repository_resource/main_test.go)
 - [examples/hello_world_resource/main_test.go](https://github.com/strowk/foxy-contexts/blob/main/examples/hello_world_resource/main_test.go)
 - [examples/k8s_contexts_resources/main_test.go](https://github.com/strowk/foxy-contexts/blob/main/examples/k8s_contexts_resources/main_test.go)
