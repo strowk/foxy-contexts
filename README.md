@@ -1,10 +1,37 @@
-# Foxy Contexts - Build MCP Servers Declaratively in Golang
+
+<h1 align="center">
+
+   <img alt="main logo" src="./docs/assets/logo.png" width="150"/>
+   
+   <!-- ![main logo](/assets/logo.png) -->
+
+   <br/>
+   Foxy Contexts
+</h1>
+
+<!-- --8<-- [start:content] -->
+
+<h4 align="center">Build MCP Servers Declaratively in Golang</h4>
+
+<p align="center">
+	<a href="https://pkg.go.dev/github.com/strowk/foxy-contexts"><img src="https://pkg.go.dev/badge/github.com/strowk/foxy-contexts.svg" alt="Go Reference"></a>
+	<img src="https://github.com/strowk/foxy-contexts/actions/workflows/test.yaml/badge.svg"/>
+</p>
+
+<p align="center">
+  <a href="#features">Features</a> 🦊
+  <a href="#tool-example">Tool Example</a> 🦊
+  <a href="https://foxy-contexts.str4.io">Docs</a> 🦊
+  <a href="https://github.com/strowk/foxy-contexts">Sources</a>
+</p>
 
 Foxy contexts is a Golang library for building context servers supporting [Model Context Protocol](https://modelcontextprotocol.io/).
 
 This library only supports server side of the protocol. Using it you can build context servers using declarative approach, by defining [tools](https://modelcontextprotocol.io/docs/concepts/tools), [resources](https://modelcontextprotocol.io/docs/concepts/resources) and [prompts](https://modelcontextprotocol.io/docs/concepts/prompts) and then registering them with your FoxyApp, which is using [uber's fx](https://github.com/uber-go/fx) under the hood and you can inject into its container as well.
 
 With this approach you can easily colocate call/read/get logic and definitions of your tools/resources/prompts in a way that every tool/resource/prompt is placed in a separate place, but related code is colocated.
+
+## Features
 
 Here is list of features that are implemented and planned:
 
