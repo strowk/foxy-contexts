@@ -16,6 +16,7 @@
 <p align="center">
 	<a href="https://pkg.go.dev/github.com/strowk/foxy-contexts"><img src="https://pkg.go.dev/badge/github.com/strowk/foxy-contexts.svg" alt="Go Reference"></a>
 	<img src="https://github.com/strowk/foxy-contexts/actions/workflows/test.yaml/badge.svg"/>
+	<img src="https://github.com/strowk/foxy-contexts/actions/workflows/golangci-lint.yaml/badge.svg"/>
 </p>
 
 <p align="center">
