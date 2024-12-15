@@ -18,3 +18,4 @@ jobs:
       - run: cd examples/hello_world_resource && go test
       - run: cd examples/k8s_contexts_resources && go test
       - run: cd examples/list_current_dir_files_tool && go test
+      - run: go test ./...
