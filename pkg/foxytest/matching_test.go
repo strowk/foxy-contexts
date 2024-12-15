@@ -200,6 +200,24 @@ a:
 				},
 			},
 		},
+		{
+			name: "value does not match embedded regex",
+			expectation: `
+a:
+  b: !!ere "hey ho /[a-z]+/ right"
+`,
+			actual: `{"a": { "b": "hey ho 123 right"}}`,
+			expectedDiff: &diff{
+				items: []diffItem{
+					{
+						path: []string{"a", "b"},
+						message: `value does not match the embedded regex: 
+expected to match: "hey ho /[a-z]+/ right",
+          but got: "hey ho 123 right"`,
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range tests {
