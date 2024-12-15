@@ -208,7 +208,7 @@ func (t *toolInputSchema) Validate(args map[string]interface{}) (ToolInput, erro
 	return input, nil
 }
 
-type ToolInputSchemaOption func(*toolInputSchema) error
+type ToolInputSchemaOption func(*toolInputSchema)
 
 func (t *toolInputSchema) GetMcpToolInputSchema() mcp.ToolInputSchema {
 	return mcp.ToolInputSchema{
@@ -229,86 +229,76 @@ func NewToolInputSchema(opts ...ToolInputSchemaOption) ToolInputSchema {
 }
 
 func WithString(name string, description string) ToolInputSchemaOption {
-	return func(tis *toolInputSchema) error {
+	return func(tis *toolInputSchema) {
 		tis.properties[name] = map[string]interface{}{
 			"type":        "string",
 			"description": description,
 		}
-		return nil
 	}
 }
 
 func WithRequiredString(name string, description string) ToolInputSchemaOption {
-	return func(tis *toolInputSchema) error {
+	return func(tis *toolInputSchema) {
 		WithString(name, description)(tis)
 		tis.required = append(tis.required, name)
-		return nil
 	}
 }
 
 func WithBoolean(name string, description string) ToolInputSchemaOption {
-	return func(tis *toolInputSchema) error {
+	return func(tis *toolInputSchema) {
 		tis.properties[name] = map[string]interface{}{
 			"type":        "boolean",
 			"description": description,
 		}
-
-		return nil
 	}
 }
 
 func WithRequiredBoolean(name string, description string) ToolInputSchemaOption {
-	return func(tis *toolInputSchema) error {
+	return func(tis *toolInputSchema) {
 		WithBoolean(name, description)(tis)
 		tis.required = append(tis.required, name)
-		return nil
 	}
 }
 
 func WithNumber(name string, description string) ToolInputSchemaOption {
-	return func(tis *toolInputSchema) error {
+	return func(tis *toolInputSchema) {
 		tis.properties[name] = map[string]interface{}{
 			"type":        "number",
 			"description": description,
 		}
-		return nil
 	}
 }
 
 func WithRequiredNumber(name string, description string) ToolInputSchemaOption {
-	return func(tis *toolInputSchema) error {
+	return func(tis *toolInputSchema) {
 		WithNumber(name, description)(tis)
 		tis.required = append(tis.required, name)
-		return nil
 	}
 }
 
 func WithObject(name string, description string, properties map[string]map[string]interface{}) ToolInputSchemaOption {
-	return func(tis *toolInputSchema) error {
+	return func(tis *toolInputSchema) {
 		tis.properties[name] = map[string]interface{}{
 			"type":        "object",
 			"description": description,
 			"properties":  properties,
 		}
-		return nil
 	}
 }
 
 func WithRequiredObject(name string, description string, properties map[string]map[string]interface{}) ToolInputSchemaOption {
-	return func(tis *toolInputSchema) error {
+	return func(tis *toolInputSchema) {
 		WithObject(name, description, properties)(tis)
 		tis.required = append(tis.required, name)
-		return nil
 	}
 }
 
 func WithArray(name string, description string, items map[string]interface{}) ToolInputSchemaOption {
-	return func(tis *toolInputSchema) error {
+	return func(tis *toolInputSchema) {
 		tis.properties[name] = map[string]interface{}{
 			"type":        "array",
 			"description": description,
 			"items":       items,
 		}
-		return nil
 	}
 }
