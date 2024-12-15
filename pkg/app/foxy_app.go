@@ -41,6 +41,8 @@ type FoxyApp struct {
 
 	capabilities *mcp.ServerCapabilities
 
+	transportError error
+
 	options []fx.Option
 }
 
@@ -144,7 +146,14 @@ func (f *FoxyApp) Run() error {
 		return err
 	}
 	app.Run()
+	if f.transportError != nil {
+		return f.transportError
+	}
 	return app.Err()
+}
+
+func (f *FoxyApp) Err() error {
+	return f.transportError
 }
 
 type ServerLifecycleParams struct {
@@ -168,11 +177,12 @@ func (f *FoxyApp) provideServerLifecycle(transport server.Transport) fx.Option {
 	return fx.Invoke((func(
 		lc fx.Lifecycle,
 		p ServerLifecycleParams,
+		shutdowner fx.Shutdowner,
 	) {
 		lc.Append(fx.Hook{
 			OnStart: func(ctx context.Context) error {
 				go func() {
-					transport.Run(
+					err := transport.Run(
 						f.getServerCapabilities(),
 						f.implementation,
 						server.ServerStartCallbackOption{
@@ -192,6 +202,10 @@ func (f *FoxyApp) provideServerLifecycle(transport server.Transport) fx.Option {
 							},
 						},
 					)
+					if err != nil {
+						f.transportError = err
+						_ = shutdowner.Shutdown()
+					}
 				}()
 				return nil
 			},
