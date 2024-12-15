@@ -11,55 +11,58 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v3"
 )
 
-// TestRunner is an interface that is compatible with the testing.T interface
-// , so that the test suite can be run with the standard go test runner
-// or with any other runner that implements this interface, particularly
-// it is used by foxytest own command line runner allowing to use this
-// test suite runner from languages other than Go
-type TestRunner interface {
+type TestSystem interface {
 	Fatal(args ...interface{})
 	Fatalf(format string, args ...interface{})
 	Errorf(format string, args ...interface{})
 	Log(args ...interface{})
 	Logf(format string, args ...interface{})
+}
+
+// TestRunner is an interface that is compatible with the testing.T interface
+// , so that the test suite can be run with the standard go test runner
+// or with any other runner that implements this interface, particularly
+// it is used by `mst` command line runner allowing to use this
+// test suite runner from languages other than Go
+type TestRunner interface {
+	TestSystem
 	Run(name string, f func(t TestRunner)) bool
 }
 
-type stdRunner struct {
+type StdRunner struct {
 	t *testing.T
 }
 
-func NewTestRunner(t *testing.T) TestRunner {
-	return &stdRunner{
+func NewTestRunner(t *testing.T) *StdRunner {
+	return &StdRunner{
 		t: t,
 	}
 }
 
-func (tc *stdRunner) Fatal(args ...interface{}) {
+func (tc *StdRunner) Fatal(args ...interface{}) {
 	tc.t.Fatal(args...)
 }
 
-func (tc *stdRunner) Fatalf(format string, args ...interface{}) {
+func (tc *StdRunner) Fatalf(format string, args ...interface{}) {
 	tc.t.Fatalf(format, args...)
 }
 
-func (tc *stdRunner) Errorf(format string, args ...interface{}) {
+func (tc *StdRunner) Errorf(format string, args ...interface{}) {
 	tc.t.Errorf(format, args...)
 }
 
-func (tc *stdRunner) Log(args ...interface{}) {
+func (tc *StdRunner) Log(args ...interface{}) {
 	tc.t.Log(args...)
 }
 
-func (tc *stdRunner) Logf(format string, args ...interface{}) {
+func (tc *StdRunner) Logf(format string, args ...interface{}) {
 	tc.t.Logf(format, args...)
 }
 
-func (tc *stdRunner) Run(name string, f func(t TestRunner)) bool {
+func (tc *StdRunner) Run(name string, f func(t TestRunner)) bool {
 	tc.t.Run(name, func(t *testing.T) {
 		f(NewTestRunner(t))
 	})
@@ -238,6 +241,9 @@ type testCase struct {
 	name    string
 	inputs  []map[string]interface{}
 	outputs []map[string]interface{}
+
+	inputNodes  []yaml.Node
+	outputNodes []yaml.Node
 }
 
 func (tc *testCase) GetName() string {
@@ -296,7 +302,7 @@ func (tst *test) Run(t TestRunner) {
 					tst.inputChan <- in
 				}
 
-				for _, out := range tc.outputs {
+				for i, out := range tc.outputs {
 					expectedJsonB, err := json.Marshal(out)
 					if err != nil {
 						t.Errorf("error marshalling expected output: %v", err)
@@ -312,7 +318,7 @@ func (tst *test) Run(t TestRunner) {
 					select {
 					case <-tst.executableDone:
 						// the process has finished, but output is not yet available
-						t.Errorf("process finished before output was received, expected: %s", expectedJson)
+						t.Errorf("process finished before output %d was received, expected: %s", i, expectedJson)
 						return
 					case got := <-tst.outputChan:
 						// TODO: do we really need to unmarshal the output? it is not like it is going to be used
@@ -322,7 +328,8 @@ func (tst *test) Run(t TestRunner) {
 							t.Errorf("error unmarshalling output: %v", err)
 						}
 
-						if assert.JSONEq(t, expectedJson, got) {
+						expectedNode := tc.outputNodes[i]
+						if assertMatch(t, &expectedNode, out) {
 							if tst.logging {
 								t.Logf("output matches: %s", got)
 							}
@@ -342,6 +349,15 @@ func (tst *test) Run(t TestRunner) {
 }
 
 func (tst *test) read(path string) error {
+	testFile, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+
+	return tst.readFromReader(testFile)
+}
+
+func (tst *test) readFromReader(thereader io.Reader) error {
 	// Test is a multi-document yaml file.
 	// Example file content:
 	//
@@ -362,19 +378,29 @@ func (tst *test) read(path string) error {
 	//
 	//
 
-	testFile, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-
-	decoder := yaml.NewDecoder(testFile)
+	decoder := yaml.NewDecoder(thereader)
 	for {
-		var doc map[string]interface{}
-		err := decoder.Decode(&doc)
+		var docNode yaml.Node
+		err := decoder.Decode(&docNode)
+
+		// var doc map[string]interface{}
+		// err := decoder.Decode(&doc)
 		if err != nil {
 			if err == io.EOF {
 				break
 			}
+			return err
+		}
+
+		var doc map[string]interface{}
+		err = docNode.Decode(&doc)
+		if err != nil {
+			return err
+		}
+
+		var intermediateDoc map[string]yaml.Node
+		err = docNode.Decode(&intermediateDoc)
+		if err != nil {
 			return err
 		}
 
@@ -390,12 +416,19 @@ func (tst *test) read(path string) error {
 					return fmt.Errorf("failed to parse input for test '%s' , expected map for key '%s', but got '%T': %v", tst.name, key, value, value)
 				}
 				tc.inputs = append(tc.inputs, testInput)
+				if inNode, ok := intermediateDoc[key]; ok {
+					tc.inputNodes = append(tc.inputNodes, inNode)
+				}
+
 			} else if strings.HasPrefix(key, "out") {
 				testOutput, ok := value.(map[string]interface{})
 				if !ok {
 					return fmt.Errorf("failed to parse output for test '%s' , expected map for key '%s', but got '%T': %v", tst.name, key, value, value)
 				}
 				tc.outputs = append(tc.outputs, testOutput)
+				if outNode, ok := intermediateDoc[key]; ok {
+					tc.outputNodes = append(tc.outputNodes, outNode)
+				}
 			}
 		}
 

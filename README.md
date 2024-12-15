@@ -59,6 +59,7 @@ Here is list of features that are implemented and planned:
 - [ ] Roots (planned)
 - [ ] Pagination (planned)
 - [ ] Notifications list_changed (planned)
+- [x] Testing - functional tests with foxytest package
 
 Check [docs](https://foxy-contexts.str4.io/) and [examples](https://github.com/strowk/foxy-contexts/tree/main/examples) to know more.
 
