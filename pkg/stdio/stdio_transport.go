@@ -85,7 +85,11 @@ func (s *stdioTransport) run(
 					srv.GetLogger().LogEvent(foxyevent.StdioFailedWriting{Err: err})
 					break out
 				}
-				s.out.Write([]byte("\n"))
+				_, err = s.out.Write([]byte("\n"))
+				if err != nil {
+					srv.GetLogger().LogEvent(foxyevent.StdioFailedWriting{Err: err})
+					break out
+				}
 			}
 		}
 		close(s.stoppedReadingResponses)
