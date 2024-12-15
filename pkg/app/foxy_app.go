@@ -56,6 +56,12 @@ func (f *FoxyApp) WithTool(newTool any) *FoxyApp {
 	return f
 }
 
+// WithServerCapabilities sets the server capabilities
+//
+// serverCapabilities is a struct that defines the capabilities of the server
+// that would be returned to the client during the initialization phase
+// if not set, it would default to an empty struct, which could cause
+// clients to not work as expected, so it is recommended to set this
 func (f *FoxyApp) WithServerCapabilities(serverCapabilities *mcp.ServerCapabilities) *FoxyApp {
 	f.capabilities = serverCapabilities
 	return f
