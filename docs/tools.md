@@ -20,6 +20,16 @@ In order to create new tool you shall use `fxctx.NewTool` function. It accepts t
 --8<-- "examples/simple_great_tool/main.go:server"
 ```
 
+## Using toolinput package
+
+In order to define input schema for your tool, you can use `toolinput` package. It allows you to define input schema and validate arriving input.
+
+Here is an example of creating schema, giving it to the tool and validating input:
+
+```go
+--8<-- "examples/list_k8s_contexts_tool/main.go:toolinput"
+```
+
 ### Examples
 
 Check out complete examples of MCP Servers with tools:
