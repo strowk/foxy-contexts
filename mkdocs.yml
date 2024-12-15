@@ -6,6 +6,7 @@ nav:
   - Resources: resources.md
   - Prompts: prompts.md
   - Testing: testing.md
+  - App: app.md
 
 extra_css:
   - static/css/extra.css

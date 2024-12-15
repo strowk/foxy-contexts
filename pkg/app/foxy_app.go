@@ -44,6 +44,8 @@ type FoxyApp struct {
 	transportError error
 
 	options []fx.Option
+
+	extraServerOptions []server.ServerOption
 }
 
 // WithTool adds a tool to the app
@@ -129,6 +131,11 @@ func (f *FoxyApp) WithVersion(version string) *FoxyApp {
 	return f
 }
 
+func (f *FoxyApp) WithExtraServerOptions(extraOptions ...server.ServerOption) *FoxyApp {
+	f.extraServerOptions = append(f.extraServerOptions, extraOptions...)
+	return f
+}
+
 // BuildFxApp builds the fx.App instance as configured by `With*` methods
 func (f *FoxyApp) BuildFxApp() (*fx.App, error) {
 	f.options = append(f.options, fxctx.ProvideToolMux())
@@ -187,26 +194,28 @@ func (f *FoxyApp) provideServerLifecycle(transport server.Transport) fx.Option {
 	) {
 		lc.Append(fx.Hook{
 			OnStart: func(ctx context.Context) error {
+				serverStartOption := server.ServerStartCallbackOption{
+					Callback: func(s server.Server) {
+						if p.ToolMux != nil {
+							p.ToolMux.RegisterHandlers(s)
+						}
+						if p.ResourceMux != nil {
+							p.ResourceMux.RegisterHandlers(s)
+						}
+						if p.PromptMux != nil {
+							p.PromptMux.RegisterHandlers(s)
+						}
+						if p.CompleteMux != nil {
+							p.CompleteMux.RegisterHandlers(s)
+						}
+					},
+				}
+				options := append(f.extraServerOptions, serverStartOption)
 				go func() {
 					err := transport.Run(
 						f.getServerCapabilities(),
 						f.implementation,
-						server.ServerStartCallbackOption{
-							Callback: func(s server.Server) {
-								if p.ToolMux != nil {
-									p.ToolMux.RegisterHandlers(s)
-								}
-								if p.ResourceMux != nil {
-									p.ResourceMux.RegisterHandlers(s)
-								}
-								if p.PromptMux != nil {
-									p.PromptMux.RegisterHandlers(s)
-								}
-								if p.CompleteMux != nil {
-									p.CompleteMux.RegisterHandlers(s)
-								}
-							},
-						},
+						options...,
 					)
 					if err != nil {
 						f.transportError = err
