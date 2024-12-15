@@ -80,7 +80,11 @@ func (s *stdioTransport) run(
 					srv.GetLogger().LogEvent(foxyevent.StdioFailedMarhalResponse{Err: err})
 				}
 				srv.GetLogger().LogEvent(foxyevent.StdioSendingResponse{Data: data})
-				s.out.Write(data)
+				_, err = s.out.Write(data)
+				if err != nil {
+					srv.GetLogger().LogEvent(foxyevent.StdioFailedWriting{Err: err})
+					break out
+				}
 				s.out.Write([]byte("\n"))
 			}
 		}

@@ -45,3 +45,9 @@ type StdioFailedReadingInput struct {
 }
 
 func (StdioFailedReadingInput) event() {}
+
+type StdioFailedWriting struct {
+	Err error
+}
+
+func (StdioFailedWriting) event() {}
