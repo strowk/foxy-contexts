@@ -35,8 +35,8 @@ Now in your Claude Desktop configuration file add the following:
 ```json
 {
     "mcpServers": {
-        "list_k8s_namespaces_prompt_example": {
-            "command": "list_k8s_namespaces_prompt",
+        "simple_prompt": {
+            "command": "simple_prompt",
             "args": []
         }
     }
