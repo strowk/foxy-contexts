@@ -63,6 +63,24 @@ If you need more information from test run, and have configured logging with `ts
 --- PASS: TestWithFoxytest (1.39s)
 ```
 
+When failed, package attempts to pretty print the diff between expected and actual JSON's, so you can quickly locate the issue.
+
+Here is an example of real world failing test:
+
+```
+    testsuite.go:54:
+          "result": {
+            "content": {
+              "0": {
+                "text": {
+                ^ value does not match the embedded regex:
+        expected to match: "{"name":"k3d-mcp-k8s-test-server-0","status":"Active","age":"/[\\d][sm]/","createdAt":"/[\\d]{4}/-/[\\d]{2}/-/[\\d]{2}/T/[\\d]{2}/:/[\\d]{2}/:/[\\d]{2}/Z"}",
+                  but got: "{"name":"k3d-mcp-k8s-integration-test-server-0","status":"Unknown","age":"1m0s"}"
+```
+
+Output is not a valid JSON, it just attempts to show the difference at the right point in structure.
+
+
 ## Using regular expressions for matching
 
 Sometimes when you have dynamic values in your responses, you might want to use regular expressions to match them. You can do this by using `!!re` tag in your expected output. For example:
@@ -70,7 +88,7 @@ Sometimes when you have dynamic values in your responses, you might want to use 
 ```yaml
 case: List tools
 in_list_tools: {"jsonrpc":"2.0","method":"tools/list","id":1}
-out_list_tools: {"jsonrpc":"2.0","result":{"tools":[ { "name": !!re "list-[^a-z]+" } ]},"id":1}
+out_list_tools: {"jsonrpc":"2.0","result":{"tools":[ { "name": !!re "list-[a-z]+" } ]},"id":1}
 ```
 
 This example is somewhat oversimplified, in reality you would probably use `!!re` with timestamps, UUIDs or other dynamic values, rather than tool names.
@@ -83,18 +101,18 @@ Embedded regular expression is just a regular expression that is embedded in a s
 ```yaml
 case: List tools
 in_list_tools: {"jsonrpc":"2.0","method":"tools/list","id":1}
-out_list_tools: {"jsonrpc":"2.0","result":{"tools":[ { "name": !!ere "list-/[^a-z]+/-tool" } ]},"id":1}
+out_list_tools: {"jsonrpc":"2.0","result":{"tools":[ { "name": !!ere "list-/[a-z]+/-tool" } ]},"id":1}
 ```
 
 Essentially `!!ere` allows you to treat most of the string as just regular string, but have a part (or parts) of it treated as regular expression.
-Everything inside slashes `/` would be treated as regular expression, here "list-" and "-tool" are regular strings, but `[^a-z]+` is a regular expression that would match any lowercase letters non-empty string, so it would match "list-abc-tool", "list-xyz-tool" and so on.
+Everything inside slashes `/` would be treated as regular expression, here "list-" and "-tool" are regular strings, but `[a-z]+` is a regular expression that would match any lowercase letters non-empty string, so it would match "list-abc-tool", "list-xyz-tool" and so on.
 
 This approach allows you not to think how to escape regular expression syntax in the rest of your string and only match bits that you need to be dynamic.
 
 ### Escaping forward slashes
 
-You do, however need to escape slashes `/` in places of your string where you want to use them, but not designate regular expression, for example: `"url": !! "https:\\/\\/foxy-contexts.str4.io\\//[^a-z]+/"` would match `"url": "https://foxy-contexts.str4.io/abc"`.
-In here `\\/` is used to become `/` and `[^a-z]+` is used to match any lowercase letters non-empty string. The reason why there are two backslashes `\\` is because in YAML strings backslash is an escape character, so to have a single backslash in the string you need to escape it with another backslash.
+You do, however need to escape slashes `/` in places of your string where you want to use them, but not designate regular expression, for example: `"url": !! "https:\\/\\/foxy-contexts.str4.io\\//[a-z]+/"` would match `"url": "https://foxy-contexts.str4.io/abc"`.
+In here `\\/` is used to become `/` and `[a-z]+` is used to match any lowercase letters non-empty string. The reason why there are two backslashes `\\` is because in YAML strings backslash is an escape character, so to have a single backslash in the string you need to escape it with another backslash.
 
 ## Examples
 
