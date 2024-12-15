@@ -79,10 +79,7 @@ func (p *promptMux) setListPromptsHandler(s server.Server) {
 		}
 
 		list := p.ListPrompts()
-		for _, p := range list {
-			resp.Prompts = append(resp.Prompts, p)
-		}
-
+		resp.Prompts = append(resp.Prompts, list...)
 		return resp, nil
 	})
 }

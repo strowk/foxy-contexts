@@ -61,9 +61,7 @@ func (m *resourceMux) GetResources() ([]mcp.Resource, error) {
 		if err != nil {
 			return nil, err
 		}
-		for _, r := range provided {
-			res = append(res, r)
-		}
+		res = append(res, provided...)
 	}
 
 	return res, nil
@@ -104,9 +102,7 @@ func (m *resourceMux) setResourceListHandler(s server.Server) {
 			return nil, jsonrpc2.NewServerError(ListResourcesFailed, fmt.Sprintf("failed to get resources: %v", err.Error()))
 		}
 
-		for _, res := range list {
-			resp.Resources = append(resp.Resources, res)
-		}
+		resp.Resources = append(resp.Resources, list...)
 
 		return resp, nil
 	})
