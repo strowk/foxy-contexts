@@ -372,7 +372,7 @@ func (tst *test) readFromReader(thereader io.Reader) error {
 	// in_1: {"jsonrpc": "2.0", "method": "Files.List", "params": {"path": "/"}, "id": 2}
 	// in_2: {"jsonrpc": "2.0", "method": "Files.List", "params": {"path": "/"}, "id": 2}
 	// # output 2
-	// out: {"jsonrpc": "2.0", "result": ["bin", "dev", "etc", "home", "lib", "media", "mnt", "opt", "proc", "root", "run", "sbin", "srv", "sys", "tmp", "usr", "var"], "id": 2}
+	// out: {"jsonrpc": "2.0", "result": ["bin", "dev", "etc", "home"], "id": 2}
 	// ---
 	// # and so on
 	//

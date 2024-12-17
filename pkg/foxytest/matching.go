@@ -280,8 +280,13 @@ expected to match: "%s",
 
 		if fmt.Sprintf("%v", decodedValue) != fmt.Sprintf("%v", actual) {
 			d.items = append(d.items, diffItem{
-				path:    pathCopy(currentPath),
-				message: fmt.Sprintf("value mismatch, \nexpected %T: '%v',\n     got %T: '%v'", decodedValue, decodedValue, actual, actual),
+				path: pathCopy(currentPath),
+				message: fmt.Sprintf("value mismatch, \nexpected %T: '%v',\n     got %T: '%v'",
+					decodedValue,
+					decodedValue,
+					actual,
+					actual,
+				),
 			})
 		}
 		return
@@ -292,8 +297,10 @@ const regexSymbolsToEscape = `[]{}()^$.|*+?`
 
 func matchEmbeddedRegex(expected, actual string) (bool, string) {
 	//we should locate everything in it that is between / and / and check if it is a valid regex
-	// if it is not, we should fail the test, if it is, we should be matching it against the value at the same place in the actual string
-	// all slashes escaped by backslash should be unescaped, slashes inside of the regex can be escaped by backslash
+	// if it is not, we should fail the test, if it is, we should be matching it
+	// against the value at the same place in the actual string
+	// all slashes escaped by backslash should be unescaped, slashes
+	// inside of the regex can be escaped by backslash
 
 	// the easiest way is to build a regex that would work the same way as the bunch of embedded regexes
 	var joinedRegex string
