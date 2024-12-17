@@ -265,8 +265,10 @@ func (d *diff) checkMatch(
 			matches, _ := matchEmbeddedRegex(expectedStringValue, actualStringValue)
 			if !matches {
 				d.items = append(d.items, diffItem{
-					path:    pathCopy(currentPath),
-					message: "value mismatch, expected value does not match the embedded regex: " + expectedStringValue,
+					path: pathCopy(currentPath),
+					message: fmt.Sprintf(`value does not match the embedded regex: 
+expected to match: "%s",
+          but got: "%s"`, expectedStringValue, actualStringValue),
 				})
 				return
 			}
