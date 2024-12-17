@@ -557,6 +557,7 @@ func (ts *testSuite) pipeOutput(t TestRunner) {
 }
 
 func (ts *testSuite) startExecutable(t TestRunner) *exec.Cmd {
+	//nolint:gosec // #nosec G204 -- user gives us this command to run, so they must be sure to want to run it
 	cmd := exec.Command(ts.command, ts.args...)
 	in, err := cmd.StdinPipe()
 	if err != nil {
