@@ -14,7 +14,7 @@
       
       
       <link rel="icon" href="assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.48">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.49">
     
     
       
@@ -435,7 +435,7 @@
 </p>
 
 <p>Foxy contexts is a Golang library for building context servers supporting <a href="https://modelcontextprotocol.io/">Model Context Protocol</a>.</p>
-<p>This library only supports server side of the protocol. Using it you can build context servers using declarative approach, by defining <a href="https://modelcontextprotocol.io/docs/concepts/tools">tools</a>, <a href="https://modelcontextprotocol.io/docs/concepts/resources">resources</a> and <a href="https://modelcontextprotocol.io/docs/concepts/prompts">prompts</a> and then registering them with your FoxyApp, which is using <a href="https://github.com/uber-go/fx">uber's fx</a> under the hood and you can inject into its container as well.</p>
+<p>This library only supports server side of the protocol. Using it you can build context servers using declarative approach, by defining <a href="https://modelcontextprotocol.io/docs/concepts/tools">tools</a>, <a href="https://modelcontextprotocol.io/docs/concepts/resources">resources</a> and <a href="https://modelcontextprotocol.io/docs/concepts/prompts">prompts</a> and then registering them with your app.Builder, which is using <a href="https://github.com/uber-go/fx">uber's fx</a> App under the hood and you can inject into its container as well.</p>
 <p>With this approach you can easily colocate call/read/get logic and definitions of your tools/resources/prompts in a way that every tool/resource/prompt is placed in a separate place, but related code is colocated.</p>
 <h2 id="features">Features<a class="headerlink" href="#features" title="Permanent link">&para;</a></h2>
 <p>Here is list of features that are implemented and planned:</p>
@@ -552,7 +552,7 @@
 </span><span id="__span-1-69"><a id="__codelineno-1-69" name="__codelineno-1-69" href="#__codelineno-1-69"></a>
 </span><span id="__span-1-70"><a id="__codelineno-1-70" name="__codelineno-1-70" href="#__codelineno-1-70"></a><span class="kd">func</span><span class="w"> </span><span class="nx">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-1-71"><a id="__codelineno-1-71" name="__codelineno-1-71" href="#__codelineno-1-71"></a><span class="w">    </span><span class="nx">app</span><span class="p">.</span>
-</span><span id="__span-1-72"><a id="__codelineno-1-72" name="__codelineno-1-72" href="#__codelineno-1-72"></a><span class="w">        </span><span class="nx">NewFoxyApp</span><span class="p">().</span>
+</span><span id="__span-1-72"><a id="__codelineno-1-72" name="__codelineno-1-72" href="#__codelineno-1-72"></a><span class="w">        </span><span class="nx">NewBuilder</span><span class="p">().</span>
 </span><span id="__span-1-73"><a id="__codelineno-1-73" name="__codelineno-1-73" href="#__codelineno-1-73"></a><span class="w">        </span><span class="c1">// adding the tool to the app</span>
 </span><span id="__span-1-74"><a id="__codelineno-1-74" name="__codelineno-1-74" href="#__codelineno-1-74"></a><span class="w">        </span><span class="nx">WithTool</span><span class="p">(</span><span class="nx">NewListCurrentDirFilesTool</span><span class="p">).</span>
 </span><span id="__span-1-75"><a id="__codelineno-1-75" name="__codelineno-1-75" href="#__codelineno-1-75"></a><span class="w">        </span><span class="c1">// setting up server</span>
@@ -660,7 +660,7 @@
     <script id="__config" type="application/json">{"base": ".", "features": ["navigation.tracking", "announce.dismiss", "navigation.instant", "navigation.instant.progress", "navigation.sections", "navigation.expand", "navigation.top", "navigation.footer", "toc.integrate", "navigation.indexes", "search.suggest", "header.autohide"], "search": "assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="assets/javascripts/bundle.83f73b43.min.js"></script>
+      <script src="assets/javascripts/bundle.88dd0f4e.min.js"></script>
       
     
   </body>

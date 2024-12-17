@@ -14,7 +14,7 @@
       
       
       <link rel="icon" href="../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.48">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.49">
     
     
       
@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#foxyapp" class="md-skip">
+        <a href="#appbuilder" class="md-skip">
           Skip to content
         </a>
       
@@ -420,13 +420,13 @@
   
 
 
-<h1 id="foxyapp">FoxyApp<a class="headerlink" href="#foxyapp" title="Permanent link">&para;</a></h1>
-<p>FoxyApp is a builder around uber's fx that combines fx DI capabilities with foxy-contexts <abbr title="Model Context Protocol">MCP</abbr> server implementation and gives simple interface to combine your <abbr title="Model Context Protocol">MCP</abbr> primitives into a single application.</p>
+<h1 id="appbuilder">app.Builder<a class="headerlink" href="#appbuilder" title="Permanent link">&para;</a></h1>
+<p>app.Builder is a builder around uber's fx that combines fx DI capabilities with foxy-contexts <abbr title="Model Context Protocol">MCP</abbr> server implementation and gives simple interface to combine your <abbr title="Model Context Protocol">MCP</abbr> primitives into a single standalone application.</p>
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
 <p>Simple example of wrapping one tool into an application, then running it with stdio transport:</p>
 <div class="language-go highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nx">app</span><span class="p">.</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">        </span><span class="nx">NewFoxyApp</span><span class="p">().</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">        </span><span class="nx">NewBuilder</span><span class="p">().</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">        </span><span class="c1">// adding the tool to the app</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">        </span><span class="nx">WithTool</span><span class="p">(</span><span class="nx">NewGreatTool</span><span class="p">).</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">        </span><span class="c1">// setting up server</span>
@@ -450,7 +450,7 @@
 </span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="p">}</span>
 </span></code></pre></div>
 <h3 id="providing-additional-server-options">Providing additional server options<a class="headerlink" href="#providing-additional-server-options" title="Permanent link">&para;</a></h3>
-<p>Normally FoxyApp preconfigure server for you, but you can provide additional server options to the application by using <code>WithExtraServerOptions</code> option.</p>
+<p>Normally app.Builder preconfigure server for you, but you can provide additional server options to the application by using <code>WithExtraServerOptions</code> option.</p>
 <p>Say, for example this would make server to turn on logging to stderr:</p>
 <div class="language-go highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nx">WithExtraServerOptions</span><span class="p">(</span><span class="nx">server</span><span class="p">.</span><span class="nx">LoggerOption</span><span class="p">{</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="nx">Logger</span><span class="p">:</span><span class="w"> </span><span class="nx">foxyevent</span><span class="p">.</span><span class="nx">NewSlogLogger</span><span class="p">(</span><span class="nx">slog</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="nx">slog</span><span class="p">.</span><span class="nx">NewTextHandler</span><span class="p">(</span><span class="nx">os</span><span class="p">.</span><span class="nx">Stderr</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">slog</span><span class="p">.</span><span class="nx">HandlerOptions</span><span class="p">{</span>
@@ -539,7 +539,7 @@
     <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tracking", "announce.dismiss", "navigation.instant", "navigation.instant.progress", "navigation.sections", "navigation.expand", "navigation.top", "navigation.footer", "toc.integrate", "navigation.indexes", "search.suggest", "header.autohide"], "search": "../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.83f73b43.min.js"></script>
+      <script src="../assets/javascripts/bundle.88dd0f4e.min.js"></script>
       
     
   </body>
