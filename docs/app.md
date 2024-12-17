@@ -1,6 +1,6 @@
-# FoxyApp
+# app.Builder
 
-FoxyApp is a builder around uber's fx that combines fx DI capabilities with foxy-contexts MCP server implementation and gives simple interface to combine your MCP primitives into a single application.
+app.Builder is a builder around uber's fx that combines fx DI capabilities with foxy-contexts MCP server implementation and gives simple interface to combine your MCP primitives into a single standalone application.
 
 ## Usage
 
@@ -12,7 +12,7 @@ Simple example of wrapping one tool into an application, then running it with st
 
 ### Providing additional server options
 
-Normally FoxyApp preconfigure server for you, but you can provide additional server options to the application by using `WithExtraServerOptions` option.
+Normally app.Builder preconfigure server for you, but you can provide additional server options to the application by using `WithExtraServerOptions` option.
 
 Say, for example this would make server to turn on logging to stderr:
 

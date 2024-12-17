@@ -90,7 +90,7 @@ func NewK8sContextsResourceProvider() fxctx.ResourceProvider {
 func main() {
 
 	err := app.
-		NewFoxyApp().
+		NewBuilder().
 		WithResourceProvider(NewK8sContextsResourceProvider).
 		// setting up server
 		WithName("my-mcp-server").

@@ -54,7 +54,7 @@ func NewGreatTool() fxctx.Tool {
 // --8<-- [start:server]
 func main() {
 	app.
-		NewFoxyApp().
+		NewBuilder().
 		// adding the tool to the app
 		WithTool(NewGreatTool).
 		// setting up server

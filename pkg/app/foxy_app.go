@@ -14,8 +14,8 @@ var (
 	ErrNoTransportSpecified = errors.New("no transport specified, please use WithTransport to specify a transport")
 )
 
-func NewFoxyApp() *FoxyApp {
-	return &FoxyApp{
+func NewBuilder() *Builder {
+	return &Builder{
 		implementation: &mcp.Implementation{
 			Name:    "my-foxy-contexts-server",
 			Version: "0.0.1",
@@ -23,9 +23,8 @@ func NewFoxyApp() *FoxyApp {
 	}
 }
 
-// FoxyApp is essentially a builder for a foxy app, that wraps fx.App
-// and provides a more user-friendly interface for building and running
-// your MCP server
+// Builder wraps fx.App and provides a more user-friendly interface for building
+// and running your MCP server
 //
 // You would be calling WithTool, WithResource, WithResourceProvider, WithPrompt
 // to register your tools, resources, resource providers and prompts and then
@@ -35,7 +34,7 @@ func NewFoxyApp() *FoxyApp {
 // WithName and WithVersion, it will use default values "my-foxy-contexts-server" and "0.0.1".
 // Finally you can use WithFxOptions to pass additional fx.Options to the fx.App instance
 // before it is built.
-type FoxyApp struct {
+type Builder struct {
 	implementation *mcp.Implementation
 	transport      server.Transport
 
@@ -53,7 +52,7 @@ type FoxyApp struct {
 // newTool must be a function that returns a fxctx.Tool
 // it can also take in any dependencies that you want to inject
 // into the tool, that will be resolved by the fx framework
-func (f *FoxyApp) WithTool(newTool any) *FoxyApp {
+func (f *Builder) WithTool(newTool any) *Builder {
 	f.options = append(f.options, fx.Provide(fxctx.AsTool(newTool)))
 	return f
 }
@@ -64,7 +63,7 @@ func (f *FoxyApp) WithTool(newTool any) *FoxyApp {
 // that would be returned to the client during the initialization phase
 // if not set, it would default to an empty struct, which could cause
 // clients to not work as expected, so it is recommended to set this
-func (f *FoxyApp) WithServerCapabilities(serverCapabilities *mcp.ServerCapabilities) *FoxyApp {
+func (f *Builder) WithServerCapabilities(serverCapabilities *mcp.ServerCapabilities) *Builder {
 	f.capabilities = serverCapabilities
 	return f
 }
@@ -74,7 +73,7 @@ func (f *FoxyApp) WithServerCapabilities(serverCapabilities *mcp.ServerCapabilit
 // newResource must be a function that returns a fxctx.Resource
 // it can also take in any dependencies that you want to inject
 // into the resource, that will be resolved by the fx framework
-func (f *FoxyApp) WithResource(newResource any) *FoxyApp {
+func (f *Builder) WithResource(newResource any) *Builder {
 	f.options = append(f.options, fx.Provide(fxctx.AsResource(newResource)))
 	return f
 }
@@ -84,7 +83,7 @@ func (f *FoxyApp) WithResource(newResource any) *FoxyApp {
 // newResourceProvider must be a function that returns a fxctx.ResourceProvider
 // it can also take in any dependencies that you want to inject
 // into the resource provider, that will be resolved by the fx framework
-func (f *FoxyApp) WithResourceProvider(newResourceProvider any) *FoxyApp {
+func (f *Builder) WithResourceProvider(newResourceProvider any) *Builder {
 	f.options = append(f.options, fx.Provide(fxctx.AsResourceProvider(newResourceProvider)))
 	return f
 }
@@ -94,7 +93,7 @@ func (f *FoxyApp) WithResourceProvider(newResourceProvider any) *FoxyApp {
 // newPrompt must be a function that returns a fxctx.Prompt
 // it can also take in any dependencies that you want to inject
 // into the prompt, that will be resolved by the fx framework
-func (f *FoxyApp) WithPrompt(newPrompt any) *FoxyApp {
+func (f *Builder) WithPrompt(newPrompt any) *Builder {
 	f.options = append(f.options, fx.Provide(fxctx.AsPrompt(newPrompt)))
 	return f
 }
@@ -102,13 +101,13 @@ func (f *FoxyApp) WithPrompt(newPrompt any) *FoxyApp {
 // WithStdioTransport sets up the server to use stdio transport
 //
 // options can be used to configure the stdio transport
-func (f *FoxyApp) WithTransport(transport server.Transport) *FoxyApp {
+func (f *Builder) WithTransport(transport server.Transport) *Builder {
 	f.transport = transport
 	return f
 }
 
 // WithFxOptions adds additional fx.Options to fx.App instance
-func (f *FoxyApp) WithFxOptions(opts ...fx.Option) *FoxyApp {
+func (f *Builder) WithFxOptions(opts ...fx.Option) *Builder {
 	f.options = append(f.options, fx.Options(opts...))
 	return f
 }
@@ -117,7 +116,7 @@ func (f *FoxyApp) WithFxOptions(opts ...fx.Option) *FoxyApp {
 //
 // The name would be returned to client during the initialization
 // phase, if not set, it would default to "my-foxy-contexts-server"
-func (f *FoxyApp) WithName(name string) *FoxyApp {
+func (f *Builder) WithName(name string) *Builder {
 	f.implementation.Name = name
 	return f
 }
@@ -126,18 +125,18 @@ func (f *FoxyApp) WithName(name string) *FoxyApp {
 //
 // The version would be returned to client during the initialization
 // phase, if not set, it would default to "0.0.1"
-func (f *FoxyApp) WithVersion(version string) *FoxyApp {
+func (f *Builder) WithVersion(version string) *Builder {
 	f.implementation.Version = version
 	return f
 }
 
-func (f *FoxyApp) WithExtraServerOptions(extraOptions ...server.ServerOption) *FoxyApp {
+func (f *Builder) WithExtraServerOptions(extraOptions ...server.ServerOption) *Builder {
 	f.extraServerOptions = append(f.extraServerOptions, extraOptions...)
 	return f
 }
 
 // BuildFxApp builds the fx.App instance as configured by `With*` methods
-func (f *FoxyApp) BuildFxApp() (*fx.App, error) {
+func (f *Builder) BuildFxApp() (*fx.App, error) {
 	f.options = append(f.options, fxctx.ProvideToolMux())
 	f.options = append(f.options, fxctx.ProvideResourceMux())
 	f.options = append(f.options, fxctx.ProvidePromptMux())
@@ -153,7 +152,7 @@ func (f *FoxyApp) BuildFxApp() (*fx.App, error) {
 }
 
 // Run builds and runs the fx.App instance as configured by `With*` methods
-func (f *FoxyApp) Run() error {
+func (f *Builder) Run() error {
 	app, err := f.BuildFxApp()
 	if err != nil {
 		return err
@@ -165,7 +164,7 @@ func (f *FoxyApp) Run() error {
 	return app.Err()
 }
 
-func (f *FoxyApp) Err() error {
+func (f *Builder) Err() error {
 	return f.transportError
 }
 
@@ -178,7 +177,7 @@ type ServerLifecycleParams struct {
 	CompleteMux fxctx.CompleteMux `optional:"true"`
 }
 
-func (f *FoxyApp) getServerCapabilities() *mcp.ServerCapabilities {
+func (f *Builder) getServerCapabilities() *mcp.ServerCapabilities {
 	if f.capabilities != nil {
 		return f.capabilities
 	}
@@ -186,7 +185,7 @@ func (f *FoxyApp) getServerCapabilities() *mcp.ServerCapabilities {
 	return serverCapabilities
 }
 
-func (f *FoxyApp) provideServerLifecycle(transport server.Transport) fx.Option {
+func (f *Builder) provideServerLifecycle(transport server.Transport) fx.Option {
 	return fx.Invoke((func(
 		lc fx.Lifecycle,
 		p ServerLifecycleParams,

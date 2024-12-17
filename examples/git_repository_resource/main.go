@@ -25,7 +25,7 @@ func main() {
 	// , then click current-git-repository
 
 	err := app.
-		NewFoxyApp().
+		NewBuilder().
 		// adding the resource to the app
 		WithResource(func() fxctx.Resource {
 			return fxctx.NewResource(

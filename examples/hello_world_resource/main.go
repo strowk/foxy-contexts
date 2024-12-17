@@ -53,7 +53,7 @@ func NewGreatResource() fxctx.Resource {
 // --8<-- [start:server]
 func main() {
 	err := app.
-		NewFoxyApp().
+		NewBuilder().
 		// adding the resource to the app
 		WithResource(NewGreatResource).
 		// setting up server

@@ -49,7 +49,7 @@ func NewGreatPrompt() fxctx.Prompt {
 // --8<-- [start:server]
 func main() {
 	app.
-		NewFoxyApp().
+		NewBuilder().
 		// adding the tool to the app
 		WithPrompt(NewGreatPrompt).
 		// setting up server

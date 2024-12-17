@@ -69,7 +69,7 @@ func NewListCurrentDirFilesTool() fxctx.Tool {
 
 func main() {
 	app.
-		NewFoxyApp().
+		NewBuilder().
 		// adding the tool to the app
 		WithTool(NewListCurrentDirFilesTool).
 		// setting up server

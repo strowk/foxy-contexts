@@ -92,7 +92,7 @@ func NewListK8sContextsTool() fxctx.Tool {
 
 func main() {
 	app.
-		NewFoxyApp().
+		NewBuilder().
 		WithTool(NewListK8sContextsTool).
 		WithTransport(stdio.NewTransport()).
 		WithName("list-k8s-contexts-tool").
