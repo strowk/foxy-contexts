@@ -2,6 +2,8 @@ module github.com/strowk/foxy-contexts/examples/initialized_callback
 
 go 1.23.3
 
+replace github.com/strowk/foxy-contexts => ../../
+
 require (
 	github.com/strowk/foxy-contexts v0.0.12
 	go.uber.org/fx v1.23.0
