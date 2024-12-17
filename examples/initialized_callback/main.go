@@ -4,8 +4,6 @@ import (
 	"log"
 
 	"github.com/strowk/foxy-contexts/pkg/app"
-	"github.com/strowk/foxy-contexts/pkg/mcp"
-	"github.com/strowk/foxy-contexts/pkg/server"
 	"github.com/strowk/foxy-contexts/pkg/stdio"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
@@ -25,27 +23,29 @@ func main() {
 	log.Printf("starting server")
 	app.
 		NewBuilder().
-		WithInitializedFinishedHandler(func(
-			shutdowner fx.Shutdowner,
-		) server.ServerOption {
-			return &server.InitializationFininshedHandlerOption{
-				Callback: func(req *mcp.InitializedNotification) {
-					// do some work after client has finished initialization
+		// this bit is WIP for now:
 
-					// this is tad strange, but we would like to simply shut down when client is ready...
-					// why not, maybe we just want to test something and then shut down?
+		// WithInitializedFinishedHandler(func(
+		// 	shutdowner fx.Shutdowner,
+		// ) server.ServerOption {
+		// 	return &server.InitializationFininshedHandlerOption{
+		// 		Callback: func(req *mcp.InitializedNotification) {
+		// 			// do some work after client has finished initialization
 
-					// Note: This currently is causing deadlock, as we are inside of input handling routine
-					// , which cannot finish as it waits for us here, where we wait for graceful shutdown,
-					// which in turn waits for input handling routine to finish, so.. essentially asking
-					// for shutdown anywhere that is processed within server's Handle method, would always
-					// cause this to stuck.
+		// 			// this is tad strange, but we would like to simply shut down when client is ready...
+		// 			// why not, maybe we just want to test something and then shut down?
 
-					log.Printf("asking fx to shut down")
-					shutdowner.Shutdown()
-				},
-			}
-		}).
+		// 			// Note: This currently is causing deadlock, as we are inside of input handling routine
+		// 			// , which cannot finish as it waits for us here, where we wait for graceful shutdown,
+		// 			// which in turn waits for input handling routine to finish, so.. essentially asking
+		// 			// for shutdown anywhere that is processed within server's Handle method, would always
+		// 			// cause this to stuck.
+
+		// 			log.Printf("asking fx to shut down")
+		// 			shutdowner.Shutdown()
+		// 		},
+		// 	}
+		// }).
 		// setting up server
 		WithName("example-server").
 		WithVersion("0.0.1").
