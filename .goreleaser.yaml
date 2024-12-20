@@ -30,7 +30,4 @@ release:
 
 git:
   ignore_tags:
-  # this is some clever workaround to make goreleaser skip
-  # prerelease versions when calculating the changelog
-  # https://github.com/orgs/goreleaser/discussions/4336
-    - "{{ if not .prerelease}}beta{{ end }}"
+    - "{{ if not .Prerelease}}*beta*{{ end }}"
