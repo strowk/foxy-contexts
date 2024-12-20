@@ -3,8 +3,8 @@ package server
 import (
 	"log/slog"
 
-	"github.com/strowk/foxy-contexts/internal/jsonrpc2"
 	foxyevent "github.com/strowk/foxy-contexts/pkg/foxy_event"
+	"github.com/strowk/foxy-contexts/pkg/jsonrpc2"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
 )
 

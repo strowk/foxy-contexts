@@ -3,8 +3,8 @@ package fxctx
 import (
 	"fmt"
 
-	"github.com/strowk/foxy-contexts/internal/jsonrpc2"
 	"github.com/strowk/foxy-contexts/internal/utils"
+	"github.com/strowk/foxy-contexts/pkg/jsonrpc2"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
 	"github.com/strowk/foxy-contexts/pkg/server"
 	"go.uber.org/fx"
