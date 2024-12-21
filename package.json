@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "deploy": "gh-pages -d site"
+    "deploy": "gh-pages -d public"
   },
   "devDependencies": {
     "gh-pages": "^6.2.0"
