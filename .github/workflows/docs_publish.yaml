@@ -5,8 +5,7 @@ on:
     branches: [main]
     paths:
       - 'docs/**'
-      - README.md
-      - mkdocs.yml
+      - hugo.yaml
       - package.json
       - package-lock.json
   workflow_dispatch:
