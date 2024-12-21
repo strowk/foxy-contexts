@@ -1,546 +1,101 @@
-
-<!doctype html>
-<html lang="en" class="no-js">
-  <head>
-    
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width,initial-scale=1">
-      
-      
-      
-      
-        <link rel="prev" href="../testing/">
-      
-      
-      
-      <link rel="icon" href="../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.49">
-    
-    
-      
-        <title>App Builder - Foxy Contexts</title>
-      
-    
-    
-      <link rel="stylesheet" href="../assets/stylesheets/main.6f8fc17f.min.css">
-      
-        
-        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
-      
-      
-
-
-    
-    
-      
-    
-    
-      
-        
-        
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
-      
-    
-    
-      <link rel="stylesheet" href="../static/css/extra.css">
-    
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
-    
-      
-
-    
-    
-    
-  </head>
-  
-  
-    
-    
-    
-    
-    
-    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="indigo">
-  
-    
-    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
-    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
-    <label class="md-overlay" for="__drawer"></label>
-    <div data-md-component="skip">
-      
-        
-        <a href="#appbuilder" class="md-skip">
-          Skip to content
-        </a>
-      
-    </div>
-    <div data-md-component="announce">
-      
-    </div>
-    
-    
-      
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="index, follow"><link rel="icon shortcut" href=/favicon.ico sizes=32x32><link rel=icon href=/favicon.svg type=image/svg+xml><link rel=icon href=/favicon-dark.svg type=image/svg+xml media="(prefers-color-scheme: dark)"><link rel=icon href=/favicon-16x16.png type=image/png sizes=16x16><link rel=icon href=/favicon-32x32.png type=image/png sizes=32x32><link rel=apple-touch-icon href=/apple-touch-icon.png sizes=180x180><link fetchpriority=low href=/site.webmanifest rel=manifest><title>Foxy Contexts Docs</title>
+<meta name=description content='app.Builderapp.Builder is a builder around uber’s fx that combines fx DI capabilities with foxy-contexts MCP server implementation and gives simple interface to combine your MCP primitives into a single standalone application.
+Usage Simple example of wrapping one tool into an application, then running it with stdio transport:
+examples/simple_great_tool/main.gofunc main() { app. NewBuilder(). // adding the tool to the app WithTool(NewGreatTool). // setting up server WithName("great-tool-server"). WithVersion("0.0.1"). WithTransport(stdio.NewTransport()). // Configuring fx logging to only show errors WithFxOptions( fx.Provide(func() *zap.Logger { cfg := zap.NewDevelopmentConfig() cfg.Level.SetLevel(zap.ErrorLevel) logger, _ := cfg.Build() return logger }), fx.Option(fx.WithLogger( func(logger *zap.Logger) fxevent.Logger { return &amp;fxevent.ZapLogger{Logger: logger} }, )), ).Run() } Providing additional server options Normally app.Builder preconfigure server for you, but you can provide additional server options to the application by using WithExtraServerOptions option.'><link rel=canonical href=/app_builder/ itemprop=url><meta property="og:title" content><meta property="og:description" content='app.Builderapp.Builder is a builder around uber&rsquo;s fx that combines fx DI capabilities with foxy-contexts MCP server implementation and gives simple interface to combine your MCP primitives into a single standalone application.
+Usage
+    Simple example of wrapping one tool into an application, then running it with stdio transport:
 
   
 
-<header class="md-header md-header--shadow" data-md-component="header">
-  <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="Foxy Contexts" class="md-header__button md-logo" aria-label="Foxy Contexts" data-md-component="logo">
-      
-  <img src="../assets/logo.png" alt="logo">
 
-    </a>
-    <label class="md-header__button md-icon" for="__drawer">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
-    </label>
-    <div class="md-header__title" data-md-component="header-title">
-      <div class="md-header__ellipsis">
-        <div class="md-header__topic">
-          <span class="md-ellipsis">
-            Foxy Contexts
-          </span>
-        </div>
-        <div class="md-header__topic" data-md-component="header-topic">
-          <span class="md-ellipsis">
-            
-              App Builder
-            
-          </span>
-        </div>
-      </div>
-    </div>
-    
-      
-    
-    
-    
-    
-      <label class="md-header__button md-icon" for="__search">
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
-      </label>
-      <div class="md-search" data-md-component="search" role="dialog">
-  <label class="md-search__overlay" for="__search"></label>
-  <div class="md-search__inner" role="search">
-    <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
-      <label class="md-search__icon md-icon" for="__search">
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
-      </label>
-      <nav class="md-search__options" aria-label="Search">
-        
-        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          examples/simple_great_tool/main.go
           
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-        </button>
-      </nav>
-      
-        <div class="md-search__suggest" data-md-component="search-suggest"></div>
-      
-    </form>
-    <div class="md-search__output">
-      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
-        <div class="md-search-result" data-md-component="search-result">
-          <div class="md-search-result__meta">
-            Initializing search
-          </div>
-          <ol class="md-search-result__list" role="presentation"></ol>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-    
-    
-      <div class="md-header__source">
-        <a href="https://github.com/strowk/foxy-contexts" title="Go to repository" class="md-source" data-md-component="source">
-  <div class="md-source__icon md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
-  </div>
-  <div class="md-source__repository">
-    strowk/foxy-contexts
-  </div>
-</a>
-      </div>
-    
-  </nav>
-  
-</header>
-    
-    <div class="md-container" data-md-component="container">
-      
-      
-        
-          
-        
-      
-      <main class="md-main" data-md-component="main">
-        <div class="md-main__inner md-grid">
-          
-            
-              
-              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-
-
-
-  
-
-<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
-  <label class="md-nav__title" for="__drawer">
-    <a href=".." title="Foxy Contexts" class="md-nav__button md-logo" aria-label="Foxy Contexts" data-md-component="logo">
-      
-  <img src="../assets/logo.png" alt="logo">
-
-    </a>
-    Foxy Contexts
-  </label>
-  
-    <div class="md-nav__source">
-      <a href="https://github.com/strowk/foxy-contexts" title="Go to repository" class="md-source" data-md-component="source">
-  <div class="md-source__icon md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
-  </div>
-  <div class="md-source__repository">
-    strowk/foxy-contexts
-  </div>
-</a>
-    </div>
-  
-  <ul class="md-nav__list" data-md-scrollfix>
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Overview
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../tools/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Tools
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../resources/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Resources
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../prompts/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Prompts
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../testing/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Testing
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
+      func main() {
+	app.
+		NewBuilder().
+		// adding the tool to the app
+		WithTool(NewGreatTool).
+		// setting up server
+		WithName("great-tool-server").
+		WithVersion("0.0.1").
+		WithTransport(stdio.NewTransport()).
+		// Configuring fx logging to only show errors
+		WithFxOptions(
+			fx.Provide(func() *zap.Logger {
+				cfg := zap.NewDevelopmentConfig()
+				cfg.Level.SetLevel(zap.ErrorLevel)
+				logger, _ := cfg.Build()
+				return logger
+			}),
+			fx.Option(fx.WithLogger(
+				func(logger *zap.Logger) fxevent.Logger {
+					return &amp;fxevent.ZapLogger{Logger: logger}
+				},
+			)),
+		).Run()
+}
   
     
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    App Builder
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  <span class="md-ellipsis">
-    App Builder
-  </span>
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
     
   
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#usage" class="md-nav__link">
-    <span class="md-ellipsis">
-      Usage
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Usage">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#providing-additional-server-options" class="md-nav__link">
-    <span class="md-ellipsis">
-      Providing additional server options
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
 
-    
-  </ul>
-</nav>
-                  </div>
-                </div>
-              </div>
-            
-            
-          
-          
-            <div class="md-content" data-md-component="content">
-              <article class="md-content__inner md-typeset">
-                
-                  
 
   
-  
-
-
-<h1 id="appbuilder">app.Builder<a class="headerlink" href="#appbuilder" title="Permanent link">&para;</a></h1>
-<p>app.Builder is a builder around uber's fx that combines fx DI capabilities with foxy-contexts <abbr title="Model Context Protocol">MCP</abbr> server implementation and gives simple interface to combine your <abbr title="Model Context Protocol">MCP</abbr> primitives into a single standalone application.</p>
-<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
-<p>Simple example of wrapping one tool into an application, then running it with stdio transport:</p>
-<div class="language-go highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nx">app</span><span class="p">.</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">        </span><span class="nx">NewBuilder</span><span class="p">().</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">        </span><span class="c1">// adding the tool to the app</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">        </span><span class="nx">WithTool</span><span class="p">(</span><span class="nx">NewGreatTool</span><span class="p">).</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">        </span><span class="c1">// setting up server</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">        </span><span class="nx">WithName</span><span class="p">(</span><span class="s">&quot;great-tool-server&quot;</span><span class="p">).</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">        </span><span class="nx">WithVersion</span><span class="p">(</span><span class="s">&quot;0.0.1&quot;</span><span class="p">).</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">        </span><span class="nx">WithTransport</span><span class="p">(</span><span class="nx">stdio</span><span class="p">.</span><span class="nx">NewTransport</span><span class="p">()).</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">        </span><span class="c1">// Configuring fx logging to only show errors</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">        </span><span class="nx">WithFxOptions</span><span class="p">(</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">            </span><span class="nx">fx</span><span class="p">.</span><span class="nx">Provide</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="nx">zap</span><span class="p">.</span><span class="nx">Logger</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">                </span><span class="nx">cfg</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">zap</span><span class="p">.</span><span class="nx">NewDevelopmentConfig</span><span class="p">()</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">                </span><span class="nx">cfg</span><span class="p">.</span><span class="nx">Level</span><span class="p">.</span><span class="nx">SetLevel</span><span class="p">(</span><span class="nx">zap</span><span class="p">.</span><span class="nx">ErrorLevel</span><span class="p">)</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">                </span><span class="nx">logger</span><span class="p">,</span><span class="w"> </span><span class="nx">_</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">cfg</span><span class="p">.</span><span class="nx">Build</span><span class="p">()</span>
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="nx">logger</span>
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">            </span><span class="p">}),</span>
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">            </span><span class="nx">fx</span><span class="p">.</span><span class="nx">Option</span><span class="p">(</span><span class="nx">fx</span><span class="p">.</span><span class="nx">WithLogger</span><span class="p">(</span>
-</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">                </span><span class="kd">func</span><span class="p">(</span><span class="nx">logger</span><span class="w"> </span><span class="o">*</span><span class="nx">zap</span><span class="p">.</span><span class="nx">Logger</span><span class="p">)</span><span class="w"> </span><span class="nx">fxevent</span><span class="p">.</span><span class="nx">Logger</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">                    </span><span class="k">return</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">fxevent</span><span class="p">.</span><span class="nx">ZapLogger</span><span class="p">{</span><span class="nx">Logger</span><span class="p">:</span><span class="w"> </span><span class="nx">logger</span><span class="p">}</span>
-</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">                </span><span class="p">},</span>
-</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">            </span><span class="p">)),</span>
-</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">        </span><span class="p">).</span><span class="nx">Run</span><span class="p">()</span>
-</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="p">}</span>
-</span></code></pre></div>
-<h3 id="providing-additional-server-options">Providing additional server options<a class="headerlink" href="#providing-additional-server-options" title="Permanent link">&para;</a></h3>
-<p>Normally app.Builder preconfigure server for you, but you can provide additional server options to the application by using <code>WithExtraServerOptions</code> option.</p>
-<p>Say, for example this would make server to turn on logging to stderr:</p>
-<div class="language-go highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nx">WithExtraServerOptions</span><span class="p">(</span><span class="nx">server</span><span class="p">.</span><span class="nx">LoggerOption</span><span class="p">{</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="nx">Logger</span><span class="p">:</span><span class="w"> </span><span class="nx">foxyevent</span><span class="p">.</span><span class="nx">NewSlogLogger</span><span class="p">(</span><span class="nx">slog</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="nx">slog</span><span class="p">.</span><span class="nx">NewTextHandler</span><span class="p">(</span><span class="nx">os</span><span class="p">.</span><span class="nx">Stderr</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">slog</span><span class="p">.</span><span class="nx">HandlerOptions</span><span class="p">{</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">        </span><span class="nx">Level</span><span class="p">:</span><span class="w"> </span><span class="nx">slog</span><span class="p">.</span><span class="nx">LevelDebug</span><span class="p">,</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="p">}))).</span><span class="nx">WithLogLevel</span><span class="p">(</span><span class="nx">slog</span><span class="p">.</span><span class="nx">LevelInfo</span><span class="p">),</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">})</span>
-</span></code></pre></div>
-
-
-
-
-
-
-
-
-
-
-
-
-                
-              </article>
-            </div>
-          
-          
-<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
-        </div>
-        
-          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
-  Back to top
-</button>
-        
-      </main>
-      
-        <footer class="md-footer">
-  
-    
-      
-      <nav class="md-footer__inner md-grid" aria-label="Footer" >
-        
-          
-          <a href="../testing/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Testing">
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
-            </div>
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              <div class="md-ellipsis">
-                Testing
-              </div>
-            </div>
-          </a>
-        
-        
-      </nav>
-    
-  
-  <div class="md-footer-meta md-typeset">
-    <div class="md-footer-meta__inner md-grid">
-      <div class="md-copyright">
-  
-  
-    Made with
-    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
-      Material for MkDocs
-    </a>
-  
-</div>
-      
-    </div>
-  </div>
-</footer>
-      
-    </div>
-    <div class="md-dialog" data-md-component="dialog">
-      <div class="md-dialog__inner md-typeset"></div>
-    </div>
-    
-      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
-    
-    
-    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tracking", "announce.dismiss", "navigation.instant", "navigation.instant.progress", "navigation.sections", "navigation.expand", "navigation.top", "navigation.footer", "toc.integrate", "navigation.indexes", "search.suggest", "header.autohide"], "search": "../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
-    
-    
-      <script src="../assets/javascripts/bundle.88dd0f4e.min.js"></script>
-      
-    
-  </body>
-</html>
+Providing additional server options
+    Normally app.Builder preconfigure server for you, but you can provide additional server options to the application by using WithExtraServerOptions option.'><meta property="og:type" content="article"><meta property="og:url" content="/app_builder/"><meta property="article:section" content><meta itemprop=name content="Foxy Contexts Docs"><meta itemprop=description content='app.Builderapp.Builder is a builder around uber’s fx that combines fx DI capabilities with foxy-contexts MCP server implementation and gives simple interface to combine your MCP primitives into a single standalone application.
+Usage Simple example of wrapping one tool into an application, then running it with stdio transport:
+examples/simple_great_tool/main.gofunc main() { app. NewBuilder(). // adding the tool to the app WithTool(NewGreatTool). // setting up server WithName("great-tool-server"). WithVersion("0.0.1"). WithTransport(stdio.NewTransport()). // Configuring fx logging to only show errors WithFxOptions( fx.Provide(func() *zap.Logger { cfg := zap.NewDevelopmentConfig() cfg.Level.SetLevel(zap.ErrorLevel) logger, _ := cfg.Build() return logger }), fx.Option(fx.WithLogger( func(logger *zap.Logger) fxevent.Logger { return &amp;fxevent.ZapLogger{Logger: logger} }, )), ).Run() } Providing additional server options Normally app.Builder preconfigure server for you, but you can provide additional server options to the application by using WithExtraServerOptions option.'><meta itemprop=wordCount content="148"><meta name=twitter:card content="summary"><meta name=twitter:title content="Foxy Contexts Docs"><meta name=twitter:description content='app.Builderapp.Builder is a builder around uber’s fx that combines fx DI capabilities with foxy-contexts MCP server implementation and gives simple interface to combine your MCP primitives into a single standalone application.
+Usage Simple example of wrapping one tool into an application, then running it with stdio transport:
+examples/simple_great_tool/main.gofunc main() { app. NewBuilder(). // adding the tool to the app WithTool(NewGreatTool). // setting up server WithName("great-tool-server"). WithVersion("0.0.1"). WithTransport(stdio.NewTransport()). // Configuring fx logging to only show errors WithFxOptions( fx.Provide(func() *zap.Logger { cfg := zap.NewDevelopmentConfig() cfg.Level.SetLevel(zap.ErrorLevel) logger, _ := cfg.Build() return logger }), fx.Option(fx.WithLogger( func(logger *zap.Logger) fxevent.Logger { return &amp;fxevent.ZapLogger{Logger: logger} }, )), ).Run() } Providing additional server options Normally app.Builder preconfigure server for you, but you can provide additional server options to the application by using WithExtraServerOptions option.'><link rel=preload href=/css/compiled/main.min.33b308ec8b8d5df72a614d7504ed2df3405a9b1d19cf059dc9c4d88f0b8a2551.css as=style integrity="sha256-M7MI7IuNXfcqYU11BO0t80Bamx0ZzwWdycTYjwuKJVE="><link href=/css/compiled/main.min.33b308ec8b8d5df72a614d7504ed2df3405a9b1d19cf059dc9c4d88f0b8a2551.css rel=stylesheet integrity="sha256-M7MI7IuNXfcqYU11BO0t80Bamx0ZzwWdycTYjwuKJVE="><link href=/css/custom.min.e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css rel=stylesheet integrity="sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU="><script>const defaultTheme="system",setDarkTheme=()=>{document.documentElement.classList.add("dark"),document.documentElement.style.colorScheme="dark"},setLightTheme=()=>{document.documentElement.classList.remove("dark"),document.documentElement.style.colorScheme="light"};"color-theme"in localStorage?localStorage.getItem("color-theme")==="dark"?setDarkTheme():setLightTheme():(defaultTheme==="dark"?setDarkTheme():setLightTheme(),defaultTheme==="system"&&(window.matchMedia("(prefers-color-scheme: dark)").matches?setDarkTheme():setLightTheme()))</script></head><body dir=ltr><div class="nav-container hx-sticky hx-top-0 hx-z-20 hx-w-full hx-bg-transparent print:hx-hidden"><div class="nav-container-blur hx-pointer-events-none hx-absolute hx-z-[-1] hx-h-full hx-w-full hx-bg-white dark:hx-bg-dark hx-shadow-[0_2px_4px_rgba(0,0,0,.02),0_1px_0_rgba(0,0,0,.06)] contrast-more:hx-shadow-[0_0_0_1px_#000] dark:hx-shadow-[0_-1px_0_rgba(255,255,255,.1)_inset] contrast-more:dark:hx-shadow-[0_0_0_1px_#fff]"></div><nav class="hx-mx-auto hx-flex hx-items-center hx-justify-end hx-gap-2 hx-h-16 hx-px-6 hx-max-w-[90rem]"><a class="hx-flex hx-items-center hover:hx-opacity-75 ltr:hx-mr-auto rtl:hx-ml-auto" href=/><span class="hx-mx-2 hx-font-extrabold hx-inline hx-select-none" title="Foxy Contexts Docs">Foxy Contexts Docs</span>
+</a><a title=Documentation href=/ class="hx-text-sm contrast-more:hx-text-gray-700 contrast-more:dark:hx-text-gray-100 hx-relative -hx-ml-2 hx-hidden hx-whitespace-nowrap hx-p-2 md:hx-inline-block hx-text-gray-600 hover:hx-text-gray-800 dark:hx-text-gray-400 dark:hover:hx-text-gray-200"><span class=hx-text-center>Documentation</span>
+</a><a class="hx-p-2 hx-text-current" target=_blank rel=noreferrer href=https://github.com/strowk/foxy-contexts title=GitHub><svg height="24" fill="currentcolor" viewBox="3 3 18 18"><path d="M12 3C7.0275 3 3 7.12937 3 12.2276c0 4.0833 2.57625 7.5321 6.15374 8.7548C9.60374 21.0631 9.77249 20.7863 9.77249 20.5441 9.77249 20.3249 9.76125 19.5982 9.76125 18.8254 7.5 19.2522 6.915 18.2602 6.735 17.7412 6.63375 17.4759 6.19499 16.6569 5.8125 16.4378 5.4975 16.2647 5.0475 15.838 5.80124 15.8264 6.51 15.8149 7.01625 16.4954 7.18499 16.7723 7.99499 18.1679 9.28875 17.7758 9.80625 17.5335 9.885 16.9337 10.1212 16.53 10.38 16.2993 8.3775 16.0687 6.285 15.2728 6.285 11.7432c0-1.0035.34875-1.834.92249-2.47994C7.1175 9.03257 6.8025 8.08674 7.2975 6.81794c0 0 .753749999999999-.24223 2.47499.94583.72001-.20762 1.48501-.31143 2.25001-.31143C12.7875 7.45234 13.5525 7.55615 14.2725 7.76377c1.7212-1.19959 2.475-.94583 2.475-.94583C17.2424 8.08674 16.9275 9.03257 16.8375 9.26326 17.4113 9.9092 17.76 10.7281 17.76 11.7432c0 3.5411-2.1037 4.3255-4.1063 4.5561C13.98 16.5877 14.2613 17.1414 14.2613 18.0065 14.2613 19.2407 14.25 20.2326 14.25 20.5441 14.25 20.7863 14.4188 21.0746 14.8688 20.9824 16.6554 20.364 18.2079 19.1866 19.3078 17.6162c1.0999-1.5705 1.6917-3.4551 1.6922-5.3886C21 7.12937 16.9725 3 12 3z"/></svg>
+<span class=hx-sr-only>GitHub</span>
+</a><a title="Changelogs ↗" href=https://github.com/strowk/foxy-contexts/releases target=_blank rel=noreferrer class="hx-text-sm contrast-more:hx-text-gray-700 contrast-more:dark:hx-text-gray-100 hx-relative -hx-ml-2 hx-hidden hx-whitespace-nowrap hx-p-2 md:hx-inline-block hx-text-gray-600 hover:hx-text-gray-800 dark:hx-text-gray-400 dark:hover:hx-text-gray-200"><span class=hx-text-center>Changelogs ↗</span>
+</a><a title="Godoc ↗" href=https://pkg.go.dev/github.com/strowk/foxy-contexts target=_blank rel=noreferrer class="hx-text-sm contrast-more:hx-text-gray-700 contrast-more:dark:hx-text-gray-100 hx-relative -hx-ml-2 hx-hidden hx-whitespace-nowrap hx-p-2 md:hx-inline-block hx-text-gray-600 hover:hx-text-gray-800 dark:hx-text-gray-400 dark:hover:hx-text-gray-200"><span class=hx-text-center>Godoc ↗</span>
+</a><a title="Examples ↗" href=https://github.com/strowk/foxy-contexts/tree/main/examples target=_blank rel=noreferrer class="hx-text-sm contrast-more:hx-text-gray-700 contrast-more:dark:hx-text-gray-100 hx-relative -hx-ml-2 hx-hidden hx-whitespace-nowrap hx-p-2 md:hx-inline-block hx-text-gray-600 hover:hx-text-gray-800 dark:hx-text-gray-400 dark:hover:hx-text-gray-200"><span class=hx-text-center>Examples ↗</span></a><div class="search-wrapper hx-relative md:hx-w-64"><div class="hx-relative hx-flex hx-items-center hx-text-gray-900 contrast-more:hx-text-gray-800 dark:hx-text-gray-300 contrast-more:dark:hx-text-gray-300"><input placeholder=Search... class="search-input hx-block hx-w-full hx-appearance-none hx-rounded-lg hx-px-3 hx-py-2 hx-transition-colors hx-text-base hx-leading-tight md:hx-text-sm hx-bg-black/[.05] dark:hx-bg-gray-50/10 focus:hx-bg-white dark:focus:hx-bg-dark placeholder:hx-text-gray-500 dark:placeholder:hx-text-gray-400 contrast-more:hx-border contrast-more:hx-border-current" type=search spellcheck=false>
+<kbd class="hx-absolute hx-my-1.5 hx-select-none ltr:hx-right-1.5 rtl:hx-left-1.5 hx-h-5 hx-rounded hx-bg-white hx-px-1.5 hx-font-mono hx-text-[10px] hx-font-medium hx-text-gray-500 hx-border dark:hx-border-gray-100/20 dark:hx-bg-dark/50 contrast-more:hx-border-current contrast-more:hx-text-current contrast-more:dark:hx-border-current hx-items-center hx-gap-1 hx-transition-opacity hx-pointer-events-none hx-hidden sm:hx-flex">CTRL K</kbd></div><div><ul class="search-results hextra-scrollbar hx-hidden hx-border hx-border-gray-200 hx-bg-white hx-text-gray-100 dark:hx-border-neutral-800 dark:hx-bg-neutral-900 hx-absolute hx-top-full hx-z-20 hx-mt-2 hx-overflow-auto hx-overscroll-contain hx-rounded-xl hx-py-2.5 hx-shadow-xl hx-max-h-[min(calc(50vh-11rem-env(safe-area-inset-bottom)),400px)] md:hx-max-h-[min(calc(100vh-5rem-env(safe-area-inset-bottom)),400px)] hx-inset-x-0 ltr:md:hx-left-auto rtl:md:hx-right-auto contrast-more:hx-border contrast-more:hx-border-gray-900 contrast-more:dark:hx-border-gray-50 hx-w-screen hx-min-h-[100px] hx-max-w-[min(calc(100vw-2rem),calc(100%+20rem))]" style="transition:max-height .2s ease 0s"></ul></div></div><button type=button aria-label=Menu class="hamburger-menu -hx-mr-2 hx-rounded hx-p-2 active:hx-bg-gray-400/20 md:hx-hidden"><svg height="24" fill="none" viewBox="0 0 24 24" stroke="currentcolor"><g><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8H20"/></g><g><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16H20"/></g></svg></button></nav></div><div class='hx-mx-auto hx-flex hx-max-w-screen-xl'><div class="mobile-menu-overlay [transition:background-color_1.5s_ease] hx-fixed hx-inset-0 hx-z-10 hx-bg-black/80 dark:hx-bg-black/60 hx-hidden"></div><aside class="sidebar-container hx-flex hx-flex-col print:hx-hidden md:hx-top-16 md:hx-shrink-0 md:hx-w-64 md:hx-self-start max-md:[transform:translate3d(0,-100%,0)] md:hx-sticky"><div class="hx-px-4 hx-pt-4 md:hx-hidden"><div class="search-wrapper hx-relative md:hx-w-64"><div class="hx-relative hx-flex hx-items-center hx-text-gray-900 contrast-more:hx-text-gray-800 dark:hx-text-gray-300 contrast-more:dark:hx-text-gray-300"><input placeholder=Search... class="search-input hx-block hx-w-full hx-appearance-none hx-rounded-lg hx-px-3 hx-py-2 hx-transition-colors hx-text-base hx-leading-tight md:hx-text-sm hx-bg-black/[.05] dark:hx-bg-gray-50/10 focus:hx-bg-white dark:focus:hx-bg-dark placeholder:hx-text-gray-500 dark:placeholder:hx-text-gray-400 contrast-more:hx-border contrast-more:hx-border-current" type=search spellcheck=false>
+<kbd class="hx-absolute hx-my-1.5 hx-select-none ltr:hx-right-1.5 rtl:hx-left-1.5 hx-h-5 hx-rounded hx-bg-white hx-px-1.5 hx-font-mono hx-text-[10px] hx-font-medium hx-text-gray-500 hx-border dark:hx-border-gray-100/20 dark:hx-bg-dark/50 contrast-more:hx-border-current contrast-more:hx-text-current contrast-more:dark:hx-border-current hx-items-center hx-gap-1 hx-transition-opacity hx-pointer-events-none hx-hidden sm:hx-flex">CTRL K</kbd></div><div><ul class="search-results hextra-scrollbar hx-hidden hx-border hx-border-gray-200 hx-bg-white hx-text-gray-100 dark:hx-border-neutral-800 dark:hx-bg-neutral-900 hx-absolute hx-top-full hx-z-20 hx-mt-2 hx-overflow-auto hx-overscroll-contain hx-rounded-xl hx-py-2.5 hx-shadow-xl hx-max-h-[min(calc(50vh-11rem-env(safe-area-inset-bottom)),400px)] md:hx-max-h-[min(calc(100vh-5rem-env(safe-area-inset-bottom)),400px)] hx-inset-x-0 ltr:md:hx-left-auto rtl:md:hx-right-auto contrast-more:hx-border contrast-more:hx-border-gray-900 contrast-more:dark:hx-border-gray-50 hx-w-screen hx-min-h-[100px] hx-max-w-[min(calc(100vw-2rem),calc(100%+20rem))]" style="transition:max-height .2s ease 0s"></ul></div></div></div><div class="hextra-scrollbar hx-overflow-y-auto hx-overflow-x-hidden hx-p-4 hx-grow md:hx-h-[calc(100vh-var(--navbar-height)-var(--menu-height))]"><ul class="hx-flex hx-flex-col hx-gap-1 md:hx-hidden"><li><a class="hx-flex hx-items-center hx-justify-between hx-gap-2 hx-cursor-pointer hx-rounded hx-px-2 hx-py-1.5 hx-text-sm hx-transition-colors [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] [word-break:break-word]
+hx-text-gray-500 hover:hx-bg-gray-100 hover:hx-text-gray-900 contrast-more:hx-border contrast-more:hx-border-transparent contrast-more:hx-text-gray-900 contrast-more:hover:hx-border-gray-900 dark:hx-text-neutral-400 dark:hover:hx-bg-primary-100/5 dark:hover:hx-text-gray-50 contrast-more:dark:hx-text-gray-50 contrast-more:dark:hover:hx-border-gray-50" href=/tools/>Tools</a></li><li><a class="hx-flex hx-items-center hx-justify-between hx-gap-2 hx-cursor-pointer hx-rounded hx-px-2 hx-py-1.5 hx-text-sm hx-transition-colors [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] [word-break:break-word]
+hx-text-gray-500 hover:hx-bg-gray-100 hover:hx-text-gray-900 contrast-more:hx-border contrast-more:hx-border-transparent contrast-more:hx-text-gray-900 contrast-more:hover:hx-border-gray-900 dark:hx-text-neutral-400 dark:hover:hx-bg-primary-100/5 dark:hover:hx-text-gray-50 contrast-more:dark:hx-text-gray-50 contrast-more:dark:hover:hx-border-gray-50" href=/resources/>Resources</a></li><li><a class="hx-flex hx-items-center hx-justify-between hx-gap-2 hx-cursor-pointer hx-rounded hx-px-2 hx-py-1.5 hx-text-sm hx-transition-colors [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] [word-break:break-word]
+hx-text-gray-500 hover:hx-bg-gray-100 hover:hx-text-gray-900 contrast-more:hx-border contrast-more:hx-border-transparent contrast-more:hx-text-gray-900 contrast-more:hover:hx-border-gray-900 dark:hx-text-neutral-400 dark:hover:hx-bg-primary-100/5 dark:hover:hx-text-gray-50 contrast-more:dark:hx-text-gray-50 contrast-more:dark:hover:hx-border-gray-50" href=/prompts/>Prompts</a></li><li class=open><a class="hx-flex hx-items-center hx-justify-between hx-gap-2 hx-cursor-pointer hx-rounded hx-px-2 hx-py-1.5 hx-text-sm hx-transition-colors [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] [word-break:break-word]
+sidebar-active-item hx-bg-primary-100 hx-font-semibold hx-text-primary-800 contrast-more:hx-border contrast-more:hx-border-primary-500 dark:hx-bg-primary-400/10 dark:hx-text-primary-600 contrast-more:dark:hx-border-primary-500" href=/app_builder/>App Builder</a><ul class='hx-flex hx-flex-col hx-gap-1 hx-relative before:hx-absolute before:hx-inset-y-1 before:hx-w-px before:hx-bg-gray-200 before:hx-content-[""] dark:before:hx-bg-neutral-800 ltr:hx-pl-3 ltr:before:hx-left-0 rtl:hx-pr-3 rtl:before:hx-right-0 ltr:hx-ml-3 rtl:hx-mr-3'><li><a href=#usage class="hx-flex hx-rounded hx-px-2 hx-py-1.5 hx-text-sm hx-transition-colors [word-break:break-word] hx-cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] contrast-more:hx-border hx-gap-2 before:hx-opacity-25 before:hx-content-['#'] hx-text-gray-500 hover:hx-bg-gray-100 hover:hx-text-gray-900 dark:hx-text-neutral-400 dark:hover:hx-bg-primary-100/5 dark:hover:hx-text-gray-50 contrast-more:hx-text-gray-900 contrast-more:dark:hx-text-gray-50 contrast-more:hx-border-transparent contrast-more:hover:hx-border-gray-900 contrast-more:dark:hover:hx-border-gray-50">Usage</a></li></ul></li><li><a class="hx-flex hx-items-center hx-justify-between hx-gap-2 hx-cursor-pointer hx-rounded hx-px-2 hx-py-1.5 hx-text-sm hx-transition-colors [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] [word-break:break-word]
+hx-text-gray-500 hover:hx-bg-gray-100 hover:hx-text-gray-900 contrast-more:hx-border contrast-more:hx-border-transparent contrast-more:hx-text-gray-900 contrast-more:hover:hx-border-gray-900 dark:hx-text-neutral-400 dark:hover:hx-bg-primary-100/5 dark:hover:hx-text-gray-50 contrast-more:dark:hx-text-gray-50 contrast-more:dark:hover:hx-border-gray-50" href=/testing/>Testing</a></li><li><a class="hx-flex hx-items-center hx-justify-between hx-gap-2 hx-cursor-pointer hx-rounded hx-px-2 hx-py-1.5 hx-text-sm hx-transition-colors [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] [word-break:break-word]
+hx-text-gray-500 hover:hx-bg-gray-100 hover:hx-text-gray-900 contrast-more:hx-border contrast-more:hx-border-transparent contrast-more:hx-text-gray-900 contrast-more:hover:hx-border-gray-900 dark:hx-text-neutral-400 dark:hover:hx-bg-primary-100/5 dark:hover:hx-text-gray-50 contrast-more:dark:hx-text-gray-50 contrast-more:dark:hover:hx-border-gray-50" href=https://modelcontextprotocol.io/ target=_blank rel=noreferrer>MCP ↗</a></li></ul><ul class="hx-flex hx-flex-col hx-gap-1 max-md:hx-hidden"><li><a class="hx-flex hx-items-center hx-justify-between hx-gap-2 hx-cursor-pointer hx-rounded hx-px-2 hx-py-1.5 hx-text-sm hx-transition-colors [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] [word-break:break-word]
+hx-text-gray-500 hover:hx-bg-gray-100 hover:hx-text-gray-900 contrast-more:hx-border contrast-more:hx-border-transparent contrast-more:hx-text-gray-900 contrast-more:hover:hx-border-gray-900 dark:hx-text-neutral-400 dark:hover:hx-bg-primary-100/5 dark:hover:hx-text-gray-50 contrast-more:dark:hx-text-gray-50 contrast-more:dark:hover:hx-border-gray-50" href=/tools/>Tools</a></li><li><a class="hx-flex hx-items-center hx-justify-between hx-gap-2 hx-cursor-pointer hx-rounded hx-px-2 hx-py-1.5 hx-text-sm hx-transition-colors [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] [word-break:break-word]
+hx-text-gray-500 hover:hx-bg-gray-100 hover:hx-text-gray-900 contrast-more:hx-border contrast-more:hx-border-transparent contrast-more:hx-text-gray-900 contrast-more:hover:hx-border-gray-900 dark:hx-text-neutral-400 dark:hover:hx-bg-primary-100/5 dark:hover:hx-text-gray-50 contrast-more:dark:hx-text-gray-50 contrast-more:dark:hover:hx-border-gray-50" href=/resources/>Resources</a></li><li><a class="hx-flex hx-items-center hx-justify-between hx-gap-2 hx-cursor-pointer hx-rounded hx-px-2 hx-py-1.5 hx-text-sm hx-transition-colors [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] [word-break:break-word]
+hx-text-gray-500 hover:hx-bg-gray-100 hover:hx-text-gray-900 contrast-more:hx-border contrast-more:hx-border-transparent contrast-more:hx-text-gray-900 contrast-more:hover:hx-border-gray-900 dark:hx-text-neutral-400 dark:hover:hx-bg-primary-100/5 dark:hover:hx-text-gray-50 contrast-more:dark:hx-text-gray-50 contrast-more:dark:hover:hx-border-gray-50" href=/prompts/>Prompts</a></li><li class=open><a class="hx-flex hx-items-center hx-justify-between hx-gap-2 hx-cursor-pointer hx-rounded hx-px-2 hx-py-1.5 hx-text-sm hx-transition-colors [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] [word-break:break-word]
+sidebar-active-item hx-bg-primary-100 hx-font-semibold hx-text-primary-800 contrast-more:hx-border contrast-more:hx-border-primary-500 dark:hx-bg-primary-400/10 dark:hx-text-primary-600 contrast-more:dark:hx-border-primary-500" href=/app_builder/>App Builder</a></li><li><a class="hx-flex hx-items-center hx-justify-between hx-gap-2 hx-cursor-pointer hx-rounded hx-px-2 hx-py-1.5 hx-text-sm hx-transition-colors [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] [word-break:break-word]
+hx-text-gray-500 hover:hx-bg-gray-100 hover:hx-text-gray-900 contrast-more:hx-border contrast-more:hx-border-transparent contrast-more:hx-text-gray-900 contrast-more:hover:hx-border-gray-900 dark:hx-text-neutral-400 dark:hover:hx-bg-primary-100/5 dark:hover:hx-text-gray-50 contrast-more:dark:hx-text-gray-50 contrast-more:dark:hover:hx-border-gray-50" href=/testing/>Testing</a></li><li><a class="hx-flex hx-items-center hx-justify-between hx-gap-2 hx-cursor-pointer hx-rounded hx-px-2 hx-py-1.5 hx-text-sm hx-transition-colors [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] [word-break:break-word]
+hx-text-gray-500 hover:hx-bg-gray-100 hover:hx-text-gray-900 contrast-more:hx-border contrast-more:hx-border-transparent contrast-more:hx-text-gray-900 contrast-more:hover:hx-border-gray-900 dark:hx-text-neutral-400 dark:hover:hx-bg-primary-100/5 dark:hover:hx-text-gray-50 contrast-more:dark:hx-text-gray-50 contrast-more:dark:hover:hx-border-gray-50" href=https://modelcontextprotocol.io/ target=_blank rel=noreferrer>MCP ↗</a></li></ul></div><div class="hx-sticky hx-bottom-0 hx-bg-white dark:hx-bg-dark hx-mx-4 hx-py-4 hx-shadow-[0_-12px_16px_#fff] hx-flex hx-items-center hx-gap-2 dark:hx-border-neutral-800 dark:hx-shadow-[0_-12px_16px_#111] contrast-more:hx-border-neutral-400 contrast-more:hx-shadow-none contrast-more:dark:hx-shadow-none hx-border-t" data-toggle-animation=show><div class="hx-flex hx-grow hx-flex-col"><button title="Change theme" data-theme=light class="theme-toggle hx-group hx-h-7 hx-rounded-md hx-px-2 hx-text-left hx-text-xs hx-font-medium hx-text-gray-600 hx-transition-colors dark:hx-text-gray-400 hover:hx-bg-gray-100 hover:hx-text-gray-900 dark:hover:hx-bg-primary-100/5 dark:hover:hx-text-gray-50" type=button aria-label="Change theme"><div class="hx-flex hx-items-center hx-gap-2 hx-capitalize"><svg height="12" class="group-data-[theme=light]:hx-hidden" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364-.707-.707M6.343 6.343l-.707-.707m12.728.0-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg><span class="group-data-[theme=light]:hx-hidden">Light</span><svg height="12" class="group-data-[theme=dark]:hx-hidden" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003.0 0012 21a9.003 9.003.0 008.354-5.646z"/></svg><span class="group-data-[theme=dark]:hx-hidden">Dark</span></div></button></div></div></aside><nav class="hextra-toc hx-order-last hx-hidden hx-w-64 hx-shrink-0 xl:hx-block print:hx-hidden hx-px-4" aria-label="table of contents"><div class="hextra-scrollbar hx-sticky hx-top-16 hx-overflow-y-auto hx-pr-4 hx-pt-6 hx-text-sm [hyphens:auto] hx-max-h-[calc(100vh-var(--navbar-height)-env(safe-area-inset-bottom))] ltr:hx--mr-4 rtl:hx--ml-4"><p class="hx-mb-4 hx-font-semibold hx-tracking-tight">On this page</p><ul><li class="hx-my-2 hx-scroll-my-6 hx-scroll-py-6"><a class="hx-font-semibold hx-inline-block hx-text-gray-500 hover:hx-text-gray-900 dark:hx-text-gray-400 dark:hover:hx-text-gray-300 contrast-more:hx-text-gray-900 contrast-more:hx-underline contrast-more:dark:hx-text-gray-50 hx-w-full hx-break-words" href=#usage>Usage</a></li><li class="hx-my-2 hx-scroll-my-6 hx-scroll-py-6"><a class="ltr:hx-pl-4 rtl:hx-pr-4 hx-inline-block hx-text-gray-500 hover:hx-text-gray-900 dark:hx-text-gray-400 dark:hover:hx-text-gray-300 contrast-more:hx-text-gray-900 contrast-more:hx-underline contrast-more:dark:hx-text-gray-50 hx-w-full hx-break-words" href=#providing-additional-server-options>Providing additional server options</a></li></ul><div class="hx-mt-8 hx-border-t hx-bg-white hx-pt-8 hx-shadow-[0_-12px_16px_white] dark:hx-bg-dark dark:hx-shadow-[0_-12px_16px_#111] hx-sticky hx-bottom-0 hx-flex hx-flex-col hx-items-start hx-gap-2 hx-pb-8 dark:hx-border-neutral-800 contrast-more:hx-border-t contrast-more:hx-border-neutral-400 contrast-more:hx-shadow-none contrast-more:dark:hx-border-neutral-400"><a class="hx-text-xs hx-font-medium hx-text-gray-500 hover:hx-text-gray-900 dark:hx-text-gray-400 dark:hover:hx-text-gray-100 contrast-more:hx-text-gray-800 contrast-more:dark:hx-text-gray-50" href=https://github.com/strowk/foxy-contexts/edit/main/docs/content/app_builder.md target=_blank rel=noreferrer>Edit this page on GitHub →</a>
+<button aria-hidden=true id=backToTop onclick=scrollUp() class="hx-transition-all hx-duration-75 hx-opacity-0 hx-text-xs hx-font-medium hx-text-gray-500 hover:hx-text-gray-900 dark:hx-text-gray-400 dark:hover:hx-text-gray-100 contrast-more:hx-text-gray-800 contrast-more:dark:hx-text-gray-50">
+<span>Scroll to top</span><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentcolor" class="hx-inline ltr:hx-ml-1 rtl:hx-mr-1 hx-h-3.5 hx-w-3.5 hx-border hx-rounded-full hx-border-gray-500 hover:hx-border-gray-900 dark:hx-border-gray-400 dark:hover:hx-border-gray-100 contrast-more:hx-border-gray-800 contrast-more:dark:hx-border-gray-50"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/></svg></button></div></div></nav><article class="hx-w-full hx-break-words hx-flex hx-min-h-[calc(100vh-var(--navbar-height))] hx-min-w-0 hx-justify-center hx-pb-8 hx-pr-[calc(env(safe-area-inset-right)-1.5rem)]"><main class="hx-w-full hx-min-w-0 hx-max-w-6xl hx-px-6 hx-pt-4 md:hx-px-12"><div class=content><h1>app.Builder</h1><p>app.Builder is a builder around uber&rsquo;s fx that combines fx DI capabilities with foxy-contexts MCP server implementation and gives simple interface to combine your MCP primitives into a single standalone application.</p><h2>Usage<span class="hx-absolute -hx-mt-20" id=usage></span>
+<a href=#usage class=subheading-anchor aria-label="Permalink for this section"></a></h2><p>Simple example of wrapping one tool into an application, then running it with stdio transport:</p><div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"><div class=filename dir=auto><a style=color:inherit;text-decoration:none href=https://github.com/strowk/foxy-contexts/blob/main/examples/simple_great_tool/main.go target=_blank rel="noopener noreferrer">examples/simple_great_tool/main.go
+<span class="hx-inline-block hx-align-text-bottom icon"><svg height="1em" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6A2 2 0 004 8v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg></span></a></div><div><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=nx><code class="code-inline language-go"><span style=color:#76a9f9>func</span> <span style=color:#00b1f7>main</span><span style=color:#abb2bf>()</span> <span style=color:#abb2bf>{</span>
+	<span style=color:#aa89ea>app</span><span style=color:#abb2bf>.</span>
+		<span style=color:#00b1f7>NewBuilder</span><span style=color:#abb2bf>().</span>
+		<span style=color:#8a93a5;font-style:italic>// adding the tool to the app
+</span><span style=color:#8a93a5;font-style:italic></span>		<span style=color:#00b1f7>WithTool</span><span style=color:#abb2bf>(</span><span style=color:#aa89ea>NewGreatTool</span><span style=color:#abb2bf>).</span>
+		<span style=color:#8a93a5;font-style:italic>// setting up server
+</span><span style=color:#8a93a5;font-style:italic></span>		<span style=color:#00b1f7>WithName</span><span style=color:#abb2bf>(</span><span style=color:#98c379>&#34;great-tool-server&#34;</span><span style=color:#abb2bf>).</span>
+		<span style=color:#00b1f7>WithVersion</span><span style=color:#abb2bf>(</span><span style=color:#98c379>&#34;0.0.1&#34;</span><span style=color:#abb2bf>).</span>
+		<span style=color:#00b1f7>WithTransport</span><span style=color:#abb2bf>(</span><span style=color:#aa89ea>stdio</span><span style=color:#abb2bf>.</span><span style=color:#00b1f7>NewTransport</span><span style=color:#abb2bf>()).</span>
+		<span style=color:#8a93a5;font-style:italic>// Configuring fx logging to only show errors
+</span><span style=color:#8a93a5;font-style:italic></span>		<span style=color:#00b1f7>WithFxOptions</span><span style=color:#abb2bf>(</span>
+			<span style=color:#aa89ea>fx</span><span style=color:#abb2bf>.</span><span style=color:#00b1f7>Provide</span><span style=color:#abb2bf>(</span><span style=color:#76a9f9>func</span><span style=color:#abb2bf>()</span> <span style=color:#54b1c7>*</span><span style=color:#aa89ea>zap</span><span style=color:#abb2bf>.</span><span style=color:#aa89ea>Logger</span> <span style=color:#abb2bf>{</span>
+				<span style=color:#aa89ea>cfg</span> <span style=color:#54b1c7>:=</span> <span style=color:#aa89ea>zap</span><span style=color:#abb2bf>.</span><span style=color:#00b1f7>NewDevelopmentConfig</span><span style=color:#abb2bf>()</span>
+				<span style=color:#aa89ea>cfg</span><span style=color:#abb2bf>.</span><span style=color:#aa89ea>Level</span><span style=color:#abb2bf>.</span><span style=color:#00b1f7>SetLevel</span><span style=color:#abb2bf>(</span><span style=color:#aa89ea>zap</span><span style=color:#abb2bf>.</span><span style=color:#aa89ea>ErrorLevel</span><span style=color:#abb2bf>)</span>
+				<span style=color:#aa89ea>logger</span><span style=color:#abb2bf>,</span> <span style=color:#aa89ea>_</span> <span style=color:#54b1c7>:=</span> <span style=color:#aa89ea>cfg</span><span style=color:#abb2bf>.</span><span style=color:#00b1f7>Build</span><span style=color:#abb2bf>()</span>
+				<span style=color:#76a9f9>return</span> <span style=color:#aa89ea>logger</span>
+			<span style=color:#abb2bf>}),</span>
+			<span style=color:#aa89ea>fx</span><span style=color:#abb2bf>.</span><span style=color:#00b1f7>Option</span><span style=color:#abb2bf>(</span><span style=color:#aa89ea>fx</span><span style=color:#abb2bf>.</span><span style=color:#00b1f7>WithLogger</span><span style=color:#abb2bf>(</span>
+				<span style=color:#76a9f9>func</span><span style=color:#abb2bf>(</span><span style=color:#aa89ea>logger</span> <span style=color:#54b1c7>*</span><span style=color:#aa89ea>zap</span><span style=color:#abb2bf>.</span><span style=color:#aa89ea>Logger</span><span style=color:#abb2bf>)</span> <span style=color:#aa89ea>fxevent</span><span style=color:#abb2bf>.</span><span style=color:#aa89ea>Logger</span> <span style=color:#abb2bf>{</span>
+					<span style=color:#76a9f9>return</span> <span style=color:#54b1c7>&amp;</span><span style=color:#aa89ea>fxevent</span><span style=color:#abb2bf>.</span><span style=color:#aa89ea>ZapLogger</span><span style=color:#abb2bf>{</span><span style=color:#aa89ea>Logger</span><span style=color:#abb2bf>:</span> <span style=color:#aa89ea>logger</span><span style=color:#abb2bf>}</span>
+				<span style=color:#abb2bf>},</span>
+			<span style=color:#abb2bf>)),</span>
+		<span style=color:#abb2bf>).</span><span style=color:#00b1f7>Run</span><span style=color:#abb2bf>()</span>
+<span style=color:#abb2bf>}</span></code></span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-8"><button class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50" title="Copy code"><div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"></div><div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"></div></button></div></div><h3>Providing additional server options<span class="hx-absolute -hx-mt-20" id=providing-additional-server-options></span>
+<a href=#providing-additional-server-options class=subheading-anchor aria-label="Permalink for this section"></a></h3><p>Normally app.Builder preconfigure server for you, but you can provide additional server options to the application by using <code>WithExtraServerOptions</code> option.</p><p>Say, for example this would make server to turn on logging to stderr:</p><div class="hextra-code-block hx-relative hx-mt-6 first:hx-mt-0 hx-group/code"><div><div class=highlight><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=nf>WithExtraServerOptions</span><span class=p>(</span><span class=nx>server</span><span class=p>.</span><span class=nx>LoggerOption</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Logger</span><span class=p>:</span> <span class=nx>foxyevent</span><span class=p>.</span><span class=nf>NewSlogLogger</span><span class=p>(</span><span class=nx>slog</span><span class=p>.</span><span class=nf>New</span><span class=p>(</span><span class=nx>slog</span><span class=p>.</span><span class=nf>NewTextHandler</span><span class=p>(</span><span class=nx>os</span><span class=p>.</span><span class=nx>Stderr</span><span class=p>,</span> <span class=o>&amp;</span><span class=nx>slog</span><span class=p>.</span><span class=nx>HandlerOptions</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>Level</span><span class=p>:</span> <span class=nx>slog</span><span class=p>.</span><span class=nx>LevelDebug</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>}))).</span><span class=nf>WithLogLevel</span><span class=p>(</span><span class=nx>slog</span><span class=p>.</span><span class=nx>LevelInfo</span><span class=p>),</span>
+</span></span><span class=line><span class=cl><span class=p>})</span></span></span></code></pre></div></div><div class="hextra-code-copy-btn-container hx-opacity-0 hx-transition group-hover/code:hx-opacity-100 hx-flex hx-gap-1 hx-absolute hx-m-[11px] hx-right-0 hx-top-0"><button class="hextra-code-copy-btn hx-group/copybtn hx-transition-all active:hx-opacity-50 hx-bg-primary-700/5 hx-border hx-border-black/5 hx-text-gray-600 hover:hx-text-gray-900 hx-rounded-md hx-p-1.5 dark:hx-bg-primary-300/10 dark:hx-border-white/10 dark:hx-text-gray-400 dark:hover:hx-text-gray-50" title="Copy code"><div class="copy-icon group-[.copied]/copybtn:hx-hidden hx-pointer-events-none hx-h-4 hx-w-4"></div><div class="success-icon hx-hidden group-[.copied]/copybtn:hx-block hx-pointer-events-none hx-h-4 hx-w-4"></div></button></div></div></div><div class=hx-mt-16></div><div class="hx-mb-8 hx-flex hx-items-center hx-border-t hx-pt-8 dark:hx-border-neutral-800 contrast-more:hx-border-neutral-400 dark:contrast-more:hx-border-neutral-400 print:hx-hidden"><a href=/prompts/ title=Prompts class="hx-flex hx-max-w-[50%] hx-items-center hx-gap-1 hx-py-4 hx-text-base hx-font-medium hx-text-gray-600 hx-transition-colors [word-break:break-word] hover:hx-text-primary-600 dark:hx-text-gray-300 md:hx-text-lg ltr:hx-pr-4 rtl:hx-pl-4"><svg class="hx-inline hx-h-5 hx-shrink-0 ltr:hx-rotate-180" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>Prompts</a><a href=/testing/ title=Testing class="hx-flex hx-max-w-[50%] hx-items-center hx-gap-1 hx-py-4 hx-text-base hx-font-medium hx-text-gray-600 hx-transition-colors [word-break:break-word] hover:hx-text-primary-600 dark:hx-text-gray-300 md:hx-text-lg ltr:hx-ml-auto ltr:hx-pl-4 ltr:hx-text-right rtl:hx-mr-auto rtl:hx-pr-4 rtl:hx-text-left">Testing<svg class="hx-inline hx-h-5 hx-shrink-0 rtl:-hx-rotate-180" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></a></div></main></article></div><footer class="hextra-footer hx-bg-gray-100 hx-pb-[env(safe-area-inset-bottom)] dark:hx-bg-neutral-900 print:hx-bg-transparent"><div class="hx-max-w-screen-xl hx-mx-auto hx-flex hx-justify-center hx-py-12 hx-pl-[max(env(safe-area-inset-left),1.5rem)] hx-pr-[max(env(safe-area-inset-right),1.5rem)] hx-text-gray-600 dark:hx-text-gray-400 md:hx-justify-start"><div class="hx-flex hx-w-full hx-flex-col hx-items-center sm:hx-items-start"><div class=hx-font-semibold><a class="hx-flex hx-text-sm hx-items-center hx-gap-1 hx-text-current" target=_blank rel="noopener noreferrer" title="Hextra GitHub Homepage" href=https://github.com/imfing/hextra><span>Powered by Hextra<svg height="1em" class="hx-inline-block ltr:hx-ml-1 rtl:hx-mr-1 hx-align-[-2.5px]" viewBox="0 0 180 180" fill="currentcolor"><path fill-rule="evenodd" clip-rule="evenodd" d="m105.50024 22.224647c-9.59169-5.537563-21.40871-5.537563-31.000093.0L39.054693 42.689119C29.463353 48.226675 23.55484 58.460531 23.55484 69.535642v40.928918c0 11.07542 5.908513 21.3092 15.499853 26.84652l35.445453 20.46446c9.591313 5.53732 21.408404 5.53732 31.000094.0l35.44507-20.46446c9.59131-5.53732 15.49985-15.7711 15.49985-26.84652V69.535642c0-11.075111-5.90854-21.308967-15.49985-26.846523zM34.112797 85.737639c-1.384445 2.397827-1.384445 5.352099.0 7.749927l24.781554 42.922974c1.38437 2.39783 3.942853 3.87496 6.711592 3.87496h49.563107c2.76905.0 5.3273-1.47713 6.71144-3.87496l24.78194-42.922974c1.38414-2.397828 1.38414-5.3521.0-7.749927L121.88049 42.814746c-1.38414-2.397828-3.94239-3.874964-6.71144-3.874964H65.605944c-2.768739.0-5.327223 1.477059-6.711592 3.874964z" style="stroke-width:.774993"/></svg></span></a></div></div></div></footer><script defer src=/js/main.min.d0f0346255ba9418db8fcf7f9440ca4e532e06276d8df17497e19e1045ee360b.js integrity="sha256-0PA0YlW6lBjbj89/lEDKTlMuBidtjfF0l+GeEEXuNgs="></script><script defer src=/lib/flexsearch/flexsearch.bundle.min.0425860527cc9968f9f049421c7a56b39327d475e2e3a8f550416be3a9134327.js integrity="sha256-BCWGBSfMmWj58ElCHHpWs5Mn1HXi46j1UEFr46kTQyc="></script><script defer src=/en.search.min.4a72af14c5044971882cecddc91b1d5027c5a1ce9145e85eae7ee5145e971777.js integrity="sha256-SnKvFMUESXGILOzdyRsdUCfFoc6RRehern7lFF6XF3c="></script></body></html>
