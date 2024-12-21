@@ -1,0 +1,83 @@
+# Hugo configuration file
+title: Foxy Contexts Docs
+
+# import hextra as module
+module:
+  imports:
+  - path: github.com/imfing/hextra
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+  extensions:
+    definitionList: true
+    footnote: true
+    linkify: true
+    linkifyProtocol: https
+    strikethrough: true
+    table: true
+    typographer:
+      apostrophe: "&rsquo;"
+      disable: false
+      ellipsis: "&hellip;"
+      emDash: "&mdash;"
+      enDash: "&ndash;"
+      leftAngleQuote: "&laquo;"
+      leftDoubleQuote: "&ldquo;"
+      leftSingleQuote: "&lsquo;"
+      rightAngleQuote: "&raquo;"
+      rightDoubleQuote: "&rdquo;"
+      rightSingleQuote: "&rsquo;"
+  highlight:
+    noClasses: false
+
+contentDir: docs/content
+layoutDir: docs/layouts
+
+menu:
+  main:
+    - name: Documentation
+      weight: 1
+      url: /
+    - name: GitHub
+      weight: 2
+      url: "https://github.com/strowk/foxy-contexts"
+      params:
+        icon: github
+    - name: Changelogs ↗
+      weight: 3
+      url: "https://github.com/strowk/foxy-contexts/releases"
+    - name: Godoc ↗
+      weight: 4
+      url: "https://pkg.go.dev/github.com/strowk/foxy-contexts"
+    - name: Examples ↗
+      weight: 5
+      url: "https://github.com/strowk/foxy-contexts/tree/main/examples"
+    - name: Search
+      weight: 5
+      params:
+        type: search
+  sidebar:
+    - identifier: mcp
+      name: "MCP ↗"
+      url: "https://modelcontextprotocol.io/"
+      weight: 1
+
+
+params:
+  navbar:
+    displayTitle: true
+    displayLogo: false
+
+  # navbar:
+  #   displayTitle: true
+  #   displayLogo: false
+
+  # footer:
+  #   displayCopyright: false
+  #   displayPoweredBy: true
+
+  editURL:
+    enable: true
+    base: "https://github.com/strowk/foxy-contexts/edit/main"

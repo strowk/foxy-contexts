@@ -1,4 +1,8 @@
-# Resources
+---
+title: Resources
+weight: 2
+breadcrumbs: false
+---
 
 > Resources are a core primitive in the Model Context Protocol (MCP) that allow servers to expose data and content that can be read by clients and used as context for LLM interactions.
 
@@ -17,15 +21,15 @@ Approach with resource provider is more flexible and allows to provide resources
 
 In order to create new static resource you shall use `fxctx.NewResource` function.
 
-```go
---8<-- "examples/hello_world_resource/main.go:tool"
+
+```go { filename_uri_base="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/hello_world_resource/main.go" }
+{{< snippet "examples/hello_world_resource/main.go:tool" "go" >}}
 ```
 
 ## Register resources and start server
 
-
-```go
---8<-- "examples/hello_world_resource/main.go:server"
+```go { filename_uri_base="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/hello_world_resource/main.go" }
+{{< snippet "examples/hello_world_resource/main.go:server" "go" >}}
 ```
 
 ## NewResourceProvider

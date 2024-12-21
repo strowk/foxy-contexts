@@ -1,6 +1,11 @@
+---
+breadcrumbs: false
+weight: 5
+---
+
 # Testing
 
-## Integration Testing with foxytest using MCP Cases format
+## foxytest
 
 In order to test your server, package `foxytest` is provided that allows you to easily start your server and test it using pre-defined JSON-RPC 2.0 messages.
 
@@ -81,7 +86,7 @@ Here is an example of real world failing test:
 Output is not a valid JSON, it just attempts to show the difference at the right point in structure.
 
 
-## Using regular expressions for matching
+## Match with regex
 
 Sometimes when you have dynamic values in your responses, you might want to use regular expressions to match them. You can do this by using `!!re` tag in your expected output. For example:
 
@@ -94,7 +99,7 @@ out_list_tools: {"jsonrpc":"2.0","result":{"tools":[ { "name": !!re "list-[a-z]+
 This example is somewhat oversimplified, in reality you would probably use `!!re` with timestamps, UUIDs or other dynamic values, rather than tool names.
 It does, however, demonstrate that strings with `!!re` tag would be treated as regular expressions and would be matched against actual values using regular expression matching instead of string equality.
 
-## Embedded regular expressions
+## Embedded regex
 
 Embedded regular expression is just a regular expression that is embedded in a string. It is used to match a part of the string. For example:
 

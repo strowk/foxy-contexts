@@ -1,3 +1,8 @@
+---
+breadcrumbs: false
+weight: 4
+---
+
 # app.Builder
 
 app.Builder is a builder around uber's fx that combines fx DI capabilities with foxy-contexts MCP server implementation and gives simple interface to combine your MCP primitives into a single standalone application.
@@ -6,9 +11,10 @@ app.Builder is a builder around uber's fx that combines fx DI capabilities with 
 
 Simple example of wrapping one tool into an application, then running it with stdio transport:
 
-```go
---8<-- "examples/simple_great_tool/main.go:server"
+```go { filename_uri_base="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/simple_great_tool/main.go" }
+{{< snippet "examples/simple_great_tool/main.go:server" "go" >}}
 ```
+
 
 ### Providing additional server options
 

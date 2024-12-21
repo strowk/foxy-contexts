@@ -1,4 +1,8 @@
-# Tools
+---
+title: Tools
+weight: 1
+breadcrumbs: false
+---
 
 > Through tools, LLMs can interact with external systems, perform computations, and take actions in the real world.
 
@@ -10,14 +14,15 @@ Foxy Contexts allows easy way to define a tool and register it within fx DI cont
 
 In order to create new tool you shall use `fxctx.NewTool` function. It accepts tool name, description and function that would be called when tool is called.
 
-```go
---8<-- "examples/simple_great_tool/main.go:tool"
+
+```go { filename_uri_base="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/simple_great_tool/main.go" }
+{{< snippet "examples/simple_great_tool/main.go:tool" "go" >}}
 ```
 
 ## Register tool and start server
 
-```go
---8<-- "examples/simple_great_tool/main.go:server"
+```go { filename_uri_base="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/simple_great_tool/main.go" }
+{{< snippet "examples/simple_great_tool/main.go:server" "go" >}}
 ```
 
 ## Using toolinput package
@@ -26,8 +31,8 @@ In order to define input schema for your tool, you can use `toolinput` package. 
 
 Here is an example of creating schema, giving it to the tool and validating input:
 
-```go
---8<-- "examples/list_k8s_contexts_tool/main.go:toolinput"
+```go { filename_uri_base="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/simple_great_tool/main.go" }
+{{< snippet "examples/list_k8s_contexts_tool/main.go:toolinput" "go" >}}
 ```
 
 ### Examples
