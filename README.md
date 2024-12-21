@@ -1,10 +1,8 @@
 
 <h1 align="center">
 
-   <img alt="main logo" src="./docs/assets/logo.png" width="150"/>
+   <img alt="main logo" src="./docs/content/assets/logo.png" width="150"/>
    
-   <!-- ![main logo](/assets/logo.png) -->
-
    <br/>
    Foxy Contexts
 </h1>
