@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"io"
-	"log"
 	"os"
 
 	foxyevent "github.com/strowk/foxy-contexts/pkg/foxy_event"
@@ -93,7 +92,6 @@ func (s *stdioTransport) run(
 				}
 			}
 		}
-		log.Printf("stopped reading responses")
 		close(s.stoppedReadingResponses)
 	}()
 
