@@ -218,8 +218,10 @@ func (f *Builder) provideServerLifecycle(transport server.Transport) fx.Option {
 					)
 					if err != nil {
 						f.transportError = err
-						_ = shutdowner.Shutdown()
 					}
+
+					// shutdown the server when transport is done
+					_ = shutdowner.Shutdown()
 				}()
 				return nil
 			},

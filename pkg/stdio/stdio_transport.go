@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"log"
 	"os"
 
 	foxyevent "github.com/strowk/foxy-contexts/pkg/foxy_event"
@@ -92,6 +93,7 @@ func (s *stdioTransport) run(
 				}
 			}
 		}
+		log.Printf("stopped reading responses")
 		close(s.stoppedReadingResponses)
 	}()
 
@@ -115,22 +117,45 @@ func (s *stdioTransport) run(
 		close(s.stoppedReadingInput)
 	}()
 
-	<-s.shuttingDown
+	// wait for either shutting down or stopped reading input
+	select {
+	case <-s.shuttingDown:
+		// if we got shutting down signal,
+		// we need to wait until we stop reading input,
+		// which waits for shutdown by itself
+		<-s.stoppedReadingInput
+	case <-s.stoppedReadingInput:
+		// if we stopped reading input, we can now initiate shutdown
+		close(s.shuttingDown)
+	}
+
+	// wait until we stop reading responses,
+	// before signaling that we are stopped
 	<-s.stoppedReadingResponses
-	<-s.stoppedReadingInput
 
 	close(s.stopped)
-
 	return nil
 }
 
 func (s *stdioTransport) Shutdown(ctx context.Context) error {
-	close(s.shuttingDown)
+	safeClose(s.shuttingDown)
 
+	// this waits either till we are stopped or we cannot wait anymore
 	select {
 	case <-s.stopped:
 		return nil
 	case <-ctx.Done():
 		return ctx.Err()
 	}
+}
+
+func safeClose(ch chan struct{}) {
+	defer func() {
+		if r := recover(); r != nil {
+			// it is possible to panic if channel is already closed
+			// in which case we just go on, as it is possible that
+			// Shutdown would be called soon after transport is stopped
+		}
+	}()
+	close(ch)
 }
