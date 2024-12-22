@@ -25,7 +25,7 @@ In order to create new prompt you shall use `fxctx.NewPrompt` function. It accep
 {{< snippet "examples/simple_prompt/main.go:server" "go" >}}
 ```
 
-### Examples
+## Examples
 
 Check out complete example of MCP Server with prompt:
 

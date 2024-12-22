@@ -35,7 +35,7 @@ Here is an example of creating schema, giving it to the tool and validating inpu
 {{< snippet "examples/list_k8s_contexts_tool/main.go:toolinput" "go" >}}
 ```
 
-### Examples
+## Examples
 
 Check out complete examples of MCP Servers with tools:
 

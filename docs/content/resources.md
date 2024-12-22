@@ -74,10 +74,10 @@ func NewGreatResourceProvider() fxctx.ResourceProvider {
 }
 ```
 
-### Examples
+## Examples
 
 Check out complete examples of MCP Servers with resources:
 
 - [k8s_contexts_resources](https://github.com/strowk/foxy-contexts/tree/main/examples/k8s_contexts_resources) - provides k8s contexts as resources
 - [hello_world_resource](https://github.com/strowk/foxy-contexts/tree/main/examples/hello_world_resource) - provides one static very simple resource
-- [git_repository_resource](https://github.com/strowk/foxy-contexts/tree/main/examples/hello_world_resource) - provides one static resource with information about git repository
+- [git_repository_resource](https://github.com/strowk/foxy-contexts/tree/main/examples/git_repository_resource) - provides one static resource with information about git repository
