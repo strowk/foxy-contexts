@@ -1,10 +1,6 @@
 package mcp
 
-// This is patched config with the spec that has certain adjustments:
-//go:generate go-jsonschema -p mcp https://raw.githubusercontent.com/strowk/mcp-specification/refs/heads/main/schema/schema.json -o ./schema.go
-
-// This is older config with original spec:
-//  //go:generate go-jsonschema -p mcp https://raw.githubusercontent.com/modelcontextprotocol/specification/refs/heads/main/schema/schema.json -o ./schema.go
+//go:generate go-jsonschema -p mcp https://raw.githubusercontent.com/modelcontextprotocol/specification/refs/heads/main/schema/schema.json -o ./schema.go
 
 // We use here the go-jsonschema tool to generate most of needed Go types from the JSON schema,
 // however methods of types are not included in the schema, so we need to list them here.
