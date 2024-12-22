@@ -1,1 +1,11 @@
-{{ $input := split (.Get 0) ":" }}{{ $file := index $input 0 }}{{ $snippet := index $input 1 }}{{ $start := printf "start:%s]\n" $snippet }}{{ $end := printf "// --8<-- [end:%s" $snippet }}{{ $file := readFile $file }}{{ $file := split $file $start }}{{ $file := index $file 1 }}{{ $file := split $file $end }}{{ $file := index $file 0 }}{{ highlight ( trim $file "\r\n" ) (.Get 1) "noClasses=true,hl_inline=true,style=doom-one2" }}
+{{- $input := split (.Get 0) ":" -}}
+{{- $file := index $input 0 -}}
+{{- $snippet := index $input 1 -}}
+{{- $start := printf "// --8<-- [start:%s]" $snippet -}}
+{{- $end := printf "// --8<-- [end:%s" $snippet -}}
+{{- $file := readFile $file -}}
+{{- $file := split $file $start -}}
+{{- $file := index $file 1 -}}
+{{- $file := split $file $end -}}
+{{- $file := index $file 0 -}}
+{{- highlight ( trim $file "\r\n" ) (.Get 1) "noClasses=true,hl_inline=true,style=doom-one2" -}}
