@@ -1,6 +1,7 @@
 package foxytest
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"sort"
@@ -15,8 +16,13 @@ type diff struct {
 
 func assertMatch(t TestRunner, expectation *yaml.Node, actual any) bool {
 	diffResult := match(expectation, actual)
+
 	if len(diffResult.items) > 0 {
-		t.Errorf("\n%s", diffResult.String())
+		marshalled, err := json.Marshal(actual)
+		if err != nil {
+			t.Logf("failed to marshal actual value to json for error message: %v", err)
+		}
+		t.Errorf("actual json did not match expectation,\n got: '%s'\n diff with expected:\n%s", string(marshalled), diffResult.String())
 		return false
 	}
 	return true
