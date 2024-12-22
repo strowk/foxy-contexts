@@ -142,7 +142,7 @@ func (d *diff) checkMatch(
 		if !ok {
 			d.items = append(d.items, diffItem{
 				path:    pathCopy(currentPath),
-				message: "actual is not a sequence",
+				message: "actual value is not an array, but expected an array",
 			})
 			return
 		}
