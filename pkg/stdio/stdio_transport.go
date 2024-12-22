@@ -149,11 +149,11 @@ func (s *stdioTransport) Shutdown(ctx context.Context) error {
 
 func safeClose(ch chan struct{}) {
 	defer func() {
-		if r := recover(); r != nil {
-			// it is possible to panic if channel is already closed
-			// in which case we just go on, as it is possible that
-			// Shutdown would be called soon after transport is stopped
-		}
+		//nolint:errcheck // it is ok to ignore if there was no panic
+		recover()
+		// it is possible to panic if channel is already closed
+		// in which case we just go on, as it is possible that
+		// Shutdown would be called soon after transport is stopped
 	}()
 	close(ch)
 }
