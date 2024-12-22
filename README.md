@@ -29,7 +29,7 @@ Foxy contexts is a Golang library for building context servers supporting [Model
 
 This library only supports server side of the protocol. Using it you can build context servers using declarative approach, by defining [tools](https://modelcontextprotocol.io/docs/concepts/tools), [resources](https://modelcontextprotocol.io/docs/concepts/resources) and [prompts](https://modelcontextprotocol.io/docs/concepts/prompts) and then registering them with your app.Builder, which is using [uber's fx](https://github.com/uber-go/fx) App under the hood and you can inject into its container as well.
 
-With this approach you can easily colocate call/read/get logic and definitions of your tools/resources/prompts in a way that every tool/resource/prompt is placed in a separate place, but related code is colocated.
+With this approach you can easily colocate call/read/get logic and definitions of your tools/resources/prompts in a way that every tool/resource/prompt is placed in a separate place, while Dependency Injection allows you to reuse shared parts like clients, database connections, etc.
 
 ## Features
 
