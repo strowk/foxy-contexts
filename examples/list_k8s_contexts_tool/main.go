@@ -26,7 +26,9 @@ import (
 // , then click List Tools
 // , then click list-k8s-contexts
 
-func NewListK8sContextsTool() fxctx.Tool {
+// --8<-- [start:dependency_inject]
+func NewListK8sContextsTool(kubeConfig clientcmd.ClientConfig) fxctx.Tool { // --8<-- [end:dependency_inject]
+
 	// --8<-- [start:toolinput]
 	schema := toolinput.NewToolInputSchema(
 		toolinput.WithString("kubeconfig", "Path to kubeconfig file"),
@@ -64,8 +66,6 @@ func NewListK8sContextsTool() fxctx.Tool {
 
 			// --8<-- [end:toolinput]
 
-			loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
-			kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, nil)
 			cfg, err := kubeConfig.RawConfig()
 			if err != nil {
 				log.Printf("failed to get kubeconfig: %v", err)
@@ -91,9 +91,13 @@ func NewListK8sContextsTool() fxctx.Tool {
 }
 
 func main() {
+	// --8<-- [start:dependency_provide]
 	app.
 		NewBuilder().
-		WithTool(NewListK8sContextsTool).
+		WithFxOptions(
+			fx.Provide(NewK8sClientConfig),
+		).
+		WithTool(NewListK8sContextsTool). // --8<-- [end:dependency_provide]
 		WithTransport(stdio.NewTransport()).
 		WithName("list-k8s-contexts-tool").
 		WithVersion("0.0.1").
