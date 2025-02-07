@@ -6,6 +6,7 @@
    <br/>
    Foxy Contexts
 </h1>
+[![smithery badge](https://smithery.ai/badge/@strowk/foxy-contexts)](https://smithery.ai/server/@strowk/foxy-contexts)
 
 <!-- --8<-- [start:content] -->
 
@@ -175,4 +176,5 @@ func Ptr[T any](v T) *T {
 }
 
 ```
+
 
