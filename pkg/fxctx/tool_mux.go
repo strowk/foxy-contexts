@@ -1,6 +1,7 @@
 package fxctx
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"sort"
@@ -17,7 +18,7 @@ var (
 
 type ToolMux interface {
 	GetMcpTools() []mcp.Tool
-	CallToolNamed(name string, args map[string]interface{}) (*mcp.CallToolResult, error)
+	CallToolNamed(ctx context.Context, name string, args map[string]interface{}) (*mcp.CallToolResult, error)
 	RegisterHandlers(s server.Server)
 }
 
@@ -39,13 +40,13 @@ func NewToolMux(
 	}
 }
 
-func (t *toolMux) CallToolNamed(name string, args map[string]interface{}) (*mcp.CallToolResult, error) {
+func (t *toolMux) CallToolNamed(ctx context.Context, name string, args map[string]interface{}) (*mcp.CallToolResult, error) {
 	tool, ok := t.tools[name]
 	if !ok {
 		return nil, ErrToolNotFound
 	}
 
-	return tool.Callback(args), nil
+	return tool.Callback(ctx, args), nil
 }
 
 func (t *toolMux) GetMcpTools() []mcp.Tool {
@@ -77,7 +78,7 @@ func (t *toolMux) RegisterHandlers(s server.Server) {
 }
 
 func (t *toolMux) setToolsListHandler(s server.Server) {
-	s.SetRequestHandler(&mcp.ListToolsRequest{}, func(r jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
+	s.SetRequestHandler(&mcp.ListToolsRequest{}, func(_ context.Context, r jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
 		tools := t.GetMcpTools()
 		return &mcp.ListToolsResult{
 			Tools: tools,
@@ -86,10 +87,10 @@ func (t *toolMux) setToolsListHandler(s server.Server) {
 }
 
 func (t *toolMux) setCallToolHandler(s server.Server) {
-	s.SetRequestHandler(&mcp.CallToolRequest{}, func(r jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
+	s.SetRequestHandler(&mcp.CallToolRequest{}, func(ctx context.Context, r jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
 		req := r.(*mcp.CallToolRequest)
 		toolName := req.Params.Name
-		res, err := t.CallToolNamed(toolName, req.Params.Arguments)
+		res, err := t.CallToolNamed(ctx, toolName, req.Params.Arguments)
 		if err != nil {
 			return nil, jsonrpc2.NewServerError(ToolNotFound, fmt.Sprintf("tool not found: %s", toolName))
 		}

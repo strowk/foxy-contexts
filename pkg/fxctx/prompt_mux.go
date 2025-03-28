@@ -1,6 +1,7 @@
 package fxctx
 
 import (
+	"context"
 	"fmt"
 	"sort"
 
@@ -73,7 +74,7 @@ func (p *promptMux) RegisterHandlers(s server.Server) {
 }
 
 func (p *promptMux) setListPromptsHandler(s server.Server) {
-	s.SetRequestHandler(&mcp.ListPromptsRequest{}, func(req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
+	s.SetRequestHandler(&mcp.ListPromptsRequest{}, func(ctx context.Context, req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
 		resp := &mcp.ListPromptsResult{
 			Prompts: []mcp.Prompt{},
 		}
@@ -85,7 +86,7 @@ func (p *promptMux) setListPromptsHandler(s server.Server) {
 }
 
 func (p *promptMux) setGetPromptHandler(s server.Server) {
-	s.SetRequestHandler(&mcp.GetPromptRequest{}, func(req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
+	s.SetRequestHandler(&mcp.GetPromptRequest{}, func(ctx context.Context, req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
 		r := req.(*mcp.GetPromptRequest)
 		res, err := p.GetPrompt(r)
 		if err != nil {

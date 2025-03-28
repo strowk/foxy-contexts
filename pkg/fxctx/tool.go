@@ -1,26 +1,28 @@
 package fxctx
 
 import (
+	"context"
+
 	"github.com/strowk/foxy-contexts/pkg/mcp"
 	"go.uber.org/fx"
 )
 
 type Tool interface {
 	GetMcpTool() *mcp.Tool
-	Callback(args map[string]interface{}) *mcp.CallToolResult
+	Callback(ctx context.Context, args map[string]interface{}) *mcp.CallToolResult
 }
 
 type tool struct {
 	mcpTool  *mcp.Tool
-	callback func(args map[string]interface{}) *mcp.CallToolResult
+	callback func(ctx context.Context, args map[string]interface{}) *mcp.CallToolResult
 }
 
 func (t *tool) GetMcpTool() *mcp.Tool {
 	return t.mcpTool
 }
 
-func (t *tool) Callback(args map[string]interface{}) *mcp.CallToolResult {
-	return t.callback(args)
+func (t *tool) Callback(ctx context.Context, args map[string]interface{}) *mcp.CallToolResult {
+	return t.callback(ctx, args)
 }
 
 type ToolResponse struct {
@@ -31,7 +33,7 @@ type ToolResponse struct {
 
 func NewTool(
 	mcpTool *mcp.Tool,
-	callback func(args map[string]interface{}) *mcp.CallToolResult) Tool {
+	callback func(ctx context.Context, args map[string]interface{}) *mcp.CallToolResult) Tool {
 	return &tool{
 		mcpTool:  mcpTool,
 		callback: callback,

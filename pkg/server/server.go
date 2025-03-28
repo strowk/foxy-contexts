@@ -1,18 +1,20 @@
 package server
 
 import (
+	"context"
 	"log/slog"
 
 	foxyevent "github.com/strowk/foxy-contexts/pkg/foxy_event"
 	"github.com/strowk/foxy-contexts/pkg/jsonrpc2"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
+	"github.com/strowk/foxy-contexts/pkg/session"
 )
 
 type Server interface {
 	Handle(b []byte)
 	GetResponses() chan jsonrpc2.JsonRpcResponse
-	SetRequestHandler(request jsonrpc2.Request, handler func(req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error))
-	SetNotificationHandler(request jsonrpc2.Request, handler func(req jsonrpc2.Request))
+	SetRequestHandler(request jsonrpc2.Request, handler func(ctx context.Context, req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error))
+	SetNotificationHandler(request jsonrpc2.Request, handler func(ctx context.Context, req jsonrpc2.Request))
 	SetLogger(logger foxyevent.Logger)
 	GetLogger() foxyevent.Logger
 }
@@ -43,7 +45,7 @@ func NewServer(
 	}
 
 	if !appliedNotificationHandler {
-		s.SetNotificationHandler(&mcp.InitializedNotification{}, func(req jsonrpc2.Request) {
+		s.SetNotificationHandler(&mcp.InitializedNotification{}, func(_ context.Context, _ jsonrpc2.Request) {
 			// just ignore it to not return any errors
 		})
 	}
@@ -53,12 +55,21 @@ func NewServer(
 	return s
 }
 
-func (s *server) SetRequestHandler(request jsonrpc2.Request, handler func(req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error)) {
-	s.router.SetRequestHandler(request, handler)
+func (s *server) SetRequestHandler(request jsonrpc2.Request, handler func(ctx context.Context, req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error)) {
+	s.router.SetRequestHandler(request, func(req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
+		ctx := context.Background()
+		ctx = session.WithSession(ctx, session.NewSession())
+		return handler(ctx, req)
+	})
 }
 
-func (s *server) SetNotificationHandler(request jsonrpc2.Request, handler func(req jsonrpc2.Request)) {
-	s.router.SetNotificationHandler(request, handler)
+func (s *server) SetNotificationHandler(request jsonrpc2.Request, handler func(ctx context.Context, req jsonrpc2.Request)) {
+	s.router.SetNotificationHandler(request,
+		func(req jsonrpc2.Request) {
+			ctx := context.Background()
+			ctx = session.WithSession(ctx, session.NewSession())
+			handler(ctx, req)
+		})
 }
 
 func (s *server) initialize(
@@ -66,11 +77,11 @@ func (s *server) initialize(
 	serverInfo *mcp.Implementation,
 ) {
 	s.SetRequestHandler(&mcp.InitializeRequest{},
-		func(req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
+		func(_ context.Context, req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
 			return s.handleInitialize(req, capabilities, serverInfo), nil
 		},
 	)
-	s.SetRequestHandler(&mcp.PingRequest{}, func(req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
+	s.SetRequestHandler(&mcp.PingRequest{}, func(_ context.Context, req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
 		return struct{}{}, nil
 	})
 }

@@ -1,6 +1,7 @@
 package fxctx
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -88,7 +89,7 @@ func (c *completeMux) RegisterHandlers(s server.Server) {
 }
 
 func (c *completeMux) setCompletionCompleteHandler(s server.Server) {
-	s.SetRequestHandler(&mcp.CompleteRequest{}, func(req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
+	s.SetRequestHandler(&mcp.CompleteRequest{}, func(ctx context.Context, req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
 		r := req.(*mcp.CompleteRequest)
 		res, err := c.Complete(r)
 		if err != nil {

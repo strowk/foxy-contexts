@@ -1,6 +1,7 @@
 package fxctx
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/strowk/foxy-contexts/internal/utils"
@@ -92,7 +93,7 @@ func (m *resourceMux) RegisterHandlers(s server.Server) {
 }
 
 func (m *resourceMux) setResourceListHandler(s server.Server) {
-	s.SetRequestHandler(&mcp.ListResourcesRequest{}, func(req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
+	s.SetRequestHandler(&mcp.ListResourcesRequest{}, func(ctx context.Context, req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
 		resp := &mcp.ListResourcesResult{
 			Resources: []mcp.Resource{},
 		}
@@ -109,7 +110,7 @@ func (m *resourceMux) setResourceListHandler(s server.Server) {
 }
 
 func (m *resourceMux) setReadResourceHandler(s server.Server) {
-	s.SetRequestHandler(&mcp.ReadResourceRequest{}, func(req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
+	s.SetRequestHandler(&mcp.ReadResourceRequest{}, func(ctx context.Context, req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
 		r := req.(*mcp.ReadResourceRequest)
 		res, err := m.ReadResource(r.Params.Uri)
 		if err != nil {
