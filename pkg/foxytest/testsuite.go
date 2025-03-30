@@ -600,7 +600,7 @@ func (ts *testSuite) startExecutable(t TestRunner) *exec.Cmd {
 
 			for {
 				select {
-				case <-ts.testsDone:
+				case <-ts.executableDone:
 					return
 				default:
 					if !scanner.Scan() {
