@@ -12,7 +12,7 @@ func TestWithFoxytest(t *testing.T) {
 		t.Fatal(err)
 	}
 	ts.WithExecutable("go", []string{"run", "main.go"})
-	ts.WithTransport(foxytest.NewTestTransportStreamableHTTP("http://localhost:80/mcp"))
+	ts.WithTransport(foxytest.NewTestTransportStreamableHTTP("http://localhost:8080/mcp"))
 	ts.WithLogging()
 	cntrl := foxytest.NewTestRunner(t)
 	ts.Run(cntrl)
