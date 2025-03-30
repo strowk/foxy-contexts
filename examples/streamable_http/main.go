@@ -28,9 +28,9 @@ func (m *MySessionData) String() string {
 // , run it with:
 // go run main.go
 // then in another terminal run:
-// curl -X POST -H "Content-Type: application/json" -d '{"method":"tools/call", "params": {"name": "my-great-tool", "arguments": {}},"id":0}' http://localhost:8080/mcp
+// curl -X POST -H "Content-Type: application/json" -d '{"method":"tools/call", "params": {"name": "my-great-tool", "arguments": {}},"id":0}' http://localhost/mcp
 // , then you should see the response:
-// {"jsonrpc":"2.0","result":{"content":[{"text":"Sup","type":"text"}]},"id":0}
+// {"jsonrpc":"2.0","result":{"content":[{"text":"Sup, saving greatness to session","type":"text"}]},"id":0}
 
 // --8<-- [start:tool]
 func NewGreatTool(sm *session.SessionManager) fxctx.Tool {
@@ -87,7 +87,7 @@ func main() {
 			streamable_http.NewTransport(
 				streamable_http.Endpoint{
 					Hostname: "localhost",
-					Port:     8080,
+					Port:     80,
 					Path:     "/mcp",
 				}),
 		).

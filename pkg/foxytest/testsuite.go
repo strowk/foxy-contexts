@@ -622,10 +622,10 @@ func (ts *testSuite) startExecutable(t TestRunner) *exec.Cmd {
 	}
 
 	go func() {
+		defer close(ts.executableDone)
 		if ts.logging {
 			t.Log("waiting for command to finish")
 		}
-		defer close(ts.executableDone)
 
 		if err := cmd.Wait(); err != nil {
 			t.Logf("error waiting for command to finish: %v", err)
