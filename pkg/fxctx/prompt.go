@@ -1,6 +1,7 @@
 package fxctx
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -13,14 +14,14 @@ type CompleterFunc = func(arg *mcp.PromptArgument, value string) (*mcp.CompleteR
 
 type Prompt interface {
 	GetMcpPrompt() mcp.Prompt
-	Get(*mcp.GetPromptRequest) (*mcp.GetPromptResult, error)
-	Complete(*mcp.CompleteRequest) (*mcp.CompleteResult, error)
+	Get(ctx context.Context, req *mcp.GetPromptRequest) (*mcp.GetPromptResult, error)
+	Complete(ctx context.Context, req *mcp.CompleteRequest) (*mcp.CompleteResult, error)
 	WithCompleter(CompleterFunc) Prompt
 }
 
 type prompt struct {
 	mcp.Prompt
-	get       func(*mcp.GetPromptRequest) (*mcp.GetPromptResult, error)
+	get       func(ctx context.Context, req *mcp.GetPromptRequest) (*mcp.GetPromptResult, error)
 	completer CompleterFunc
 }
 
@@ -28,13 +29,13 @@ func (p *prompt) GetMcpPrompt() mcp.Prompt {
 	return p.Prompt
 }
 
-func (p *prompt) Get(req *mcp.GetPromptRequest) (*mcp.GetPromptResult, error) {
-	return p.get(req)
+func (p *prompt) Get(ctx context.Context, req *mcp.GetPromptRequest) (*mcp.GetPromptResult, error) {
+	return p.get(ctx, req)
 }
 
 func NewPrompt(
 	p mcp.Prompt,
-	get func(*mcp.GetPromptRequest) (*mcp.GetPromptResult, error),
+	get func(ctx context.Context, req *mcp.GetPromptRequest) (*mcp.GetPromptResult, error),
 ) Prompt {
 	return &prompt{
 		Prompt: p,
@@ -55,8 +56,8 @@ var (
 	ErrNoSuchArgument = errors.New("no such argument to complete for prompt")
 )
 
-func (p *prompt) Complete(req *mcp.CompleteRequest) (*mcp.CompleteResult, error) {
-	for _, arg := range p.Prompt.Arguments {
+func (p *prompt) Complete(ctx context.Context, req *mcp.CompleteRequest) (*mcp.CompleteResult, error) {
+	for _, arg := range p.Arguments {
 		if arg.Name == req.Params.Argument.Name {
 			if p.completer == nil {
 				return &mcp.CompleteResult{

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/strowk/foxy-contexts/pkg/jsonrpc2"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
 	"github.com/strowk/foxy-contexts/pkg/server"
+	"github.com/strowk/foxy-contexts/pkg/session"
 )
 
 func NewTransport(options ...StdioTransportOption) server.Transport {
@@ -30,6 +32,8 @@ func NewTransport(options ...StdioTransportOption) server.Transport {
 		) server.Server {
 			return server.NewServer(capabilities, serverInfo, options...)
 		},
+
+		sessionManager: session.NewSessionManager(),
 	}
 
 	for _, o := range options {
@@ -53,6 +57,8 @@ type stdioTransport struct {
 		serverInfo *mcp.Implementation,
 		options ...server.ServerOption,
 	) server.Server
+
+	sessionManager *session.SessionManager
 }
 
 func (s *stdioTransport) Run(
@@ -67,6 +73,14 @@ func (s *stdioTransport) Run(
 func (s *stdioTransport) run(
 	srv server.Server,
 ) error {
+	// local stdio transport is using only one session per whole execution
+	ctx := context.Background()
+	ctx, _, err := s.sessionManager.CreateNewSession(ctx)
+	if err != nil {
+		srv.GetLogger().LogEvent(foxyevent.FailedCreatingSession{Err: err})
+		return fmt.Errorf("failed to create session: %w", err)
+	}
+
 	reader := bufio.NewReader(s.in)
 	go func() {
 	out:
@@ -109,7 +123,7 @@ func (s *stdioTransport) run(
 					}
 					break out
 				}
-				srv.Handle(input)
+				srv.Handle(ctx, input)
 			}
 		}
 		close(s.stoppedReadingInput)
@@ -156,4 +170,8 @@ func safeClose(ch chan struct{}) {
 		// Shutdown would be called soon after transport is stopped
 	}()
 	close(ch)
+}
+
+func (s *stdioTransport) GetSessionManager() *session.SessionManager {
+	return s.sessionManager
 }

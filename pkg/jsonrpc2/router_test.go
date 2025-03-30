@@ -1,18 +1,25 @@
 package jsonrpc2
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
+	"github.com/strowk/foxy-contexts/pkg/session"
 )
+
+func testContext() context.Context {
+	return session.WithNewSession(context.Background())
+}
 
 func TestRouter(t *testing.T) {
 	r := NewJsonRPCRouter()
 
 	r.SetRequestHandler(&mcp.ListResourcesRequest{},
-		func(req Request) (Result, *Error) {
+		func(ctx context.Context, req Request) (Result, *Error) {
 			return &mcp.ListResourcesResult{
 				Resources: []mcp.Resource{
 					{
@@ -24,9 +31,13 @@ func TestRouter(t *testing.T) {
 		},
 	)
 
+	r.SetNotificationHandler(&mcp.InitializedNotification{}, func(ctx context.Context, req Request) {})
+
 	t.Run("Handle list resources and check that result pointer is different every time", func(t *testing.T) {
 		data := `{"method":"resources/list","params":{}, "id":1}`
-		res := r.Handle([]byte(data))
+		responses := r.Handle(testContext(), []byte(data))
+		require.Len(t, responses, 1)
+		res := responses[0]
 		if res.Error != nil {
 			t.Fatalf("failed: %v", res.Error)
 		}
@@ -37,7 +48,9 @@ func TestRouter(t *testing.T) {
 		addr1 := fmt.Sprintf("%p", res.Result)
 
 		// marshal and unmarshal to get a new pointer
-		res2 := r.Handle([]byte(data))
+		responses2 := r.Handle(testContext(), []byte(data))
+		require.Len(t, responses2, 1)
+		res2 := responses2[0]
 		if res2.Error != nil {
 			t.Fatalf("failed: %v", res2.Error)
 		}
@@ -48,9 +61,19 @@ func TestRouter(t *testing.T) {
 		}
 	})
 
+	t.Run("Handle initialized notification", func(t *testing.T) {
+		data := `{"method":"notifications/initialized","params":{}}`
+		responses := r.Handle(testContext(), []byte(data))
+		require.Len(t, responses, 1)
+		res := responses[0]
+		require.Nil(t, res)
+	})
+
 	t.Run("Handle empty request", func(t *testing.T) {
 		data := `{}`
-		res := r.Handle([]byte(data))
+		responses := r.Handle(testContext(), []byte(data))
+		require.Len(t, responses, 1)
+		res := responses[0]
 		if res.Error == nil {
 			t.Fatalf("expected error, got nil")
 		}
@@ -61,7 +84,9 @@ func TestRouter(t *testing.T) {
 
 	t.Run("Handle unparseable request", func(t *testing.T) {
 		data := `not a json`
-		res := r.Handle([]byte(data))
+		responses := r.Handle(testContext(), []byte(data))
+		require.Len(t, responses, 1)
+		res := responses[0]
 		if res.Error == nil {
 			t.Fatalf("expected error, got nil")
 		}
@@ -72,7 +97,9 @@ func TestRouter(t *testing.T) {
 
 	t.Run("Handle null request", func(t *testing.T) {
 		data := `null`
-		res := r.Handle([]byte(data))
+		responses := r.Handle(testContext(), []byte(data))
+		require.Len(t, responses, 1)
+		res := responses[0]
 		if res.Error == nil {
 			t.Fatalf("expected error, got nil")
 		}
@@ -83,7 +110,9 @@ func TestRouter(t *testing.T) {
 
 	t.Run("Handle unknown method", func(t *testing.T) {
 		data := `{"method":"unknown","params":{}, "id":1}`
-		res := r.Handle([]byte(data))
+		responses := r.Handle(testContext(), []byte(data))
+		require.Len(t, responses, 1)
+		res := responses[0]
 		if res.Error == nil {
 			t.Fatalf("expected error, got nil")
 		}
@@ -94,7 +123,9 @@ func TestRouter(t *testing.T) {
 
 	t.Run("Handle invalid method type", func(t *testing.T) {
 		data := `{"method":1,"params":{}, "id":1}`
-		res := r.Handle([]byte(data))
+		responses := r.Handle(testContext(), []byte(data))
+		require.Len(t, responses, 1)
+		res := responses[0]
 		if res.Error == nil {
 			t.Fatalf("expected error, got nil")
 		}

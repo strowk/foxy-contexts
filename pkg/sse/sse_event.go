@@ -1,9 +1,11 @@
 package sse
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"io"
+	"regexp"
 )
 
 type Event struct {
@@ -17,9 +19,11 @@ func (ev *Event) MarshalTo(w io.Writer) error {
 	if len(ev.Data) == 0 {
 		return nil
 	}
-	_, err := fmt.Fprintf(w, "id: %s\n", ev.ID)
-	if err != nil {
-		return err
+	if len(ev.ID) > 0 {
+		_, err := fmt.Fprintf(w, "id: %s\n", ev.ID)
+		if err != nil {
+			return err
+		}
 	}
 	sd := bytes.Split(ev.Data, []byte("\n"))
 	for i := range sd {
@@ -61,4 +65,55 @@ func (ev *CommentEvent) MarshalTo(w io.Writer) error {
 	}
 
 	return nil
+}
+
+func DecodeEvent(r *bufio.Reader) (*Event, error) {
+	fieldCaptureRegex := "[\\s]*(data|id|event|retry):[\\s]*([^\\n]+)"
+	regexp := regexp.MustCompile(fieldCaptureRegex)
+	var ev Event
+	readPartialEvent := false
+
+	for {
+		line, err := r.ReadBytes('\n')
+		if err != nil {
+			if err == io.EOF {
+				if !readPartialEvent {
+					return nil, io.EOF
+				}
+				break
+			}
+			return nil, err
+		}
+
+		line = bytes.TrimSpace(line)
+		if len(line) == 0 {
+			break // end of event
+		}
+
+		if bytes.HasPrefix(line, []byte(":")) {
+			// comment line
+			continue
+		}
+
+		if regexp.Match(line) {
+			field := regexp.FindSubmatch(line)
+			switch string(field[1]) {
+			case "data":
+				ev.Data = append(ev.Data, field[2]...)
+			case "id":
+				ev.ID = field[2]
+			case "event":
+				ev.Event = field[2]
+			case "retry":
+				ev.Retry = field[2]
+			}
+		}
+
+		readPartialEvent = true
+	}
+	if len(ev.Data) == 0 {
+		return nil, fmt.Errorf("no data found in event")
+	}
+
+	return &ev, nil
 }

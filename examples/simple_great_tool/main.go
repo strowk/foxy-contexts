@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/strowk/foxy-contexts/pkg/app"
@@ -35,7 +36,7 @@ func NewGreatTool() fxctx.Tool {
 		},
 
 		// This is the callback that would be executed when the tool is called:
-		func(args map[string]interface{}) *mcp.CallToolResult {
+		func(_ context.Context, args map[string]interface{}) *mcp.CallToolResult {
 			// here we can do anything we want
 			return &mcp.CallToolResult{
 				Content: []interface{}{

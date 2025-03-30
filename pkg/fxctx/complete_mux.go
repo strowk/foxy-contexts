@@ -1,6 +1,7 @@
 package fxctx
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -11,11 +12,11 @@ import (
 )
 
 type Completer interface {
-	Complete(*mcp.CompleteRequest, string) (*mcp.CompleteResult, error)
+	Complete(ctx context.Context, req *mcp.CompleteRequest, completingName string) (*mcp.CompleteResult, error)
 }
 
 type CompleteMux interface {
-	Complete(*mcp.CompleteRequest) (*mcp.CompleteResult, error)
+	Complete(ctx context.Context, req *mcp.CompleteRequest) (*mcp.CompleteResult, error)
 	RegisterHandlers(s server.Server)
 }
 
@@ -30,21 +31,21 @@ type completeMux struct {
 	resourceMux Completer
 }
 
-func (c *completeMux) Complete(req *mcp.CompleteRequest) (*mcp.CompleteResult, error) {
+func (c *completeMux) Complete(ctx context.Context, req *mcp.CompleteRequest) (*mcp.CompleteResult, error) {
 	if ref, ok := req.Params.Ref.(map[string]interface{}); ok {
-		return c.complete(req, ref)
+		return c.complete(ctx, req, ref)
 	} else {
 		return nil, fmt.Errorf("%w: %T", ErrUnknownTypeOfRef, req.Params.Ref)
 	}
 }
 
-func (c *completeMux) complete(req *mcp.CompleteRequest, ref map[string]interface{}) (*mcp.CompleteResult, error) {
+func (c *completeMux) complete(ctx context.Context, req *mcp.CompleteRequest, ref map[string]interface{}) (*mcp.CompleteResult, error) {
 	if refType, ok := ref["type"]; ok {
 		switch refType {
 		case "ref/prompt":
-			return c.completePrompt(req, ref)
+			return c.completePrompt(ctx, req, ref)
 		case "ref/resource":
-			return c.completeResource(req, ref)
+			return c.completeResource(ctx, req, ref)
 		default:
 			return nil, fmt.Errorf("%w: %s", ErrUnknownValueOfRefType, refType)
 		}
@@ -53,17 +54,17 @@ func (c *completeMux) complete(req *mcp.CompleteRequest, ref map[string]interfac
 	}
 }
 
-func (c *completeMux) completePrompt(req *mcp.CompleteRequest, ref map[string]interface{}) (*mcp.CompleteResult, error) {
+func (c *completeMux) completePrompt(ctx context.Context, req *mcp.CompleteRequest, ref map[string]interface{}) (*mcp.CompleteResult, error) {
 	if promptName, ok := ref["name"].(string); ok {
-		return c.promptMux.Complete(req, promptName)
+		return c.promptMux.Complete(ctx, req, promptName)
 	} else {
 		return nil, fmt.Errorf("%w: %T", ErrUnknownTypeOfRef, ref["name"])
 	}
 }
 
-func (c *completeMux) completeResource(req *mcp.CompleteRequest, ref map[string]interface{}) (*mcp.CompleteResult, error) {
+func (c *completeMux) completeResource(ctx context.Context, req *mcp.CompleteRequest, ref map[string]interface{}) (*mcp.CompleteResult, error) {
 	if uri, ok := ref["uri"].(string); ok {
-		return c.resourceMux.Complete(req, uri)
+		return c.resourceMux.Complete(ctx, req, uri)
 	} else {
 		return nil, fmt.Errorf("%w: %T", ErrUnknownTypeOfRef, ref["uri"])
 	}
@@ -88,9 +89,9 @@ func (c *completeMux) RegisterHandlers(s server.Server) {
 }
 
 func (c *completeMux) setCompletionCompleteHandler(s server.Server) {
-	s.SetRequestHandler(&mcp.CompleteRequest{}, func(req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
+	s.SetRequestHandler(&mcp.CompleteRequest{}, func(ctx context.Context, req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
 		r := req.(*mcp.CompleteRequest)
-		res, err := c.Complete(r)
+		res, err := c.Complete(ctx, r)
 		if err != nil {
 			return nil, jsonrpc2.NewServerError(CompleteFailed, fmt.Sprintf("failed to complete: %v", err.Error()))
 		}

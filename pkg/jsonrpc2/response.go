@@ -30,3 +30,7 @@ func Marshal(id RequestId, v Result, e *Error) ([]byte, error) {
 		Id:      id,
 	})
 }
+
+func (r JsonRpcResponse) MarshalJSON() ([]byte, error) {
+	return Marshal(r.Id, r.Result, r.Error)
+}

@@ -1,6 +1,7 @@
 package fxctx
 
 import (
+	"context"
 	"fmt"
 	"sort"
 
@@ -12,7 +13,7 @@ import (
 
 type PromptMux interface {
 	Completer
-	ListPrompts() []mcp.Prompt
+	ListPrompts(ctx context.Context) []mcp.Prompt
 	RegisterHandlers(s server.Server)
 }
 
@@ -30,15 +31,15 @@ func NewPromptMux(prompts []Prompt) PromptMux {
 	}
 }
 
-func (p *promptMux) Complete(req *mcp.CompleteRequest, name string) (*mcp.CompleteResult, error) {
+func (p *promptMux) Complete(ctx context.Context, req *mcp.CompleteRequest, name string) (*mcp.CompleteResult, error) {
 	prompt, ok := p.prompts[name]
 	if !ok {
 		return nil, fmt.Errorf("prompt not found: %s", name)
 	}
-	return prompt.Complete(req)
+	return prompt.Complete(ctx, req)
 }
 
-func (p *promptMux) ListPrompts() []mcp.Prompt {
+func (p *promptMux) ListPrompts(ctx context.Context) []mcp.Prompt {
 	var prompts []mcp.Prompt
 	for _, p := range p.prompts {
 		prompts = append(prompts, p.GetMcpPrompt())
@@ -50,6 +51,7 @@ func (p *promptMux) ListPrompts() []mcp.Prompt {
 }
 
 func (p *promptMux) GetPrompt(
+	ctx context.Context,
 	req *mcp.GetPromptRequest,
 ) (*mcp.GetPromptResult, error) {
 	prompt, ok := p.prompts[req.Params.Name]
@@ -57,7 +59,7 @@ func (p *promptMux) GetPrompt(
 		return nil, fmt.Errorf("prompt not found: %s", req.Params.Name)
 	}
 
-	return prompt.Get(req)
+	return prompt.Get(ctx, req)
 }
 
 func ProvidePromptMux() fx.Option {
@@ -73,21 +75,21 @@ func (p *promptMux) RegisterHandlers(s server.Server) {
 }
 
 func (p *promptMux) setListPromptsHandler(s server.Server) {
-	s.SetRequestHandler(&mcp.ListPromptsRequest{}, func(req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
+	s.SetRequestHandler(&mcp.ListPromptsRequest{}, func(ctx context.Context, req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
 		resp := &mcp.ListPromptsResult{
 			Prompts: []mcp.Prompt{},
 		}
 
-		list := p.ListPrompts()
+		list := p.ListPrompts(ctx)
 		resp.Prompts = append(resp.Prompts, list...)
 		return resp, nil
 	})
 }
 
 func (p *promptMux) setGetPromptHandler(s server.Server) {
-	s.SetRequestHandler(&mcp.GetPromptRequest{}, func(req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
+	s.SetRequestHandler(&mcp.GetPromptRequest{}, func(ctx context.Context, req jsonrpc2.Request) (jsonrpc2.Result, *jsonrpc2.Error) {
 		r := req.(*mcp.GetPromptRequest)
-		res, err := p.GetPrompt(r)
+		res, err := p.GetPrompt(ctx, r)
 		if err != nil {
 			return nil, jsonrpc2.NewServerError(GetPromptFailed, fmt.Sprintf("failed to get prompt: %v", err.Error()))
 		}

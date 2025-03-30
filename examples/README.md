@@ -22,3 +22,7 @@ This [example](./list_k8s_contexts_tool/main.go) demonstrates how MCP tool could
 
 This [example](./list_k8s_namespaces_prompt/main.go) demonstrates how MCP prompt could be defined using NewPrompt.
 
+## Streamable HTTP Transport
+
+This [example](./streamable_http/main.go) demonstrates how MCP server could be started with streamable HTTP transport.
+

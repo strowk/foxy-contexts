@@ -50,7 +50,7 @@ func main() {
 					},
 
 					// This is the callback that would be executed when the prompt/get is requested:
-					func(req *mcp.GetPromptRequest) (*mcp.GetPromptResult, error) {
+					func(ctx context.Context, req *mcp.GetPromptRequest) (*mcp.GetPromptResult, error) {
 						k8sContext := req.Params.Arguments["context"]
 						loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
 						configOverrides := &clientcmd.ConfigOverrides{}
@@ -74,7 +74,7 @@ func main() {
 							return nil, fmt.Errorf("failed to create k8s client: %w", err)
 						}
 
-						ns, err := clientset.CoreV1().Namespaces().List(context.Background(), metav1.ListOptions{})
+						ns, err := clientset.CoreV1().Namespaces().List(ctx, metav1.ListOptions{})
 
 						if err != nil {
 							log.Printf("failed to list namespaces: %v", err)
