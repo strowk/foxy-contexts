@@ -83,6 +83,7 @@ func (s *stdioTransport) run(
 
 	reader := bufio.NewReader(s.in)
 	go func() {
+		defer close(s.stoppedReadingResponses)
 	out:
 		for {
 			select {
@@ -106,38 +107,28 @@ func (s *stdioTransport) run(
 				}
 			}
 		}
-		close(s.stoppedReadingResponses)
 	}()
 
 	go func() {
+		defer close(s.stoppedReadingInput)
 	out:
 		for {
-			select {
-			case <-s.shuttingDown:
-				break out
-			default:
-				input, err := reader.ReadBytes('\n')
-				if err != nil {
-					if !errors.Is(err, io.EOF) {
-						srv.GetLogger().LogEvent(foxyevent.StdioFailedReadingInput{Err: err})
-					}
-					break out
+			input, err := reader.ReadBytes('\n')
+			if err != nil {
+				if !errors.Is(err, io.EOF) {
+					srv.GetLogger().LogEvent(foxyevent.StdioFailedReadingInput{Err: err})
 				}
-				srv.Handle(ctx, input)
+				break out
 			}
+			srv.Handle(ctx, input)
 		}
-		close(s.stoppedReadingInput)
 	}()
 
 	// wait for either shutting down or stopped reading input
 	select {
 	case <-s.shuttingDown:
-		// if we got shutting down signal,
-		// we need to wait until we stop reading input,
-		// which waits for shutdown by itself
-		<-s.stoppedReadingInput
 	case <-s.stoppedReadingInput:
-		// if we stopped reading input, we can now initiate shutdown
+		// if we stopped reading input, we can now initiate transport shutdown
 		close(s.shuttingDown)
 	}
 
