@@ -625,12 +625,19 @@ func (ts *testSuite) startExecutable(t TestRunner) *exec.Cmd {
 		if ts.logging {
 			t.Log("waiting for command to finish")
 		}
-		if err := cmd.Wait(); err != nil {
-			t.Logf("error waiting for command to finish: %v", err)
-		}
-		if ts.logging {
-			t.Log("command finished")
-		}
+
+		//nolint:errcheck // explained further why cannot process error
+		cmd.Wait()
+
+		// if err := cmd.Wait(); err != nil {
+		// logging here sometimes causes test to fail sadly, so have to comment it out
+		// for now until is more clear what is causing this panic:
+		// panic: Log in goroutine after TestWithFoxytest has completed:
+		// t.Logf("error waiting for command to finish: %v", err)
+		// }
+		// if ts.logging {
+		// t.Log("command finished")
+		// }
 		close(ts.executableDone)
 	}()
 
