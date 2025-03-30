@@ -24,23 +24,24 @@ type internalTestRunner struct {
 
 //go:generate mockgen -destination=./mock/testrunner_mock.go -package=testrunner_mock . TestSystem
 
-func (tc *internalTestRunner) Fatal(args ...interface{}) {
+func (tc *internalTestRunner) Fatal(args ...any) {
 	tc.themock.Fatal(args...)
 }
 
-func (tc *internalTestRunner) Fatalf(format string, args ...interface{}) {
+func (tc *internalTestRunner) Fatalf(format string, args ...any) {
 	tc.themock.Fatalf(format, args...)
 }
 
-func (tc *internalTestRunner) Errorf(format string, args ...interface{}) {
+func (tc *internalTestRunner) Errorf(format string, args ...any) {
+	tc.t.Helper()
 	tc.themock.Errorf(format, args...)
 }
 
-func (tc *internalTestRunner) Log(args ...interface{}) {
+func (tc *internalTestRunner) Log(args ...any) {
 	tc.themock.Log(args...)
 }
 
-func (tc *internalTestRunner) Logf(format string, args ...interface{}) {
+func (tc *internalTestRunner) Logf(format string, args ...any) {
 	tc.themock.Logf(format, args...)
 }
 
@@ -53,7 +54,7 @@ func (tc *internalTestRunner) Run(name string, f func(t TestRunner)) bool {
 
 func createTestTest() *test {
 	// input channel we would need to have test to write stuff in
-	inputChan := make(chan map[string]interface{})
+	inputChan := make(chan TestInput)
 
 	// the output channel we would be writing to to see what test would do
 	outputChan := make(chan string)
@@ -124,6 +125,15 @@ out: {"val": 1, "reg": !!ere "this is usual string escaping \\/some slashes, /an
 `, // note that in sequence \\/ second backslash is needed ^ here to escape second backslash through YAML,
 			// then that second backslash is needed to escape forward slash from embedded regex
 			output: `{"val": 1, "reg": "this is usual string escaping /some slashes, and this is regex WOW ! .. end"}`,
+		},
+		{
+			name: "with batch input",
+			caseDocument: `
+case: case 1
+in: [{"val": "hoho"}, {"val": "hohoho"}]
+out: {"val": "whatever"}
+`,
+			output: `{"val": "whatever"}`,
 		},
 	}
 

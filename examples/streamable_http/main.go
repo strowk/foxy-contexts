@@ -3,26 +3,36 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/strowk/foxy-contexts/pkg/app"
 	"github.com/strowk/foxy-contexts/pkg/fxctx"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
-	"github.com/strowk/foxy-contexts/pkg/stdio"
+	"github.com/strowk/foxy-contexts/pkg/session"
+	"github.com/strowk/foxy-contexts/pkg/streamable_http"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
 	"go.uber.org/zap"
 )
 
-// This example defines my-great-tool tool for MCP server
+type MySessionData struct {
+	isItGreat bool
+}
+
+func (m *MySessionData) String() string {
+	return "MySessionData"
+}
+
+// This example defines my-great-tool tool for MCP server that is using streamable http transport
 // , run it with:
-// npx @modelcontextprotocol/inspector go run main.go
-// , then in browser open http://localhost:5173
-// , then click Connect
-// , then click List Tools
-// , then click my-great-tool
+// go run main.go
+// then in another terminal run:
+// curl -X POST -H "Content-Type: application/json" -d '{"method":"tools/call", "params": {"name": "my-great-tool", "arguments": {}},"id":0}' http://localhost:8080/mcp
+// , then you should see the response:
+// {"jsonrpc":"2.0","result":{"content":[{"text":"Sup","type":"text"}]},"id":0}
 
 // --8<-- [start:tool]
-func NewGreatTool() fxctx.Tool {
+func NewGreatTool(sm *session.SessionManager) fxctx.Tool {
 	return fxctx.NewTool(
 		// This information about the tool would be used when it is listed:
 		&mcp.Tool{
@@ -36,13 +46,24 @@ func NewGreatTool() fxctx.Tool {
 		},
 
 		// This is the callback that would be executed when the tool is called:
-		func(_ context.Context, args map[string]interface{}) *mcp.CallToolResult {
+		func(ctx context.Context, args map[string]interface{}) *mcp.CallToolResult {
+			data := sm.GetSessionData(ctx)
+			if data == nil {
+				sm.SetSessionData(ctx, &MySessionData{
+					isItGreat: true,
+				})
+			}
+
+			resp := "saving greatness to session"
+			if data != nil {
+				resp = "already great"
+			}
 			// here we can do anything we want
 			return &mcp.CallToolResult{
 				Content: []interface{}{
 					mcp.TextContent{
 						Type: "text",
-						Text: fmt.Sprintf("Sup"),
+						Text: fmt.Sprintf("Sup, %s", resp),
 					},
 				},
 			}
@@ -54,14 +75,21 @@ func NewGreatTool() fxctx.Tool {
 
 // --8<-- [start:server]
 func main() {
-	app.
+	server := app.
 		NewBuilder().
 		// adding the tool to the app
 		WithTool(NewGreatTool).
 		// setting up server
 		WithName("great-tool-server").
 		WithVersion("0.0.1").
-		WithTransport(stdio.NewTransport()).
+		WithTransport(
+			streamable_http.NewTransport(
+				streamable_http.Endpoint{
+					Hostname: "localhost",
+					Port:     8080,
+					Path:     "/mcp",
+				}),
+		).
 		// Configuring fx logging to only show errors
 		WithFxOptions(
 			fx.Provide(func() *zap.Logger {
@@ -75,7 +103,12 @@ func main() {
 					return &fxevent.ZapLogger{Logger: logger}
 				},
 			)),
-		).Run()
+		)
+	server.Run()
+
+	if server.Err() != nil {
+		log.Fatal("Server exited", zap.Error(server.Err()))
+	}
 }
 
 // --8<-- [end:server]

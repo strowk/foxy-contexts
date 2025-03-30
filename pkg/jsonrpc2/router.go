@@ -1,6 +1,8 @@
 package jsonrpc2
 
 import (
+	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"reflect"
@@ -14,14 +16,14 @@ type Request interface {
 
 type JsonRpcRouter interface {
 	/// SetRequestHandler sets a handler for a request that would return a response
-	SetRequestHandler(request Request, handler func(req Request) (Result, *Error))
+	SetRequestHandler(request Request, handler func(ctx context.Context, req Request) (Result, *Error))
 
 	/// SetNotificationHandler sets a handler for a notification, that would not return any response
-	SetNotificationHandler(request Request, handler func(req Request))
+	SetNotificationHandler(request Request, handler func(ctx context.Context, req Request))
 
-	/// Handle processes incoming JSON-RPC request and either returns JSON-RPC result or error within response
-	/// or returns nil if successfully processed notification
-	Handle(b []byte) *JsonRpcResponse
+	/// Handle processes incoming JSON-RPC request and either returns an array of
+	// JSON-RPC results or error responses or nil if successfully processed notification
+	Handle(ctx context.Context, b []byte) []*JsonRpcResponse
 }
 
 type RequestId struct {
@@ -71,16 +73,16 @@ func NewNullRequestId() RequestId {
 }
 
 type router struct {
-	requestHandlers      map[string]func(req Request) (Result, *Error)
-	notificationHandlers map[string]func(req Request)
+	requestHandlers      map[string]func(ctx context.Context, req Request) (Result, *Error)
+	notificationHandlers map[string]func(ctx context.Context, req Request)
 	requestRegistry      map[string]func() Request
 }
 
 func NewJsonRPCRouter() JsonRpcRouter {
 	return &router{
-		requestHandlers:      map[string]func(req Request) (Result, *Error){},
+		requestHandlers:      map[string]func(ctx context.Context, req Request) (Result, *Error){},
 		requestRegistry:      map[string]func() Request{},
-		notificationHandlers: map[string]func(req Request){},
+		notificationHandlers: map[string]func(ctx context.Context, req Request){},
 	}
 }
 
@@ -92,26 +94,26 @@ func (r *router) saveRequestToRegistry(method string, request Request) {
 	}
 }
 
-func (r *router) SetRequestHandler(request Request, handler func(req Request) (Result, *Error)) {
+func (r *router) SetRequestHandler(request Request, handler func(ctx context.Context, req Request) (Result, *Error)) {
 	method := request.GetMethod()
 	r.saveRequestToRegistry(method, request)
 	r.requestHandlers[method] = handler
 }
 
-func (r *router) SetNotificationHandler(request Request, handler func(req Request)) {
+func (r *router) SetNotificationHandler(request Request, handler func(ctx context.Context, req Request)) {
 	method := request.GetMethod()
 	r.saveRequestToRegistry(method, request)
 	r.notificationHandlers[method] = handler
 }
 
-func (r *router) getRequestHandler(method string) func(req Request) (Result, *Error) {
+func (r *router) getRequestHandler(method string) func(ctx context.Context, req Request) (Result, *Error) {
 	if handler, ok := r.requestHandlers[method]; ok {
 		return handler
 	}
 	return nil
 }
 
-func (r *router) getNotificationHandler(method string) func(req Request) {
+func (r *router) getNotificationHandler(method string) func(ctx context.Context, req Request) {
 	if handler, ok := r.notificationHandlers[method]; ok {
 		return handler
 	}
@@ -119,6 +121,7 @@ func (r *router) getNotificationHandler(method string) func(req Request) {
 }
 
 func (r *router) handle(
+	ctx context.Context,
 	buf []byte,
 	method string,
 	id RequestId,
@@ -139,7 +142,7 @@ func (r *router) handle(
 			if handler == nil {
 				return nil, NewNullRequestId(), methodNotFound(fmt.Sprintf("handler for method %v not found to process notification", method))
 			}
-			handler(req)
+			handler(ctx, req)
 			return nil, id, nil
 		} else {
 			handler := r.getRequestHandler(method)
@@ -147,7 +150,7 @@ func (r *router) handle(
 				return nil, id, methodNotFound(fmt.Sprintf("handler for method %v not found to process request", method))
 			}
 
-			res, err := handler(req)
+			res, err := handler(ctx, req)
 			if err != nil {
 				return nil, id, err
 			}
@@ -185,28 +188,65 @@ func getId(raw map[string]interface{}) (*RequestId, error) {
 	}
 }
 
-func (r *router) handleRequest(buf []byte) (Result, RequestId, *Error) {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(buf, &raw); err != nil {
-		return nil, NewNullRequestId(), parseError(err.Error())
+func (r *router) Handle(ctx context.Context, buf []byte) []*JsonRpcResponse {
+	trimmedBytes := bytes.TrimLeft(buf, " \t\r\n")
+
+	isArray := len(trimmedBytes) > 0 && trimmedBytes[0] == '['
+	isObject := len(trimmedBytes) > 0 && trimmedBytes[0] == '{'
+
+	if isArray {
+		var rawArray []json.RawMessage
+		if err := json.Unmarshal(buf, &rawArray); err != nil {
+			return errResponseWithNullId(parseError(err.Error()))
+		}
+		var resp []*JsonRpcResponse
+		for _, raw := range rawArray {
+			resp = append(resp, getResponse(r.handleSingleObject(ctx, raw)))
+		}
+		return resp
 	}
 
+	if isObject {
+		return getResponses(r.handleSingleObject(ctx, buf))
+	}
+
+	// need to check whether request is correct json at all
+	var raw any
+	if err := json.Unmarshal(buf, &raw); err != nil {
+		return errResponseWithNullId(parseError(err.Error()))
+	}
+
+	// finally if it was correct json, but probably not an object or array, we need to return invalid request response
+	if raw == nil {
+		return errResponseWithNullId(invalidRequest("Request is null, but must be an object"))
+	}
+
+	return errResponseWithNullId(invalidRequest(fmt.Sprintf("Request is expected to be an object or array, but was %T' : %s", raw, string(trimmedBytes))))
+}
+
+func (r *router) handleSingleObject(ctx context.Context, raw json.RawMessage) (Result, RequestId, *Error) {
 	if raw == nil {
 		return nil, NewNullRequestId(), invalidRequest("Request is null, but must be an object")
 	}
 
-	id, err := getId(raw)
+	var rawMap map[string]any
+	err := json.Unmarshal(raw, &rawMap)
+	if err != nil {
+		return nil, NewNullRequestId(), parseError(err.Error())
+	}
+
+	id, err := getId(rawMap)
 	if err != nil {
 		return nil, NewNullRequestId(), invalidRequest(err.Error())
 	}
 
-	if method, ok := raw["method"]; ok {
+	if method, ok := rawMap["method"]; ok {
 		if method == nil {
 			return nil, *id, invalidRequest("Method is required, but was null")
 		}
 
 		if methodString, ok := method.(string); ok {
-			res, resId, err := r.handle(buf, methodString, *id)
+			res, resId, err := r.handle(ctx, raw, methodString, *id)
 			if err != nil {
 				return nil, resId, err
 			}
@@ -220,8 +260,7 @@ func (r *router) handleRequest(buf []byte) (Result, RequestId, *Error) {
 	}
 }
 
-func (r *router) Handle(buf []byte) *JsonRpcResponse {
-	res, id, err := r.handleRequest(buf)
+func getResponse(res Result, id RequestId, err *Error) *JsonRpcResponse {
 	if err != nil {
 		return &JsonRpcResponse{
 			Id:    id,
@@ -235,4 +274,12 @@ func (r *router) Handle(buf []byte) *JsonRpcResponse {
 		}
 	}
 	return nil
+}
+
+func getResponses(res Result, id RequestId, err *Error) []*JsonRpcResponse {
+	return []*JsonRpcResponse{getResponse(res, id, err)}
+}
+
+func errResponseWithNullId(err *Error) []*JsonRpcResponse {
+	return getResponses(nil, NewNullRequestId(), err)
 }

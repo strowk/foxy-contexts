@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+
 	"github.com/strowk/foxy-contexts/pkg/app"
 	"github.com/strowk/foxy-contexts/pkg/fxctx"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
@@ -26,7 +28,7 @@ func NewGreatPrompt() fxctx.Prompt {
 			},
 		},
 		// This is the callback that would be executed when the prompt/get is requested:
-		func(req *mcp.GetPromptRequest) (*mcp.GetPromptResult, error) {
+		func(_ context.Context, req *mcp.GetPromptRequest) (*mcp.GetPromptResult, error) {
 			description := "Prompting to do something great"
 			return &mcp.GetPromptResult{
 				Description: &description,

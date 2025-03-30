@@ -1,31 +1,33 @@
 package fxctx
 
 import (
+	"context"
+
 	"github.com/strowk/foxy-contexts/pkg/mcp"
 	"go.uber.org/fx"
 )
 
 type ResourceProvider interface {
-	GetResources() ([]mcp.Resource, error)
-	ReadResource(uri string) (*mcp.ReadResourceResult, error)
+	GetResources(ctx context.Context) ([]mcp.Resource, error)
+	ReadResource(ctx context.Context, uri string) (*mcp.ReadResourceResult, error)
 }
 
 type resourceProvider struct {
-	getResources func() ([]mcp.Resource, error)
-	readResource func(uri string) (*mcp.ReadResourceResult, error)
+	getResources func(ctx context.Context) ([]mcp.Resource, error)
+	readResource func(ctx context.Context, uri string) (*mcp.ReadResourceResult, error)
 }
 
-func (r *resourceProvider) GetResources() ([]mcp.Resource, error) {
-	return r.getResources()
+func (r *resourceProvider) GetResources(ctx context.Context) ([]mcp.Resource, error) {
+	return r.getResources(ctx)
 }
 
-func (r *resourceProvider) ReadResource(uri string) (*mcp.ReadResourceResult, error) {
-	return r.readResource(uri)
+func (r *resourceProvider) ReadResource(ctx context.Context, uri string) (*mcp.ReadResourceResult, error) {
+	return r.readResource(ctx, uri)
 }
 
 func NewResourceProvider(
-	getResources func() ([]mcp.Resource, error),
-	readResource func(uri string) (*mcp.ReadResourceResult, error),
+	getResources func(ctx context.Context) ([]mcp.Resource, error),
+	readResource func(ctx context.Context, uri string) (*mcp.ReadResourceResult, error),
 ) ResourceProvider {
 	return &resourceProvider{
 		getResources: getResources,

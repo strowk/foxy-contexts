@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 
 	"github.com/strowk/foxy-contexts/pkg/app"
@@ -34,7 +35,7 @@ func NewGreatResource() fxctx.Resource {
 				},
 			},
 		},
-		func(uri string) (*mcp.ReadResourceResult, error) {
+		func(_ context.Context, uri string) (*mcp.ReadResourceResult, error) {
 			return &mcp.ReadResourceResult{
 				Contents: []interface{}{
 					mcp.TextResourceContents{

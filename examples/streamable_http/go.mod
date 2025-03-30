@@ -1,4 +1,4 @@
-module github.com/strowk/foxy-contexts/examples/hello_world_tool
+module github.com/strowk/foxy-contexts/examples/streamable_http
 
 go 1.23.3
 
