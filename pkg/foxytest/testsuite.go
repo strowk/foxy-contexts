@@ -625,6 +625,7 @@ func (ts *testSuite) startExecutable(t TestRunner) *exec.Cmd {
 		if ts.logging {
 			t.Log("waiting for command to finish")
 		}
+		defer close(ts.executableDone)
 
 		//nolint:errcheck // explained further why cannot process error
 		cmd.Wait()
@@ -638,7 +639,6 @@ func (ts *testSuite) startExecutable(t TestRunner) *exec.Cmd {
 		// if ts.logging {
 		// t.Log("command finished")
 		// }
-		close(ts.executableDone)
 	}()
 
 	return cmd
