@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/strowk/foxy-contexts/pkg/app"
 	"github.com/strowk/foxy-contexts/pkg/fxctx"
@@ -107,7 +108,11 @@ func main() {
 	server.Run()
 
 	if server.Err() != nil {
-		log.Fatal("Server exited", zap.Error(server.Err()))
+		if server.Err() == http.ErrServerClosed {
+			log.Println("Server closed")
+		} else {
+			log.Fatalf("Server error: %v", server.Err())
+		}
 	}
 }
 
