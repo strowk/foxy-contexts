@@ -75,7 +75,7 @@ func (s *stdioTransport) run(
 ) error {
 	// local stdio transport is using only one session per whole execution
 	ctx := context.Background()
-	ctx, _, err := s.sessionManager.CreateNewSession(ctx)
+	ctx, _, err := s.sessionManager.CreateNewSession(ctx, nil)
 	if err != nil {
 		srv.GetLogger().LogEvent(foxyevent.FailedCreatingSession{Err: err})
 		return fmt.Errorf("failed to create session: %w", err)
