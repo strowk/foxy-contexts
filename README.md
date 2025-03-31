@@ -40,6 +40,7 @@ Here is list of features that are implemented and planned:
 - [x] Transports
 	- [x] Stdio Transport
 	- [x] SSE Transport
+	- [x] Streamable HTTP Transport (beta)
 - [x] Tools
     - [x] Package toolinput helps define tools input schema and validate arriving input
 - [ ] Resources
