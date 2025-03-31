@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/strowk/foxy-contexts/pkg/app"
@@ -21,42 +22,51 @@ import (
 // , then click List Resources
 // , then click hello-world
 
-// --8<-- [start:resource]
-func NewGreatResource() fxctx.Resource {
-	return fxctx.NewResource(
-		mcp.Resource{
-			Name:        "hello-world",
-			Uri:         "hello-world://hello-world",
-			MimeType:    Ptr("application/json"),
-			Description: Ptr("Hello World Resource"),
-			Annotations: &mcp.ResourceAnnotations{
-				Audience: []mcp.Role{
-					mcp.RoleAssistant, mcp.RoleUser,
-				},
-			},
-		},
-		func(_ context.Context, uri string) (*mcp.ReadResourceResult, error) {
-			return &mcp.ReadResourceResult{
-				Contents: []interface{}{
-					mcp.TextResourceContents{
-						MimeType: Ptr("application/json"),
-						Text:     `{"hello": "world"}`,
-						Uri:      uri,
-					},
+// --8<-- [start:provider]
+func NewGreatResourceProvider() fxctx.ResourceProvider {
+	return fxctx.NewResourceProvider(
+		// This is the callback that would be executed when the resources/list is requested:
+		func(_ context.Context) ([]mcp.Resource, error) {
+			return []mcp.Resource{
+				{
+					Name:        "my-great-resource-one",
+					Description: Ptr("Does something great"),
+					Uri:         "/resources/great/one",
 				},
 			}, nil
+		},
+		//  This function reads the resource for a given uri to run when resources/read is requested:
+		func(_ context.Context, uri string) (*mcp.ReadResourceResult, error) {
+
+			// you would probably be doing something more complicated here
+			// like reading from a database or calling an external service
+			// based on what you have parsed from the uri
+			if uri == "/resources/great/one" {
+				return &mcp.ReadResourceResult{
+					Contents: []interface{}{
+						mcp.TextResourceContents{
+							MimeType: Ptr("application/json"),
+							Text:     string(`{"great": "resource"}`),
+							Uri:      uri,
+						},
+					},
+				}, nil
+			}
+
+			// this error would be wrapped in JSON-RPC error response
+			return nil, fmt.Errorf("resource not found")
 		},
 	)
 }
 
-// --8<-- [end:resource]
+// --8<-- [end:provider]
 
 // --8<-- [start:server]
 func main() {
 	err := app.
 		NewBuilder().
-		// adding the resource to the app
-		WithResource(NewGreatResource).
+		// adding the resource provider to server
+		WithResourceProvider(NewGreatResourceProvider).
 		// setting up server
 		WithName("my-mcp-server").
 		WithVersion("0.0.1").

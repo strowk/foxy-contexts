@@ -20,5 +20,6 @@ jobs:
       - run: cd examples/list_current_dir_files_tool && go test
       - run: cd examples/list_k8s_contexts_tool && go test
       - run: cd examples/streamable_http && go test -v
+      - run: cd examples/resource_provider && go test -v
       - run: cd tests/lifecycle && go test
       - run: go test ./...

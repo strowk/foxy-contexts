@@ -117,7 +117,7 @@ func NewListCurrentDirFilesTool() fxctx.Tool {
       },
 
       // This is the callback that would be executed when the tool is called:
-      func(args map[string]interface{}) *mcp.CallToolResult {
+      func(_ context.Context, args map[string]interface{}) *mcp.CallToolResult {
          files, err := os.ReadDir(".")
          if err != nil {
             return &mcp.CallToolResult{

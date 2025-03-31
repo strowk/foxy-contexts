@@ -23,7 +23,7 @@ In order to create new static resource you shall use `fxctx.NewResource` functio
 
 
 ```go { filename_uri_base="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/hello_world_resource/main.go" }
-{{< snippet "examples/hello_world_resource/main.go:tool" "go" >}}
+{{< snippet "examples/hello_world_resource/main.go:resource" "go" >}}
 ```
 
 ## Register resources and start server
@@ -36,42 +36,8 @@ In order to create new static resource you shall use `fxctx.NewResource` functio
 
 In order to create new resource provider that would be returning resources dynamically, you shall use `fxctx.NewResourceProvider` function. It would then take two functions - one in order to list resources and another to read them.
 
-```go
-func NewGreatResourceProvider() fxctx.ResourceProvider {
-    return fxctx.NewResourceProvider(
-        // This is the callback that would be executed when the resources/list is requested:
-        func() ([]mcp.Resource, error) {
-            return []mcp.Resource{
-                {
-                    Name: "my-great-resource-one",
-                    Description: Ptr("Does something great"),
-                    Uri: "/resources/great/one",
-                },
-            }, nil
-        },
-        //  This function reads the resource for a given uri to run when resources/read is requested:
-		func(uri string) (*mcp.ReadResourceResult, error) {
-
-            // you would probably be doing something more complicated here
-            // like reading from a database or calling an external service
-            // based on what you have parsed from the uri
-            if uri == "/resources/great/one" {
-                return &mcp.ReadResourceResult{
-                    Contents: []interface{}{
-                        mcp.TextResourceContents{
-                            MimeType: Ptr("application/json"),
-                            Text:     string(`{"great": "resource"}`),
-                            Uri:      uri,
-                        }
-                    },
-                }, nil
-            }
-
-            // this error would be wrapped in JSON-RPC error response
-            return nil, fmt.Errorf("resource not found")
-        },
-    )
-}
+```go { filename_uri_base="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/resource_provider/main.go" }
+{{< snippet "examples/resource_provider/main.go:provider" "go" >}}
 ```
 
 ## Examples

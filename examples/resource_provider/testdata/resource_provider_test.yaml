@@ -1,0 +1,51 @@
+case: List resources
+
+# reading resource of the current git repository
+in: { "jsonrpc": "2.0", "method": "resources/list", "params": {}, "id": 1 }
+
+# expect great resource
+out:
+  {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result":
+      {
+        "resources":
+          [
+            {
+              "uri": "/resources/great/one",
+              "name": "my-great-resource-one",
+              "description": "Does something great",
+            },
+          ],
+      },
+  }
+
+---
+case: Read great resource
+
+# reading resource of the hello world
+in:
+  {
+    "jsonrpc": "2.0",
+    "method": "resources/read",
+    "params": { "uri": "/resources/great/one" },
+    "id": 2,
+  }
+
+# expect /resources/great/one resource
+out:
+  {
+    "jsonrpc": "2.0",
+    "result":
+      {
+        "contents":
+          [
+            {
+              "uri": "/resources/great/one",
+              "text": '{"great": "resource"}',
+            },
+          ],
+      },
+    "id": 2,
+  }
