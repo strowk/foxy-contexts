@@ -52,22 +52,31 @@ func (sm *SessionManager) FindSessionById(sessionId uuid.UUID) (*Session, bool) 
 	return session, ok
 }
 
-func (sm *SessionManager) ResolveSessionOrCreateNew(ctx context.Context, sessionId uuid.UUID) (context.Context, *Session, error) {
+func (sm *SessionManager) ResolveSessionOrCreateNew(
+	ctx context.Context,
+	sessionId uuid.UUID,
+) (context.Context, *Session, error) {
 	session, ok := sm.FindSessionById(sessionId)
 	if ok {
 		ctx = WithSession(ctx, session)
 		return ctx, session, nil
 	}
 
-	return sm.CreateNewSession(ctx)
+	return sm.CreateNewSession(ctx, &sessionId)
 }
 
 func (sm *SessionManager) DeleteSession(sessionId uuid.UUID) {
 	delete(sm.sessions, sessionId)
 }
 
-func (sm *SessionManager) CreateNewSession(ctx context.Context) (context.Context, *Session, error) {
+func (sm *SessionManager) CreateNewSession(
+	ctx context.Context,
+	sessionId *uuid.UUID,
+) (context.Context, *Session, error) {
 	session := NewSession()
+	if sessionId != nil {
+		session.SessionID = *sessionId
+	}
 	ctx = WithSession(ctx, session)
 	sm.saveSession(session)
 	return ctx, session, nil
