@@ -105,13 +105,13 @@ func main() {
 				},
 			)),
 		)
-	server.Run()
 
-	if server.Err() != nil {
-		if server.Err() == http.ErrServerClosed {
+	err := server.Run()
+	if err != nil {
+		if err == http.ErrServerClosed {
 			log.Println("Server closed")
 		} else {
-			log.Fatalf("Server error: %v", server.Err())
+			log.Fatalf("Server error: %v", err)
 		}
 	}
 }
