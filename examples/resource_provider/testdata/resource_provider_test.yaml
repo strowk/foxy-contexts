@@ -1,6 +1,6 @@
 case: List resources
 
-# reading resource of the current git repository
+# requesting list of resources
 in: { "jsonrpc": "2.0", "method": "resources/list", "params": {}, "id": 1 }
 
 # expect great resource
@@ -24,7 +24,7 @@ out:
 ---
 case: Read great resource
 
-# reading resource of the hello world
+# reading great resource
 in:
   {
     "jsonrpc": "2.0",
