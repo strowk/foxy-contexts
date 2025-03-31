@@ -7,6 +7,7 @@ set -e
 ( cd examples/k8s_contexts_resources && go test )
 ( cd examples/list_current_dir_files_tool && go test )
 ( cd examples/list_k8s_contexts_tool && go test )
+( cd examples/resource_provider && go test )
 ( cd examples/streamable_http && go test )
 ( cd tests/lifecycle && go test )
 ( go test ./... )
