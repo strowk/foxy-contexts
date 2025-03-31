@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -24,7 +25,7 @@ func NewK8sContextsResourceProvider() fxctx.ResourceProvider {
 	return fxctx.NewResourceProvider(
 
 		// This function returns list of resources in order to include them to the list of resources
-		func() ([]mcp.Resource, error) {
+		func(_ context.Context) ([]mcp.Resource, error) {
 			loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
 			kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, nil)
 			cfg, err := kubeConfig.RawConfig()
@@ -40,7 +41,7 @@ func NewK8sContextsResourceProvider() fxctx.ResourceProvider {
 		},
 
 		//  This function reads the resource for a given uri
-		func(uri string) (*mcp.ReadResourceResult, error) {
+		func(_ context.Context, uri string) (*mcp.ReadResourceResult, error) {
 			loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
 			kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, nil)
 			cfg, err := kubeConfig.RawConfig()
@@ -114,72 +115,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	// fx.New(
-	// 	// Here we define a resource provider that provides k8s contexts as resources
-	// 	fx.Provide(fxctx.AsResourceProvider()),
-
-	// 	// ResourceMux registers resources and resource providers and serves that data for listing resources and reading them
-	// 	fxctx.ProvideResourceMux(),
-
-	// 	// ToolMux registers tools and provides them to the server for listing tools and calling them
-	// 	// TODO: this normally does not need to be here, we should teach server to provide empty list of tools
-	// 	// without actually registering the tool mux?
-	// 	fxctx.ProvideToolMux(),
-
-	// 	// Start the server using stdio transport
-	// 	fx.Invoke((func(
-	// 		lc fx.Lifecycle,
-	// 		resourceMux fxctx.ResourceMux,
-	// 		toolsMux fxctx.ToolMux,
-	// 	) {
-	// 		transport := stdio.NewTransport()
-	// 		lc.Append(fx.Hook{
-	// 			OnStart: func(ctx context.Context) error {
-	// 				go func() {
-	// 					transport.Run(
-	// 						&mcp.ServerCapabilities{
-	// 							Resources: &mcp.ServerCapabilitiesResources{
-	// 								ListChanged: Ptr(false),
-	// 								Subscribe:   Ptr(false),
-	// 							},
-	// 						},
-	// 						&mcp.Implementation{
-	// 							Name:    "my-mcp-k8s-server",
-	// 							Version: "0.0.1",
-	// 						},
-	// 						server.ServerStartCallbackOption{
-	// 							Callback: func(s server.Server) {
-	// 								// This makes sure that server is aware of the tools
-	// 								// we have registered and both can list and call them
-	// 								resourceMux.RegisterHandlers(s)
-	// 								toolsMux.RegisterHandlers(s)
-	// 							},
-	// 						},
-	// 					)
-	// 				}()
-	// 				return nil
-	// 			},
-	// 			OnStop: func(ctx context.Context) error {
-	// 				return transport.Shutdown(ctx)
-	// 			},
-	// 		})
-	// 	})),
-
-	// 	// Just configuring fx logging to only show errors
-	// 	fx.Provide(func() *zap.Logger {
-	// 		cfg := zap.NewDevelopmentConfig()
-	// 		cfg.Level.SetLevel(zap.ErrorLevel)
-	// 		logger, _ := cfg.Build()
-	// 		return logger
-	// 	}),
-	// 	fx.Option(fx.WithLogger(
-	// 		func(logger *zap.Logger) fxevent.Logger {
-	// 			return &fxevent.ZapLogger{Logger: logger}
-	// 		},
-	// 	)),
-	// ).Run()
-
 }
 
 func toMcpResourcse(contextName string) mcp.Resource {

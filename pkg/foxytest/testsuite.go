@@ -43,22 +43,27 @@ func NewTestRunner(t *testing.T) *StdRunner {
 }
 
 func (tc *StdRunner) Fatal(args ...interface{}) {
+	tc.t.Helper()
 	tc.t.Fatal(args...)
 }
 
 func (tc *StdRunner) Fatalf(format string, args ...interface{}) {
+	tc.t.Helper()
 	tc.t.Fatalf(format, args...)
 }
 
 func (tc *StdRunner) Errorf(format string, args ...interface{}) {
+	tc.t.Helper()
 	tc.t.Errorf(format, args...)
 }
 
 func (tc *StdRunner) Log(args ...interface{}) {
+	tc.t.Helper()
 	tc.t.Log(args...)
 }
 
 func (tc *StdRunner) Logf(format string, args ...interface{}) {
+	tc.t.Helper()
 	tc.t.Logf(format, args...)
 }
 
@@ -79,6 +84,7 @@ type TestSuite interface {
 	WithLogging() TestSuite
 
 	WithExecutable(command string, args []string) TestSuite
+	WithTransport(transport TestTransport) TestSuite
 
 	Run(t TestRunner)
 	Errors() []error
@@ -95,7 +101,7 @@ type testSuite struct {
 	afterEach  []func() error
 	tests      []Test
 
-	inputChan  chan map[string]interface{}
+	inputChan  chan TestInput
 	outputChan chan string
 
 	// targetInput is to write to the target process, where the SuT takes input
@@ -114,6 +120,8 @@ type testSuite struct {
 	executableDone chan struct{}
 	testsDone      chan struct{}
 	completed      chan struct{}
+
+	transport TestTransport
 }
 
 func (ts *testSuite) GetTests() []Test {
@@ -154,6 +162,11 @@ func (ts *testSuite) WithLogging() TestSuite {
 	return ts
 }
 
+func (ts *testSuite) WithTransport(transport TestTransport) TestSuite {
+	ts.transport = transport
+	return ts
+}
+
 func (ts *testSuite) AssertNoErrors(t TestRunner) {
 	if len(ts.errors) > 0 {
 		t.Errorf("errors: %v", ts.errors)
@@ -165,6 +178,9 @@ func (ts *testSuite) Errors() []error {
 }
 
 func (ts *testSuite) runTests(t TestRunner) []error {
+	if ts.transport == nil {
+		ts.transport = &TestTransportStdio{}
+	}
 	// signal that tests are done at the end
 	defer close(ts.testsDone)
 
@@ -233,14 +249,34 @@ type Test interface {
 
 type TestCase interface {
 	GetName() string
-	GetInputs() []map[string]interface{}
-	GetOutputs() []map[string]interface{}
+	GetInputs() []TestInput
+	GetOutputs() []map[string]any
+}
+
+type TestInput interface {
+	getForMarshalling() any
+}
+
+type singleInput struct {
+	input map[string]any
+}
+
+func (si *singleInput) getForMarshalling() any {
+	return si.input
+}
+
+type batchInput struct {
+	inputs []map[string]any
+}
+
+func (bi *batchInput) getForMarshalling() any {
+	return bi.inputs
 }
 
 type testCase struct {
 	name    string
-	inputs  []map[string]interface{}
-	outputs []map[string]interface{}
+	inputs  []TestInput
+	outputs []map[string]any
 
 	inputNodes  []yaml.Node
 	outputNodes []yaml.Node
@@ -250,11 +286,11 @@ func (tc *testCase) GetName() string {
 	return tc.name
 }
 
-func (tc *testCase) GetInputs() []map[string]interface{} {
+func (tc *testCase) GetInputs() []TestInput {
 	return tc.inputs
 }
 
-func (tc *testCase) GetOutputs() []map[string]interface{} {
+func (tc *testCase) GetOutputs() []map[string]any {
 	return tc.outputs
 }
 
@@ -263,7 +299,7 @@ type test struct {
 	name     string
 
 	testCases  []testCase
-	inputChan  chan map[string]interface{}
+	inputChan  chan TestInput
 	outputChan chan string
 
 	executableDone chan struct{}
@@ -321,11 +357,13 @@ func (tst *test) Run(t TestRunner) {
 						t.Errorf("process finished before output %d was received, expected: %s", i, expectedJson)
 						return
 					case got := <-tst.outputChan:
-						// TODO: do we really need to unmarshal the output? it is not like it is going to be used
-						var out map[string]interface{}
+						var out map[string]any
 						err = json.Unmarshal([]byte(got), &out)
 						if err != nil {
 							t.Errorf("error unmarshalling output: %v", err)
+							if tst.logging {
+								t.Logf("failed on output: %s", got)
+							}
 						}
 
 						expectedNode := tc.outputNodes[i]
@@ -411,11 +449,28 @@ func (tst *test) readFromReader(thereader io.Reader) error {
 
 		for key, value := range doc {
 			if strings.HasPrefix(key, "in") {
-				testInput, ok := value.(map[string]interface{})
-				if !ok {
-					return fmt.Errorf("failed to parse input for test '%s' , expected map for key '%s', but got '%T': %v", tst.name, key, value, value)
+				testInputBatch, ok := value.([]interface{})
+				if ok {
+					testInputBatchMap := make([]map[string]interface{}, len(testInputBatch))
+					for i, v := range testInputBatch {
+						testInput, ok := v.(map[string]interface{})
+						if !ok {
+							return fmt.Errorf("%w for test '%s', expected map for key '%s', but got '%T': %v", ErrFailedToParseInput, tst.name, key, v, v)
+						}
+						testInputBatchMap[i] = testInput
+					}
+					tc.inputs = append(tc.inputs, &batchInput{
+						inputs: testInputBatchMap,
+					})
+				} else {
+					testInput, ok := value.(map[string]interface{})
+					if !ok {
+						return fmt.Errorf("%w for test '%s' , expected map or array of maps for key '%s', but got '%T': %v", ErrFailedToParseInput, tst.name, key, value, value)
+					}
+					tc.inputs = append(tc.inputs, &singleInput{
+						input: testInput,
+					})
 				}
-				tc.inputs = append(tc.inputs, testInput)
 				if inNode, ok := intermediateDoc[key]; ok {
 					tc.inputNodes = append(tc.inputNodes, inNode)
 				}
@@ -423,7 +478,7 @@ func (tst *test) readFromReader(thereader io.Reader) error {
 			} else if strings.HasPrefix(key, "out") {
 				testOutput, ok := value.(map[string]interface{})
 				if !ok {
-					return fmt.Errorf("failed to parse output for test '%s' , expected map for key '%s', but got '%T': %v", tst.name, key, value, value)
+					return fmt.Errorf("%w for test '%s' , expected map for key '%s', but got '%T': %v", ErrFailedToParseOutput, tst.name, key, value, value)
 				}
 				tc.outputs = append(tc.outputs, testOutput)
 				if outNode, ok := intermediateDoc[key]; ok {
@@ -442,7 +497,7 @@ func (tst *test) readFromReader(thereader io.Reader) error {
 // specified by path
 func Read(path string) (TestSuite, error) {
 	suite := &testSuite{
-		inputChan:      make(chan map[string]interface{}),
+		inputChan:      make(chan TestInput),
 		outputChan:     make(chan string),
 		testsDone:      make(chan struct{}),
 		completed:      make(chan struct{}),
@@ -496,69 +551,18 @@ func Read(path string) (TestSuite, error) {
 }
 
 func (ts *testSuite) pipeInput(t TestRunner) {
-	for {
-		select {
-		case <-ts.testsDone:
-			if ts.logging {
-				t.Log("finished reading inputs")
-			}
-			return
-		case in := <-ts.inputChan:
-			// write the input to the target process
-			// where the SuT takes input
-			data, err := json.Marshal(in)
-			if err != nil {
-				t.Errorf("error marshalling input: %v", err)
-			}
-
-			if ts.logging {
-				t.Logf("sending input: %s", string(data))
-			}
-			_, err = ts.targetInput.Write(data)
-			if err != nil {
-				t.Errorf("error writing input: %v", err)
-			}
-			_, err = ts.targetInput.Write([]byte("\n"))
-			if err != nil {
-				t.Errorf("error writing input: %v", err)
-			}
-		}
-	}
+	ts.transport.pipeInput(t, ts)
 }
 
 func (ts *testSuite) pipeOutput(t TestRunner) {
-	// read the output from the target process
-	// where the SuT writes output
-	reader := bufio.NewReader(ts.targetOutput)
-	for {
-
-		finish := false
-		line, err := reader.ReadString('\n')
-		if err != nil && err != io.EOF {
-			t.Logf("error reading output: %v", err)
-			return
-		}
-		if err == io.EOF {
-			if ts.logging {
-				t.Log("finished reading output")
-			}
-			finish = true
-		}
-
-		if line != "" {
-			// send the output to the output channel
-			ts.outputChan <- line
-		}
-
-		if finish {
-			break
-		}
-	}
+	ts.transport.pipeOutput(t, ts)
 }
 
 func (ts *testSuite) startExecutable(t TestRunner) *exec.Cmd {
 	//nolint:gosec // #nosec G204 -- user gives us this command to run, so they must be sure to want to run it
 	cmd := exec.Command(ts.command, ts.args...)
+	addToGroup(cmd)
+
 	in, err := cmd.StdinPipe()
 	if err != nil {
 		t.Fatalf("error creating stdin pipe: %v", err)
@@ -582,6 +586,7 @@ func (ts *testSuite) startExecutable(t TestRunner) *exec.Cmd {
 		stderrPipeCreated := make(chan struct{})
 		go func() {
 			var errReader io.ReadCloser
+			var scanner *bufio.Scanner
 			createPipe := func() {
 				defer close(stderrPipeCreated)
 				var err error
@@ -589,16 +594,15 @@ func (ts *testSuite) startExecutable(t TestRunner) *exec.Cmd {
 				if err != nil {
 					t.Fatalf("error creating stderr pipe: %v", err)
 				}
+				scanner = bufio.NewScanner(errReader)
 			}
 			createPipe()
-
-			scanner := bufio.NewScanner(errReader)
 
 			// log while tests are running
 
 			for {
 				select {
-				case <-ts.testsDone:
+				case <-ts.executableDone:
 					return
 				default:
 					if !scanner.Scan() {
@@ -620,16 +624,17 @@ func (ts *testSuite) startExecutable(t TestRunner) *exec.Cmd {
 	}
 
 	go func() {
+		defer close(ts.executableDone)
 		if ts.logging {
 			t.Log("waiting for command to finish")
 		}
+
 		if err := cmd.Wait(); err != nil {
 			t.Logf("error waiting for command to finish: %v", err)
 		}
 		if ts.logging {
 			t.Log("command finished")
 		}
-		close(ts.executableDone)
 	}()
 
 	return cmd
@@ -657,7 +662,9 @@ func (ts *testSuite) setup(t TestRunner) {
 					t.Logf("error killing process: %v", err)
 				}
 			}
-			t.Log("executable stopped")
+			if ts.logging {
+				t.Log("executable stopped")
+			}
 		}()
 	}
 	inPipeFinished := make(chan struct{})
@@ -682,5 +689,6 @@ func (ts *testSuite) setup(t TestRunner) {
 
 		// wait for the process to finish
 		<-processDone
+		<-ts.executableDone
 	}()
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/strowk/foxy-contexts/pkg/mcp"
+	"github.com/strowk/foxy-contexts/pkg/session"
 )
 
 type Transport interface {
@@ -14,4 +15,6 @@ type Transport interface {
 	) error
 
 	Shutdown(context.Context) error
+
+	GetSessionManager() *session.SessionManager
 }

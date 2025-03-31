@@ -28,6 +28,12 @@ type SSEFailedMarshalEvent struct {
 
 func (SSEFailedMarshalEvent) event() {}
 
+type StreamingHTTPFailedMarshalEvent struct {
+	Err error
+}
+
+func (StreamingHTTPFailedMarshalEvent) event() {}
+
 type StdioFailedMarhalResponse struct {
 	Err error
 }
@@ -51,3 +57,9 @@ type StdioFailedWriting struct {
 }
 
 func (StdioFailedWriting) event() {}
+
+type FailedCreatingSession struct {
+	Err error
+}
+
+func (FailedCreatingSession) event() {}

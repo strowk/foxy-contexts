@@ -6,5 +6,5 @@ import (
 )
 
 func stop(process *os.Process) error {
-	return process.Signal(syscall.SIGTERM)
+	return syscall.Kill(-process.Pid, syscall.SIGTERM)
 }

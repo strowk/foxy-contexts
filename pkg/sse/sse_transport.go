@@ -13,6 +13,7 @@ import (
 	"github.com/strowk/foxy-contexts/pkg/jsonrpc2"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
 	"github.com/strowk/foxy-contexts/pkg/server"
+	"github.com/strowk/foxy-contexts/pkg/session"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -23,10 +24,14 @@ type SSETransportOption interface {
 	apply(*sseTransport)
 }
 
+// Deprecated: Use streamable_http.NewTransport instead
+// Old SSE transport is replaced with streamable http transport
+// , read more: https://github.com/modelcontextprotocol/specification/pull/206
 func NewTransport(options ...SSETransportOption) server.Transport {
 	tp := &sseTransport{
 		keepAliveInterval: 5 * time.Second,
-		port:              1323,
+
+		sessionManager: session.NewSessionManager(),
 	}
 
 	for _, o := range options {
@@ -40,6 +45,7 @@ type sseTransport struct {
 	keepAliveInterval time.Duration
 	e                 *echo.Echo
 	port              int
+	sessionManager    *session.SessionManager
 }
 
 func newResponseEvent(res jsonrpc2.JsonRpcResponse) (*Event, error) {
@@ -148,7 +154,12 @@ func (s *sseTransport) Run(
 			return c.String(http.StatusInternalServerError, "failed to read request body")
 		}
 
-		r.(server.Server).Handle(b)
+		ctx, _, err := s.sessionManager.ResolveSessionOrCreateNew(c.Request().Context(), parsedSessionId)
+		if err != nil {
+			return c.String(http.StatusNotFound, "failed to resolve session")
+		}
+
+		r.(server.Server).Handle(ctx, b)
 		return c.JSON(http.StatusAccepted, "Accepted")
 	})
 
@@ -160,4 +171,8 @@ func (s *sseTransport) Shutdown(ctx context.Context) error {
 		return s.e.Shutdown(ctx)
 	}
 	return nil
+}
+
+func (s *sseTransport) GetSessionManager() *session.SessionManager {
+	return s.sessionManager
 }

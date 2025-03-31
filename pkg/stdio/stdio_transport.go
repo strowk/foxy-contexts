@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/strowk/foxy-contexts/pkg/jsonrpc2"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
 	"github.com/strowk/foxy-contexts/pkg/server"
+	"github.com/strowk/foxy-contexts/pkg/session"
 )
 
 func NewTransport(options ...StdioTransportOption) server.Transport {
@@ -30,6 +32,8 @@ func NewTransport(options ...StdioTransportOption) server.Transport {
 		) server.Server {
 			return server.NewServer(capabilities, serverInfo, options...)
 		},
+
+		sessionManager: session.NewSessionManager(),
 	}
 
 	for _, o := range options {
@@ -53,6 +57,8 @@ type stdioTransport struct {
 		serverInfo *mcp.Implementation,
 		options ...server.ServerOption,
 	) server.Server
+
+	sessionManager *session.SessionManager
 }
 
 func (s *stdioTransport) Run(
@@ -67,8 +73,17 @@ func (s *stdioTransport) Run(
 func (s *stdioTransport) run(
 	srv server.Server,
 ) error {
+	// local stdio transport is using only one session per whole execution
+	ctx := context.Background()
+	ctx, _, err := s.sessionManager.CreateNewSession(ctx)
+	if err != nil {
+		srv.GetLogger().LogEvent(foxyevent.FailedCreatingSession{Err: err})
+		return fmt.Errorf("failed to create session: %w", err)
+	}
+
 	reader := bufio.NewReader(s.in)
 	go func() {
+		defer close(s.stoppedReadingResponses)
 	out:
 		for {
 			select {
@@ -92,38 +107,28 @@ func (s *stdioTransport) run(
 				}
 			}
 		}
-		close(s.stoppedReadingResponses)
 	}()
 
 	go func() {
+		defer close(s.stoppedReadingInput)
 	out:
 		for {
-			select {
-			case <-s.shuttingDown:
-				break out
-			default:
-				input, err := reader.ReadBytes('\n')
-				if err != nil {
-					if !errors.Is(err, io.EOF) {
-						srv.GetLogger().LogEvent(foxyevent.StdioFailedReadingInput{Err: err})
-					}
-					break out
+			input, err := reader.ReadBytes('\n')
+			if err != nil {
+				if !errors.Is(err, io.EOF) {
+					srv.GetLogger().LogEvent(foxyevent.StdioFailedReadingInput{Err: err})
 				}
-				srv.Handle(input)
+				break out
 			}
+			srv.Handle(ctx, input)
 		}
-		close(s.stoppedReadingInput)
 	}()
 
 	// wait for either shutting down or stopped reading input
 	select {
 	case <-s.shuttingDown:
-		// if we got shutting down signal,
-		// we need to wait until we stop reading input,
-		// which waits for shutdown by itself
-		<-s.stoppedReadingInput
 	case <-s.stoppedReadingInput:
-		// if we stopped reading input, we can now initiate shutdown
+		// if we stopped reading input, we can now initiate transport shutdown
 		close(s.shuttingDown)
 	}
 
@@ -156,4 +161,8 @@ func safeClose(ch chan struct{}) {
 		// Shutdown would be called soon after transport is stopped
 	}()
 	close(ch)
+}
+
+func (s *stdioTransport) GetSessionManager() *session.SessionManager {
+	return s.sessionManager
 }

@@ -1,0 +1,64 @@
+case: Empty tools list
+in: [ { "jsonrpc": "2.0", "method": "tools/list", "id": 1 }, { "jsonrpc": "2.0", "method": "prompts/list", "id": 2 }]
+out_1:
+  {
+    "jsonrpc": "2.0",
+    "result":
+      {
+        "tools":
+          [
+            {
+              "description": "The great tool",
+              "name": "my-great-tool",
+              "inputSchema": { "type": "object" },
+            },
+          ],
+      },
+    "id": 1,
+  }
+out_2:
+  {
+    "jsonrpc": "2.0",
+    "result":
+      {
+        "prompts": [],
+      },
+    "id": 2,
+  }
+
+# Note, that there is some sort of race condition in the test, probably due to order of responses, looks like this:
+# === RUN   TestWithFoxytest/list_tools_and_promts/Empty_tools_list
+#     matching.go:25: actual json did not match expectation,
+#          got: '{"id":1,"jsonrpc":"2.0","result":{"tools":[{"description":"The great tool","inputSchema":{"type":"object"},"name":"my-great-tool"}]}}'
+#          diff with expected:
+#           "id": {
+#           ^ value mismatch,
+#         expected int: '2',
+#              got float64: '1'
+#           "result": {
+#             "prompts": {
+#             ^ key not found
+#     matching.go:25: actual json did not match expectation,
+#          got: '{"id":2,"jsonrpc":"2.0","result":{"prompts":[]}}'
+#          diff with expected:
+#           "id": {
+#           ^ value mismatch,
+#         expected int: '1',
+#              got float64: '2'
+#           "result": {
+#             "tools": {
+#             ^ key not found
+# === NAME  TestWithFoxytest
+#     testsuite.go:629: error waiting for command to finish: exit status 1
+# --- FAIL: TestWithFoxytest (1.38s)
+#     --- PASS: TestWithFoxytest/call_tool (1.11s)
+#         --- PASS: TestWithFoxytest/call_tool/Call_great_tool (1.11s)
+#     --- FAIL: TestWithFoxytest/list_tools_and_promts (0.00s)
+#         --- FAIL: TestWithFoxytest/list_tools_and_promts/Empty_tools_list (0.00s)
+# FAIL
+# exit status 1
+# FAIL    github.com/strowk/foxy-contexts/examples/streamable_http        1.610s
+
+# Currently is not quite clear where the order is failing now, but this is most probably the issue with the testing framework itself,
+# , because protocol at least for streamable http does not guarantee that events would arrive in order they were sent, which
+# means that either test framework needs to buffer and reorder or it should try to match with every event until one found that matches.

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -44,7 +45,7 @@ func NewListK8sContextsTool(kubeConfig clientcmd.ClientConfig) fxctx.Tool { // -
 		},
 
 		// This is the callback that would be executed when the tool is called:
-		func(args map[string]interface{}) *mcp.CallToolResult {
+		func(_ context.Context, args map[string]interface{}) *mcp.CallToolResult {
 			input, err := schema.Validate(args)
 			if err != nil {
 				log.Printf("failed to validate input: %v", err)

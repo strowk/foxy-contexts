@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -40,7 +41,7 @@ func main() {
 						},
 					},
 				},
-				func(uri string) (*mcp.ReadResourceResult, error) {
+				func(_ context.Context, uri string) (*mcp.ReadResourceResult, error) {
 					repo, err := git.PlainOpenWithOptions(".", &git.PlainOpenOptions{
 						DetectDotGit: true,
 					})

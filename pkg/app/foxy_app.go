@@ -7,6 +7,7 @@ import (
 	"github.com/strowk/foxy-contexts/pkg/fxctx"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
 	"github.com/strowk/foxy-contexts/pkg/server"
+	"github.com/strowk/foxy-contexts/pkg/session"
 	"go.uber.org/fx"
 )
 
@@ -137,15 +138,17 @@ func (f *Builder) WithExtraServerOptions(extraOptions ...server.ServerOption) *B
 
 // BuildFxApp builds the fx.App instance as configured by `With*` methods
 func (f *Builder) BuildFxApp() (*fx.App, error) {
-	f.options = append(f.options, fxctx.ProvideToolMux())
-	f.options = append(f.options, fxctx.ProvideResourceMux())
-	f.options = append(f.options, fxctx.ProvidePromptMux())
-	f.options = append(f.options, fxctx.ProvideCompleteMux())
-
 	if f.transport == nil {
 		return nil, ErrNoTransportSpecified
 	}
 
+	f.options = append(f.options, fxctx.ProvideToolMux())
+	f.options = append(f.options, fxctx.ProvideResourceMux())
+	f.options = append(f.options, fxctx.ProvidePromptMux())
+	f.options = append(f.options, fxctx.ProvideCompleteMux())
+	f.options = append(f.options, fx.Provide(func() *session.SessionManager {
+		return f.transport.GetSessionManager()
+	}))
 	f.options = append(f.options, f.provideServerLifecycle(f.transport))
 
 	return fx.New(fx.Options(f.options...)), nil
@@ -175,6 +178,8 @@ type ServerLifecycleParams struct {
 	ResourceMux fxctx.ResourceMux `optional:"true"`
 	PromptMux   fxctx.PromptMux   `optional:"true"`
 	CompleteMux fxctx.CompleteMux `optional:"true"`
+
+	SessionManager *session.SessionManager
 }
 
 func (f *Builder) getServerCapabilities() *mcp.ServerCapabilities {
