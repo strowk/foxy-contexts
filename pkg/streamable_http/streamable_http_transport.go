@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"sync"
 	"time"
 
 	"github.com/google/uuid"
@@ -38,7 +39,7 @@ func (t *streamableHttpTransport) Run(
 	e := echo.New()
 	t.e = e
 
-	servers := map[uuid.UUID]server.Server{}
+	servers := sync.Map{}
 
 	// ensure that negotiated version would be at least the one with streamable http transport
 	serverOptions = append(serverOptions, server.MinimalProtocolVersionOption{
@@ -54,11 +55,11 @@ func (t *streamableHttpTransport) Run(
 		if err != nil {
 			return echo.NewHTTPError(400, "Wrong session id format, expected UUID")
 		}
-		_, ok := servers[sessionId]
+		_, ok := servers.Load(sessionId)
 		if !ok {
 			return echo.NewHTTPError(404, "Requested session id not found in session store")
 		}
-		delete(servers, sessionId)
+		servers.Delete(sessionId)
 		t.sessionManager.DeleteSession(sessionId)
 		return c.NoContent(204)
 	})
@@ -74,17 +75,17 @@ func (t *streamableHttpTransport) Run(
 				// , hence we return 404 Not Found with some details in the body
 				return echo.NewHTTPError(404, "Wrong session id format, expected UUID")
 			}
-			s, ok := servers[sessionId]
+			s, ok := servers.Load(sessionId)
 			if !ok {
 				return echo.NewHTTPError(404, "Requested session id not found in session store")
 			}
 			w.Header().Set("Mcp-Session-Id", sessionId.String())
-			serv = s
+			serv = s.(server.Server)
 			sessionIdUsed = sessionId
 		} else {
 			sessionId := uuid.New()
 			s := server.NewServer(capabilities, serverInfo, serverOptions...)
-			servers[sessionId] = s
+			servers.Store(sessionId, s)
 			w.Header().Set("Mcp-Session-Id", sessionId.String())
 			serv = s
 			sessionIdUsed = sessionId
