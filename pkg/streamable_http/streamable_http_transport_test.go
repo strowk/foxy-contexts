@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -39,6 +40,13 @@ func TestStreamableHttpTransport(t *testing.T) {
 		assert.NoError(t, tr.Shutdown(context.Background()))
 		waitGroup.Wait()
 	}()
+
+	// addresses race condition between server start and test start
+	assert.EventuallyWithT(t, func(c *assert.CollectT) {
+		resp, err := http.Get("http://localhost:8080/mcp")
+		assert.NoError(c, err)
+		defer func() { assert.NoError(c, resp.Body.Close()) }()
+	}, 5*time.Second, 200*time.Millisecond)
 
 	// testing https://spec.modelcontextprotocol.io/specification/2025-03-26/basic/transports/#listening-for-messages-from-the-server
 	// for now we only check that the server is responding with 405 as spec says it should when "long-running" SSE is not supported
@@ -188,7 +196,6 @@ func TestStreamableHttpTransport(t *testing.T) {
 		require.Equal(t, "", resp.Header.Get("Content-Type"))
 		require.Equal(t, ``, string(respBody))
 	})
-
 }
 
 func TestMarshalServerError(t *testing.T) {
