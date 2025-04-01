@@ -9,7 +9,7 @@ weight: 5
 
 In order to test your server, package `foxytest` is provided that allows you to easily start your server and test it using pre-defined JSON-RPC 2.0 messages.
 
-`foxytest` currently only supports stdio transport.
+`foxytest` currently supports stdio and streamable HTTP transports.
 
 Here is an example how to setup integration tests:
 
