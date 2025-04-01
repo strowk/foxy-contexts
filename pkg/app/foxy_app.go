@@ -53,8 +53,10 @@ type Builder struct {
 // newTool must be a function that returns a fxctx.Tool
 // it can also take in any dependencies that you want to inject
 // into the tool, that will be resolved by the fx framework
-func (f *Builder) WithTool(newTool any) *Builder {
-	f.options = append(f.options, fx.Provide(fxctx.AsTool(newTool)))
+func (f *Builder) WithTool(newTool ...any) *Builder {
+	for i := range newTool {
+		f.options = append(f.options, fx.Provide(fxctx.AsTool(newTool[i])))
+	}
 	return f
 }
 
@@ -74,8 +76,10 @@ func (f *Builder) WithServerCapabilities(serverCapabilities *mcp.ServerCapabilit
 // newResource must be a function that returns a fxctx.Resource
 // it can also take in any dependencies that you want to inject
 // into the resource, that will be resolved by the fx framework
-func (f *Builder) WithResource(newResource any) *Builder {
-	f.options = append(f.options, fx.Provide(fxctx.AsResource(newResource)))
+func (f *Builder) WithResource(newResource ...any) *Builder {
+	for i := range newResource {
+		f.options = append(f.options, fx.Provide(fxctx.AsResource(newResource[i])))
+	}
 	return f
 }
 
@@ -84,8 +88,10 @@ func (f *Builder) WithResource(newResource any) *Builder {
 // newResourceProvider must be a function that returns a fxctx.ResourceProvider
 // it can also take in any dependencies that you want to inject
 // into the resource provider, that will be resolved by the fx framework
-func (f *Builder) WithResourceProvider(newResourceProvider any) *Builder {
-	f.options = append(f.options, fx.Provide(fxctx.AsResourceProvider(newResourceProvider)))
+func (f *Builder) WithResourceProvider(newResourceProvider ...any) *Builder {
+	for i := range newResourceProvider {
+		f.options = append(f.options, fx.Provide(fxctx.AsResourceProvider(newResourceProvider[i])))
+	}
 	return f
 }
 
@@ -94,8 +100,10 @@ func (f *Builder) WithResourceProvider(newResourceProvider any) *Builder {
 // newPrompt must be a function that returns a fxctx.Prompt
 // it can also take in any dependencies that you want to inject
 // into the prompt, that will be resolved by the fx framework
-func (f *Builder) WithPrompt(newPrompt any) *Builder {
-	f.options = append(f.options, fx.Provide(fxctx.AsPrompt(newPrompt)))
+func (f *Builder) WithPrompt(newPrompt ...any) *Builder {
+	for i := range newPrompt {
+		f.options = append(f.options, fx.Provide(fxctx.AsPrompt(newPrompt[i])))
+	}
 	return f
 }
 
