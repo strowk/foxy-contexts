@@ -23,7 +23,13 @@ type Endpoint struct {
 }
 
 func (o Endpoint) apply(t *streamableHttpTransport) {
-	t.port = o.Port
-	t.hostname = o.Hostname
-	t.path = o.Path
+	if o.Port != 0 {
+		t.port = o.Port
+	}
+	if o.Hostname != "" {
+		t.hostname = o.Hostname
+	}
+	if o.Path != "" {
+		t.path = o.Path
+	}
 }
