@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 
+	"github.com/strowk/foxy-contexts/internal/utils"
 	"github.com/strowk/foxy-contexts/pkg/app"
 	"github.com/strowk/foxy-contexts/pkg/fxctx"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
@@ -18,12 +19,12 @@ func NewGreatPrompt() fxctx.Prompt {
 		// This information about the prompt would be used when it is listed:
 		mcp.Prompt{
 			Name:        "my-great-prompt",
-			Description: Ptr("Doing something great"),
+			Description: utils.Ptr("Doing something great"),
 			Arguments: []mcp.PromptArgument{
 				{
-					Description: Ptr("An argument for the prompt"),
+					Description: utils.Ptr("An argument for the prompt"),
 					Name:        "arg-1",
-					Required:    Ptr(true),
+					Required:    utils.Ptr(true),
 				},
 			},
 		},
@@ -54,6 +55,11 @@ func main() {
 		NewBuilder().
 		// adding the tool to the app
 		WithPrompt(NewGreatPrompt).
+		WithServerCapabilities(&mcp.ServerCapabilities{
+			Prompts: &mcp.ServerCapabilitiesPrompts{
+				ListChanged: utils.Ptr(false),
+			},
+		}).
 		// setting up server
 		WithName("great-tool-server").
 		WithVersion("0.0.1").
@@ -75,7 +81,3 @@ func main() {
 }
 
 // --8<-- [end:server]
-
-func Ptr[T any](v T) *T {
-	return &v
-}

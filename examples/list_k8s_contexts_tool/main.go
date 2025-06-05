@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/strowk/foxy-contexts/internal/utils"
 	"github.com/strowk/foxy-contexts/pkg/app"
 	"github.com/strowk/foxy-contexts/pkg/fxctx"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
@@ -21,8 +22,8 @@ import (
 
 // This example defines list-k8s-contexts tool for MCP server, that uses k8s client-go to list available contexts
 // and returns them as a response, run it with:
-// npx @modelcontextprotocol/inspector go run main.go
-// , then in browser open http://localhost:5173
+// npx @modelcontextprotocol/inspector go run .
+// , then in browser open http://localhost:6274
 // , then click Connect
 // , then click List Tools
 // , then click list-k8s-contexts
@@ -40,7 +41,7 @@ func NewListK8sContextsTool(kubeConfig clientcmd.ClientConfig) fxctx.Tool { // -
 		// This information about the tool would be used when it is listed:
 		&mcp.Tool{
 			Name:        "list-k8s-contexts",
-			Description: Ptr("List Kubernetes contexts from configuration files such as kubeconfig"),
+			Description: utils.Ptr("List Kubernetes contexts from configuration files such as kubeconfig"),
 			InputSchema: schema.GetMcpToolInputSchema(),
 		},
 
@@ -50,7 +51,7 @@ func NewListK8sContextsTool(kubeConfig clientcmd.ClientConfig) fxctx.Tool { // -
 			if err != nil {
 				log.Printf("failed to validate input: %v", err)
 				return &mcp.CallToolResult{
-					IsError: Ptr(true),
+					IsError: utils.Ptr(true),
 					Content: []interface{}{
 						mcp.TextContent{
 							Type: "text",
@@ -71,7 +72,7 @@ func NewListK8sContextsTool(kubeConfig clientcmd.ClientConfig) fxctx.Tool { // -
 			if err != nil {
 				log.Printf("failed to get kubeconfig: %v", err)
 				return &mcp.CallToolResult{
-					IsError: Ptr(true),
+					IsError: utils.Ptr(true),
 					Meta:    map[string]interface{}{},
 					Content: []interface{}{
 						mcp.TextContent{
@@ -85,7 +86,7 @@ func NewListK8sContextsTool(kubeConfig clientcmd.ClientConfig) fxctx.Tool { // -
 			return &mcp.CallToolResult{
 				Meta:    map[string]interface{}{},
 				Content: getListContextsToolContent(cfg),
-				IsError: Ptr(false),
+				IsError: utils.Ptr(false),
 			}
 		},
 	)
@@ -99,6 +100,11 @@ func main() {
 			fx.Provide(NewK8sClientConfig),
 		).
 		WithTool(NewListK8sContextsTool). // --8<-- [end:dependency_provide]
+		WithServerCapabilities(&mcp.ServerCapabilities{
+			Tools: &mcp.ServerCapabilitiesTools{
+				ListChanged: utils.Ptr(false),
+			},
+		}).
 		WithTransport(stdio.NewTransport()).
 		WithName("list-k8s-contexts-tool").
 		WithVersion("0.0.1").
@@ -117,7 +123,6 @@ func main() {
 			)),
 		).
 		Run()
-
 }
 
 func getListContextsToolContent(cfg api.Config) []interface{} {
@@ -144,8 +149,4 @@ func getListContextsToolContent(cfg api.Config) []interface{} {
 type ContextJsonEncoded struct {
 	Context *api.Context `json:"context"`
 	Name    string       `json:"name"`
-}
-
-func Ptr[T any](v T) *T {
-	return &v
 }

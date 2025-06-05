@@ -7,6 +7,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/strowk/foxy-contexts/internal/utils"
 	"github.com/strowk/foxy-contexts/pkg/fxctx"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
 	"github.com/strowk/foxy-contexts/pkg/server"
@@ -23,7 +24,7 @@ func main() {
 	// This example defines list-k8s-contexts prompt for MCP server, that uses k8s client-go to list available namespaces
 	// and returns them as a response, run it with:
 	// npx @modelcontextprotocol/inspector go run main.go
-	// , then in browser open http://localhost:5173
+	// , then in browser open http://localhost:6274
 	// , then click Connect
 	// , then go to Prompts
 	// , then click List Prompts
@@ -34,17 +35,16 @@ func main() {
 		// Here we define a prompt that lists k8s contexts using client-go
 		fx.Provide(fxctx.AsPrompt(
 			func() fxctx.Prompt {
-
 				return fxctx.NewPrompt(
 					// This information about the prompt would be used when it is listed:
 					mcp.Prompt{
 						Name:        "list-k8s-namespaces",
-						Description: Ptr("List Kubernetes namespaces"),
+						Description: utils.Ptr("List Kubernetes namespaces"),
 						Arguments: []mcp.PromptArgument{
 							{
-								Description: Ptr("Kubernetes context"),
+								Description: utils.Ptr("Kubernetes context"),
 								Name:        "context",
-								Required:    Ptr(true),
+								Required:    utils.Ptr(true),
 							},
 						},
 					},
@@ -75,7 +75,6 @@ func main() {
 						}
 
 						ns, err := clientset.CoreV1().Namespaces().List(ctx, metav1.ListOptions{})
-
 						if err != nil {
 							log.Printf("failed to list namespaces: %v", err)
 							return nil, fmt.Errorf("failed to list namespaces: %w", err)
@@ -88,7 +87,6 @@ func main() {
 						}, len(ns.Items))
 
 						for i, n := range ns.Items {
-
 							namespaces[i] = struct {
 								Namespace string `json:"namespace"`
 							}{
@@ -104,7 +102,7 @@ func main() {
 
 						return &mcp.GetPromptResult{
 							Meta:        map[string]interface{}{},
-							Description: Ptr(fmt.Sprintf("Namespaces in context %s", k8sContext)),
+							Description: utils.Ptr(fmt.Sprintf("Namespaces in context %s", k8sContext)),
 							Messages: []mcp.PromptMessage{
 								{
 									Content: mcp.TextContent{
@@ -142,8 +140,8 @@ func main() {
 
 						return &mcp.CompleteResult{
 							Completion: mcp.CompleteResultCompletion{
-								HasMore: Ptr(false),
-								Total:   Ptr(len(contexts)),
+								HasMore: utils.Ptr(false),
+								Total:   utils.Ptr(len(contexts)),
 								Values:  contexts,
 							},
 						}, nil
@@ -169,7 +167,7 @@ func main() {
 						transport.Run(
 							&mcp.ServerCapabilities{
 								Prompts: &mcp.ServerCapabilitiesPrompts{
-									ListChanged: Ptr(false),
+									ListChanged: utils.Ptr(false),
 								},
 							},
 							&mcp.Implementation{
@@ -207,9 +205,4 @@ func main() {
 			},
 		)),
 	).Run()
-
-}
-
-func Ptr[T any](v T) *T {
-	return &v
 }

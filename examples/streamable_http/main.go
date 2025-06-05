@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/strowk/foxy-contexts/internal/utils"
 	"github.com/strowk/foxy-contexts/pkg/app"
 	"github.com/strowk/foxy-contexts/pkg/fxctx"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
@@ -38,7 +39,7 @@ func NewGreatTool(sm *session.SessionManager) fxctx.Tool {
 		// This information about the tool would be used when it is listed:
 		&mcp.Tool{
 			Name:        "my-great-tool",
-			Description: Ptr("The great tool"),
+			Description: utils.Ptr("The great tool"),
 			InputSchema: mcp.ToolInputSchema{ // here we tell client what we expect as input
 				Type:       "object",
 				Properties: map[string]map[string]interface{}{},
@@ -80,6 +81,11 @@ func main() {
 		NewBuilder().
 		// adding the tool to the app
 		WithTool(NewGreatTool).
+		WithServerCapabilities(&mcp.ServerCapabilities{
+			Tools: &mcp.ServerCapabilitiesTools{
+				ListChanged: utils.Ptr(false),
+			},
+		}).
 		// setting up server
 		WithName("great-tool-server").
 		WithVersion("0.0.1").
@@ -117,7 +123,3 @@ func main() {
 }
 
 // --8<-- [end:server]
-
-func Ptr[T any](v T) *T {
-	return &v
-}

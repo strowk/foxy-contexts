@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"github.com/strowk/foxy-contexts/internal/utils"
 	"github.com/strowk/foxy-contexts/pkg/app"
 	"github.com/strowk/foxy-contexts/pkg/fxctx"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
@@ -16,7 +17,7 @@ import (
 // This example defines resource tool for MCP server
 // , run it with:
 // npx @modelcontextprotocol/inspector go run main.go
-// , then in browser open http://localhost:5173
+// , then in browser open http://localhost:6274
 // , then click Connect
 // , then click List Resources
 // , then click hello-world
@@ -27,8 +28,8 @@ func NewGreatResource() fxctx.Resource {
 		mcp.Resource{
 			Name:        "hello-world",
 			Uri:         "hello-world://hello-world",
-			MimeType:    Ptr("application/json"),
-			Description: Ptr("Hello World Resource"),
+			MimeType:    utils.Ptr("application/json"),
+			Description: utils.Ptr("Hello World Resource"),
 			Annotations: &mcp.ResourceAnnotations{
 				Audience: []mcp.Role{
 					mcp.RoleAssistant, mcp.RoleUser,
@@ -39,7 +40,7 @@ func NewGreatResource() fxctx.Resource {
 			return &mcp.ReadResourceResult{
 				Contents: []interface{}{
 					mcp.TextResourceContents{
-						MimeType: Ptr("application/json"),
+						MimeType: utils.Ptr("application/json"),
 						Text:     `{"hello": "world"}`,
 						Uri:      uri,
 					},
@@ -57,6 +58,12 @@ func main() {
 		NewBuilder().
 		// adding the resource to the app
 		WithResource(NewGreatResource).
+		WithServerCapabilities(&mcp.ServerCapabilities{
+			Resources: &mcp.ServerCapabilitiesResources{
+				ListChanged: utils.Ptr(false),
+				Subscribe:   utils.Ptr(false),
+			},
+		}).
 		// setting up server
 		WithName("my-mcp-server").
 		WithVersion("0.0.1").
@@ -75,14 +82,9 @@ func main() {
 				},
 			)),
 		).Run()
-
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
 // --8<-- [end:server]
-
-func Ptr[T any](v T) *T {
-	return &v
-}
