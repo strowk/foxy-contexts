@@ -67,7 +67,3 @@ func main() {
 }
 
 // --8<-- [end:server]
-
-func Ptr[T any](v T) *T {
-	return &v
-}

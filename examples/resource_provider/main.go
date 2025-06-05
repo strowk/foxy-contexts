@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/strowk/foxy-contexts/internal/utils"
 	"github.com/strowk/foxy-contexts/pkg/app"
 	"github.com/strowk/foxy-contexts/pkg/fxctx"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
@@ -30,14 +31,13 @@ func NewGreatResourceProvider() fxctx.ResourceProvider {
 			return []mcp.Resource{
 				{
 					Name:        "my-great-resource-one",
-					Description: Ptr("Does something great"),
+					Description: utils.Ptr("Does something great"),
 					Uri:         "/resources/great/one",
 				},
 			}, nil
 		},
 		//  This function reads the resource for a given uri to run when resources/read is requested:
 		func(_ context.Context, uri string) (*mcp.ReadResourceResult, error) {
-
 			// you would probably be doing something more complicated here
 			// like reading from a database or calling an external service
 			// based on what you have parsed from the uri
@@ -45,7 +45,7 @@ func NewGreatResourceProvider() fxctx.ResourceProvider {
 				return &mcp.ReadResourceResult{
 					Contents: []interface{}{
 						mcp.TextResourceContents{
-							MimeType: Ptr("application/json"),
+							MimeType: utils.Ptr("application/json"),
 							Text:     string(`{"great": "resource"}`),
 							Uri:      uri,
 						},
@@ -67,6 +67,12 @@ func main() {
 		NewBuilder().
 		// adding the resource provider to server
 		WithResourceProvider(NewGreatResourceProvider).
+		WithServerCapabilities(&mcp.ServerCapabilities{
+			Resources: &mcp.ServerCapabilitiesResources{
+				ListChanged: utils.Ptr(false),
+				Subscribe:   utils.Ptr(false),
+			},
+		}).
 		// setting up server
 		WithName("my-mcp-server").
 		WithVersion("0.0.1").
@@ -85,14 +91,9 @@ func main() {
 				},
 			)),
 		).Run()
-
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
 // --8<-- [end:server]
-
-func Ptr[T any](v T) *T {
-	return &v
-}

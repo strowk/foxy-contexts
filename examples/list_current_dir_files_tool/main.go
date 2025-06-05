@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/strowk/foxy-contexts/internal/utils"
 	"github.com/strowk/foxy-contexts/pkg/app"
 	"github.com/strowk/foxy-contexts/pkg/fxctx"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
@@ -28,7 +29,7 @@ func NewListCurrentDirFilesTool() fxctx.Tool {
 		// This information about the tool would be used when it is listed:
 		&mcp.Tool{
 			Name:        "list-current-dir-files",
-			Description: Ptr("Lists files in the current directory"),
+			Description: utils.Ptr("Lists files in the current directory"),
 			InputSchema: mcp.ToolInputSchema{
 				Type:       "object",
 				Properties: map[string]map[string]interface{}{},
@@ -41,7 +42,7 @@ func NewListCurrentDirFilesTool() fxctx.Tool {
 			files, err := os.ReadDir(".")
 			if err != nil {
 				return &mcp.CallToolResult{
-					IsError: Ptr(true),
+					IsError: utils.Ptr(true),
 					Meta:    map[string]interface{}{},
 					Content: []interface{}{
 						mcp.TextContent{
@@ -62,7 +63,7 @@ func NewListCurrentDirFilesTool() fxctx.Tool {
 			return &mcp.CallToolResult{
 				Meta:    map[string]interface{}{},
 				Content: contents,
-				IsError: Ptr(false),
+				IsError: utils.Ptr(false),
 			}
 		},
 	)
@@ -73,6 +74,11 @@ func main() {
 		NewBuilder().
 		// adding the tool to the app
 		WithTool(NewListCurrentDirFilesTool).
+		WithServerCapabilities(&mcp.ServerCapabilities{
+			Tools: &mcp.ServerCapabilitiesTools{
+				ListChanged: utils.Ptr(false),
+			},
+		}).
 		// setting up server
 		WithName("list-current-dir-files").
 		WithVersion("0.0.1").
@@ -91,8 +97,4 @@ func main() {
 				},
 			)),
 		).Run()
-}
-
-func Ptr[T any](v T) *T {
-	return &v
 }
