@@ -23,7 +23,7 @@ func main() {
 	// This example defines list-k8s-contexts prompt for MCP server, that uses k8s client-go to list available namespaces
 	// and returns them as a response, run it with:
 	// npx @modelcontextprotocol/inspector go run main.go
-	// , then in browser open http://localhost:5173
+	// , then in browser open http://localhost:6274
 	// , then click Connect
 	// , then go to Prompts
 	// , then click List Prompts

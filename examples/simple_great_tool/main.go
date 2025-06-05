@@ -16,7 +16,7 @@ import (
 // This example defines my-great-tool tool for MCP server
 // , run it with:
 // npx @modelcontextprotocol/inspector go run main.go
-// , then in browser open http://localhost:5173
+// , then in browser open http://localhost:6274
 // , then click Connect
 // , then click List Tools
 // , then click my-great-tool

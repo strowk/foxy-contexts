@@ -20,7 +20,7 @@ func main() {
 	// This example defines resource tool for MCP server, that shows information about a current git repository
 	// , run it with:
 	// npx @modelcontextprotocol/inspector go run main.go
-	// , then in browser open http://localhost:5173
+	// , then in browser open http://localhost:6274
 	// , then click Connect
 	// , then click List Resources
 	// , then click current-git-repository
