@@ -73,7 +73,7 @@ git clone https://github.com/strowk/foxy-contexts
 cd foxy-contexts/examples/list_current_dir_files_tool
 npx @modelcontextprotocol/inspector go run main.go
 ```
-, then once inspector is started in browser open http://localhost:5173 and try to use list-current-dir-files.
+, then once inspector is started in browser open http://localhost:6274 and try to use list-current-dir-files.
 
 Here's the code of that example from [examples/list_current_dir_files_tool/main.go](https://github.com/strowk/foxy-contexts/blob/main/examples/list_current_dir_files_tool/main.go) (in real world application you would probably want to split it into multiple files):
 
@@ -97,7 +97,7 @@ import (
 // This example defines list-current-dir-files tool for MCP server, that prints files in the current directory
 // , run it with:
 // npx @modelcontextprotocol/inspector go run main.go
-// , then in browser open http://localhost:5173
+// , then in browser open http://localhost:6274
 // , then click Connect
 // , then click List Tools
 // , then click list-current-dir-files

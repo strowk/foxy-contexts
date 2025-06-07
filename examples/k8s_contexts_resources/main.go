@@ -7,6 +7,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/strowk/foxy-contexts/internal/utils"
 	"github.com/strowk/foxy-contexts/pkg/app"
 	"github.com/strowk/foxy-contexts/pkg/fxctx"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
@@ -73,7 +74,7 @@ func NewK8sContextsResourceProvider() fxctx.ResourceProvider {
 				}
 
 				contents[0] = mcp.TextResourceContents{
-					MimeType: Ptr("application/json"),
+					MimeType: utils.Ptr("application/json"),
 					Text:     string(marshalled),
 					Uri:      uri,
 				}
@@ -85,14 +86,18 @@ func NewK8sContextsResourceProvider() fxctx.ResourceProvider {
 
 			return nil, fmt.Errorf("unknown uri: %s", uri)
 		})
-
 }
 
 func main() {
-
 	err := app.
 		NewBuilder().
 		WithResourceProvider(NewK8sContextsResourceProvider).
+		WithServerCapabilities(&mcp.ServerCapabilities{
+			Resources: &mcp.ServerCapabilitiesResources{
+				ListChanged: utils.Ptr(false),
+				Subscribe:   utils.Ptr(false),
+			},
+		}).
 		// setting up server
 		WithName("my-mcp-server").
 		WithVersion("0.0.1").
@@ -111,18 +116,18 @@ func main() {
 				},
 			)),
 		).Run()
-
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
 func toMcpResourcse(contextName string) mcp.Resource {
-	return mcp.Resource{Annotations: &mcp.ResourceAnnotations{
-		Audience: []mcp.Role{mcp.RoleAssistant, mcp.RoleUser},
-	},
+	return mcp.Resource{
+		Annotations: &mcp.ResourceAnnotations{
+			Audience: []mcp.Role{mcp.RoleAssistant, mcp.RoleUser},
+		},
 		Name:        contextName,
-		Description: Ptr("Specific k8s context as read from kubeconfig configuration files"),
+		Description: utils.Ptr("Specific k8s context as read from kubeconfig configuration files"),
 		Uri:         "contexts/" + contextName,
 	}
 }
@@ -139,7 +144,7 @@ func getContextsContent(uri string, cfg api.Config) []interface{} {
 		}
 
 		contents[i] = mcp.TextResourceContents{
-			MimeType: Ptr("application/json"),
+			MimeType: utils.Ptr("application/json"),
 			Text:     string(marshalled),
 			Uri:      uri + "/" + name,
 		}
@@ -153,8 +158,4 @@ type ContextContent struct {
 	Text    string       `json:"text"`
 	Context *api.Context `json:"context"`
 	Name    string       `json:"name"`
-}
-
-func Ptr[T any](v T) *T {
-	return &v
 }

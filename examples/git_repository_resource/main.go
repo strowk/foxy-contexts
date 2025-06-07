@@ -7,6 +7,7 @@ import (
 	"log"
 
 	"github.com/go-git/go-git/v5"
+	"github.com/strowk/foxy-contexts/internal/utils"
 	"github.com/strowk/foxy-contexts/pkg/app"
 	"github.com/strowk/foxy-contexts/pkg/fxctx"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
@@ -20,7 +21,7 @@ func main() {
 	// This example defines resource tool for MCP server, that shows information about a current git repository
 	// , run it with:
 	// npx @modelcontextprotocol/inspector go run main.go
-	// , then in browser open http://localhost:5173
+	// , then in browser open http://localhost:6274
 	// , then click Connect
 	// , then click List Resources
 	// , then click current-git-repository
@@ -33,8 +34,8 @@ func main() {
 				mcp.Resource{
 					Name:        "current-git-repository",
 					Uri:         "git://current-git-repository",
-					MimeType:    Ptr("application/json"),
-					Description: Ptr("Shows information about a current git repository"),
+					MimeType:    utils.Ptr("application/json"),
+					Description: utils.Ptr("Shows information about a current git repository"),
 					Annotations: &mcp.ResourceAnnotations{
 						Audience: []mcp.Role{
 							mcp.RoleAssistant, mcp.RoleUser,
@@ -77,7 +78,7 @@ func main() {
 					return &mcp.ReadResourceResult{
 						Contents: []interface{}{
 							mcp.TextResourceContents{
-								MimeType: Ptr("application/json"),
+								MimeType: utils.Ptr("application/json"),
 								Text:     string(data),
 								Uri:      uri,
 							},
@@ -85,6 +86,12 @@ func main() {
 					}, nil
 				},
 			)
+		}).
+		WithServerCapabilities(&mcp.ServerCapabilities{
+			Resources: &mcp.ServerCapabilitiesResources{
+				ListChanged: utils.Ptr(false),
+				Subscribe:   utils.Ptr(false),
+			},
 		}).
 		// setting up server
 		WithName("my-mcp-server").
@@ -104,12 +111,7 @@ func main() {
 				},
 			)),
 		).Run()
-
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func Ptr[T any](v T) *T {
-	return &v
 }

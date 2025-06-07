@@ -15,7 +15,7 @@ import (
 // some workafter the client has finished initialization and notified the server
 // , run it with:
 // npx @modelcontextprotocol/inspector go run main.go
-// , then in browser open http://localhost:5173
+// , then in browser open http://localhost:6274
 // , then click Connect
 
 // --8<-- [start:server]
@@ -67,7 +67,3 @@ func main() {
 }
 
 // --8<-- [end:server]
-
-func Ptr[T any](v T) *T {
-	return &v
-}

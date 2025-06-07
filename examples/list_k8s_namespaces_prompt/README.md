@@ -14,7 +14,7 @@ To try this example with inspector, run the following command:
 npx @modelcontextprotocol/inspector go run main.go
 ```
 
-Then in browser open http://localhost:5173
+Then in browser open http://localhost:6274
 
 , then click Connect
 , then go to Prompts
