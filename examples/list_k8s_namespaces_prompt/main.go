@@ -115,7 +115,7 @@ func main() {
 						}, nil
 					},
 				).WithCompleter(
-					func(arg *mcp.PromptArgument, value string) (*mcp.CompleteResult, error) {
+					func(ctx context.Context, arg *mcp.PromptArgument, value string) (*mcp.CompleteResult, error) {
 						loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
 						configOverrides := &clientcmd.ConfigOverrides{}
 

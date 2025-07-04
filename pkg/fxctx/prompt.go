@@ -10,7 +10,7 @@ import (
 	"go.uber.org/fx"
 )
 
-type CompleterFunc = func(arg *mcp.PromptArgument, value string) (*mcp.CompleteResult, error)
+type CompleterFunc = func(ctx context.Context, arg *mcp.PromptArgument, value string) (*mcp.CompleteResult, error)
 
 type Prompt interface {
 	GetMcpPrompt() mcp.Prompt
@@ -69,7 +69,7 @@ func (p *prompt) Complete(ctx context.Context, req *mcp.CompleteRequest) (*mcp.C
 				}, nil
 			}
 
-			return p.completer(&arg, req.Params.Argument.Value)
+			return p.completer(ctx, &arg, req.Params.Argument.Value)
 		}
 	}
 
