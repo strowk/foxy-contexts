@@ -1,0 +1,36 @@
+# This is a foxytest file. It contains a list of test cases in YAML format.
+# Each test case has variable number of inputs (keyst starting with 'in') and outputs (keys starting with 'out').
+# The test cases are separated by '---' (three dashes) on a new line, making it multi-document YAML file.
+# File name must end with '_test.yaml' to be recognized as a foxytest file.
+
+case: Call great tool
+
+in: {"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "my-great-tool", "arguments": {}}, "id": 1}
+
+out: {
+  "jsonrpc": "2.0", 
+  "id": 1,
+  "result": {
+    "content": [
+      {"type": "text", "text": "Sup, saving greatness to session"}
+    ]
+  }, 
+}
+
+# ---
+
+# TODO: to make this work, foxytest needs to preserve session between calls for one test
+
+# case: Call tool second time
+
+# in: {"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "my-great-tool", "arguments": {}}, "id": 2}
+
+# out: {
+#   "jsonrpc": "2.0", 
+#   "id": 2,
+#   "result": {
+#     "content": [
+#       {"type": "text", "text": "Sup, already great"}
+#     ]
+#   }, 
+# }

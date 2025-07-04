@@ -1,0 +1,4 @@
+localhost:443 , caddy:443 {
+	tls internal
+	reverse_proxy * dex:5556
+}

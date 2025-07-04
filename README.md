@@ -41,6 +41,7 @@ Here is list of features that are implemented and planned:
 	- [x] Stdio Transport
 	- [x] SSE Transport
 	- [x] Streamable HTTP Transport (beta)
+	- [x] Authorization (beta)
 - [x] Tools
     - [x] Package toolinput helps define tools input schema and validate arriving input
 - [ ] Resources
@@ -48,7 +49,7 @@ Here is list of features that are implemented and planned:
 	- [x] Resources - dynamic via Resource Providers
 	- [ ] Resources - dynamic via Resource Templates (planned)
 	- [ ] Resource Templates completion (planned)
-	- [ ] Resource subscriptions
+	- [ ] Resource subscriptions (planned)
 - [x] Prompts
 - [x] Prompts Completion
 - [x] Functional Testing package foxytest
@@ -71,10 +72,9 @@ git clone https://github.com/strowk/foxy-contexts
 cd foxy-contexts/examples/list_current_dir_files_tool
 npx @modelcontextprotocol/inspector go run main.go
 ```
-, then once inspector is started in browser open http://localhost:6274 and try to use list-current-dir-files.
+, then once inspector is started in browser open url it has printed and try to use list-current-dir-files.
 
 Here's the code of that example from [examples/list_current_dir_files_tool/main.go](https://github.com/strowk/foxy-contexts/blob/main/examples/list_current_dir_files_tool/main.go) (in real world application you would probably want to split it into multiple files):
-
 
 ```go
 package main
@@ -91,14 +91,6 @@ import (
 	"go.uber.org/fx/fxevent"
 	"go.uber.org/zap"
 )
-
-// This example defines list-current-dir-files tool for MCP server, that prints files in the current directory
-// , run it with:
-// npx @modelcontextprotocol/inspector go run main.go
-// , then in browser open http://localhost:6274
-// , then click Connect
-// , then click List Tools
-// , then click list-current-dir-files
 
 // NewListCurrentDirFilesTool defines a tool that lists files in the current directory
 func NewListCurrentDirFilesTool() fxctx.Tool {
@@ -155,19 +147,6 @@ func main() {
 		WithName("list-current-dir-files").
 		WithVersion("0.0.1").
 		WithTransport(stdio.NewTransport()).
-		// Configuring fx logging to only show errors
-		WithFxOptions(fx.Provide(func() *zap.Logger {
-				cfg := zap.NewDevelopmentConfig()
-				cfg.Level.SetLevel(zap.ErrorLevel)
-				logger, _ := cfg.Build()
-				return logger
-			}),
-			fx.Option(fx.WithLogger(
-				func(logger *zap.Logger) fxevent.Logger {
-					return &fxevent.ZapLogger{Logger: logger}
-				},
-			)),
-		).
 		Run()
 }
 
