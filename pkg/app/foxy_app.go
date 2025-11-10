@@ -10,6 +10,8 @@ import (
 	"github.com/strowk/foxy-contexts/pkg/server"
 	"github.com/strowk/foxy-contexts/pkg/session"
 	"go.uber.org/fx"
+	"go.uber.org/fx/fxevent"
+	"go.uber.org/zap"
 )
 
 var (
@@ -47,6 +49,8 @@ type Builder struct {
 	options []fx.Option
 
 	extraServerOptions []server.ServerOption
+
+	logger *zap.Logger
 }
 
 func (f *Builder) WithAuthorization(authorization auth.Authorization) *Builder {
@@ -142,6 +146,11 @@ func (f *Builder) WithExtraServerOptions(extraOptions ...server.ServerOption) *B
 	return f
 }
 
+func (f *Builder) WithLogger(logger *zap.Logger) *Builder {
+	f.logger = logger
+	return f
+}
+
 // BuildFxApp builds the fx.App instance as configured by `With*` methods
 func (f *Builder) BuildFxApp() (*fx.App, error) {
 	if f.transport == nil {
@@ -155,9 +164,43 @@ func (f *Builder) BuildFxApp() (*fx.App, error) {
 	f.options = append(f.options, fx.Provide(func() *session.SessionManager {
 		return f.transport.GetSessionManager()
 	}))
-	f.options = append(f.options, f.provideServerLifecycle(f.transport))
+	f.options = append(f.options, f.provideServerLifecycle())
 
-	return fx.New(fx.Options(f.options...)), nil
+	if f.logger == nil {
+		cfg := zap.NewDevelopmentConfig()
+		cfg.Level.SetLevel(zap.ErrorLevel)
+		logger, _ := cfg.Build()
+		f.logger = logger
+	}
+
+	fxEventLogger := fx.WithLogger(
+		func() fxevent.Logger {
+			return &fxevent.ZapLogger{Logger: f.logger}
+		},
+	)
+
+	return fx.New(
+		fxEventLogger,
+		fx.Module("transport",
+			fx.Provide(f.getTransportForFx),
+		),
+		fx.Module(
+			"mcp-server",
+			fx.Invoke(func(_ server.Transport) {
+				// this is a no-op, but it ensures that the transport is provided
+				// before the rest of application is prepared in order to avoid
+				// deadlocks when tools or their dependencies are blocking
+				// transport shutdown, like for example http server in streamable http
+				// transport would be blocked on waiting for all running requests to finish
+			}),
+			fx.Options(f.options...),
+		),
+	), nil
+}
+
+func (f *Builder) getTransportForFx(lc fx.Lifecycle) server.Transport {
+	lc.Append(fx.StopHook(f.transport.Shutdown))
+	return f.transport
 }
 
 // Run builds and runs the fx.App instance as configured by `With*` methods
@@ -198,11 +241,12 @@ func (f *Builder) getServerCapabilities() *mcp.ServerCapabilities {
 	return serverCapabilities
 }
 
-func (f *Builder) provideServerLifecycle(transport server.Transport) fx.Option {
+func (f *Builder) provideServerLifecycle() fx.Option {
 	return fx.Invoke((func(
 		lc fx.Lifecycle,
 		params ServerLifecycleParams,
 		shutdowner fx.Shutdowner,
+		transport server.Transport,
 	) {
 		lc.Append(fx.Hook{
 			OnStart: func(ctx context.Context) error {
@@ -243,9 +287,6 @@ func (f *Builder) provideServerLifecycle(transport server.Transport) fx.Option {
 					_ = shutdowner.Shutdown()
 				}()
 				return nil
-			},
-			OnStop: func(ctx context.Context) error {
-				return transport.Shutdown(ctx)
 			},
 		})
 	}))

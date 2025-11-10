@@ -196,6 +196,8 @@ func NewTransport(options ...TransportOption) server.Transport {
 	}
 
 	e := echo.New()
+	e.HideBanner = true
+	e.HidePort = true
 	tp.e = e
 
 	for _, o := range options {
