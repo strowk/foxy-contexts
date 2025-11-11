@@ -112,11 +112,7 @@ func (s *streamableHttpTransport) isAuthorizationValid(header string) bool {
 		return false
 	}
 	token := strings.TrimPrefix(header, "Bearer ")
-	if token == "" {
-		return false
-	}
-
-	return true
+	return token != ""
 }
 
 func (s *streamableHttpTransport) AsAuthorizeable() auth.AuthorizeableTransport {
