@@ -13,12 +13,12 @@ import (
 )
 
 var (
-	ErrInvalidRedirectUri     = errors.New("Invalid redirect URI - must be absolute and either use https scheme or be local")
+	ErrInvalidRedirectUri     = errors.New("invalid redirect URI - must be absolute and either use https scheme or be local")
 	ErrInvalidTokenAuthMethod = errors.New("invalid token endpoint auth method - only client_secret_post is supported")
 	ErrInvalidGrantType       = errors.New("invalid grant type - only authorization_code is supported")
 	ErrInvalidResponseType    = errors.New("invalid response type - only code is supported")
 
-	ErrInvalidJWKs = errors.New("Only one of jwks_uri or jwks must be provided")
+	ErrInvalidJWKs = errors.New("only one of jwks_uri or jwks must be provided")
 
 	GrantTypesSupported = []string{"authorization_code"} // TODO: support refresh token and maybe client creds as well
 

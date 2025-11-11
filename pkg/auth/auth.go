@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	ErrInvalidRedirectURI = errors.New("Invalid redirect URI")
+	ErrInvalidRedirectURI = errors.New("invalid redirect URI")
 )
 
 // Authorization is an interface that defines necessary methods for setting up
