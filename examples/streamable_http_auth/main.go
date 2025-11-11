@@ -16,9 +16,6 @@ import (
 	"github.com/strowk/foxy-contexts/pkg/mcp"
 	"github.com/strowk/foxy-contexts/pkg/session"
 	"github.com/strowk/foxy-contexts/pkg/streamable_http"
-	"go.uber.org/fx"
-	"go.uber.org/fx/fxevent"
-	"go.uber.org/zap"
 
 	"golang.org/x/oauth2"
 )
@@ -216,21 +213,7 @@ func main() {
 					return "", nil // this will stop the request here as we already provided redirection
 				},
 			),
-		))).
-		// Configuring fx logging to only show errors
-		WithFxOptions(
-			fx.Provide(func() *zap.Logger {
-				cfg := zap.NewDevelopmentConfig()
-				cfg.Level.SetLevel(zap.ErrorLevel)
-				logger, _ := cfg.Build()
-				return logger
-			}),
-			fx.Option(fx.WithLogger(
-				func(logger *zap.Logger) fxevent.Logger {
-					return &fxevent.ZapLogger{Logger: logger}
-				},
-			)),
-		)
+		)))
 
 	err := server.Run()
 	if err != nil {

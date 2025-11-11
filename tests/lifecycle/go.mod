@@ -4,11 +4,7 @@ replace github.com/strowk/foxy-contexts => ../../
 
 go 1.23.3
 
-require (
-	github.com/strowk/foxy-contexts v0.0.0-00010101000000-000000000000
-	go.uber.org/fx v1.23.0
-	go.uber.org/zap v1.27.0
-)
+require github.com/strowk/foxy-contexts v0.0.0-00010101000000-000000000000
 
 require (
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.4.0 // indirect
@@ -31,6 +27,8 @@ require (
 	github.com/tidwall/rtree v0.0.0-20180113144539-6cd427091e0e // indirect
 	github.com/tidwall/tinyqueue v0.0.0-20180302190814-1e39f5511563 // indirect
 	go.uber.org/dig v1.18.0 // indirect
+	go.uber.org/fx v1.23.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
+	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
 )
