@@ -3,6 +3,7 @@ package streamable_http
 import (
 	"context"
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -43,7 +44,7 @@ const (
 )
 
 var (
-	ErrWrongMinTLSVersion = fmt.Errorf("Wrong minimum TLS version - authorization requires TLS 1.3 or higher")
+	ErrWrongMinTLSVersion = errors.New("wrong minimum TLS version - authorization requires TLS 1.3 or higher")
 )
 
 func (s *streamableHttpTransport) pathExcludedFromAuth(path string) bool {
