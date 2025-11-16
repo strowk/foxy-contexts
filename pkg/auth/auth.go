@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"sync"
@@ -143,14 +144,17 @@ type AuthorizeableTransport interface {
 func (o *oauth2Auth) RegisterClient(ctx context.Context, req *ClientRegistrationRequest) (*ClientRegistrationResponse, error) {
 	client, err := o.registeredClients.registerClient(ctx, req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to register client: %w", err)
 	}
 
-	o.clientStore.Set(client.clientId, &models.Client{
+	err = o.clientStore.Set(client.clientId, &models.Client{
 		ID:     client.clientId,
 		Secret: client.clientSecret,
 		Domain: client.redirectUris[0],
 	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to store client: %w", err)
+	}
 
 	return &ClientRegistrationResponse{
 		ClientId:     client.clientId,
