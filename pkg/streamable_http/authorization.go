@@ -150,11 +150,7 @@ func (s *streamableHttpTransport) PlugInAuthorization(authorization auth.Authori
 		}
 
 		return c.JSON(200, AuthorizationServerMetadata{
-			Issuer: fmt.Sprintf("%s://%s%s", s.authScheme, s.authHost, s.path),
-
-			// TODO: figure out if it makes sense to use JWK at all
-			// JWKSUri: fmt.Sprintf("https://%s%s", s.authHost, JWKSPath),
-
+			Issuer:                fmt.Sprintf("%s://%s%s", s.authScheme, s.authHost, s.path),
 			AuthorizationEndpoint: fmt.Sprintf("%s://%s%s", s.authScheme, s.authHost, AuthorizePath),
 			TokenEndpoint:         fmt.Sprintf("%s://%s%s", s.authScheme, s.authHost, TokenPath),
 			RegistrationEndpoint:  fmt.Sprintf("%s://%s%s", s.authScheme, s.authHost, RegisterPath),
