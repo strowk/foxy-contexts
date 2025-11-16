@@ -14,16 +14,16 @@ import (
 func main() {
 	redirectUri := "http://localhost:8081/callback"
 
-	body := `{
+	registerClientBody := `{
 		"client_name": "test-client-name",
 		"redirect_uris": ["%s"],
 		"token_endpoint_auth_method": "client_secret_post",
 		"grant_types": ["authorization_code"],
 		"response_types": ["code"]
 	}`
-	body = fmt.Sprintf(body, redirectUri)
+	registerClientBody = fmt.Sprintf(registerClientBody, redirectUri)
 
-	reqBody := []byte(body)
+	reqBody := []byte(registerClientBody)
 
 	req, err := http.NewRequest("POST", "http://localhost:8080/register", bytes.NewBuffer(reqBody))
 	if err != nil {
@@ -115,51 +115,61 @@ func main() {
 			}
 
 			// requesting MCP ping with the access token
-
-			http.NewRequest("GET", "http://localhost:8080/mcp", bytes.NewBuffer([]byte(`{"method":"ping","params":{},"id":0, "jsonrpc":"2.0"}`)))
-			req.Header.Set("Authorization", "Bearer "+parsedToken.AccessToken)
-			req.Header.Set("Content-Type", "application/json")
-			req.Header.Set("Accept", "application/json, text/event-stream")
-
-			resp, err := client.Do(req)
+			bodyString, statusCode, err := callPing(parsedToken.AccessToken, client)
 			if err != nil {
-				return c.String(http.StatusInternalServerError, "Error sending request: "+err.Error())
+				return c.String(http.StatusInternalServerError, "Error calling MCP ping: "+err.Error())
 			}
-			defer resp.Body.Close()
-			respBody := new(bytes.Buffer)
-			_, err = respBody.ReadFrom(resp.Body)
-			if err != nil {
-				return c.String(http.StatusInternalServerError, "Error reading response: "+err.Error())
-			}
-			bodyString := respBody.String()
-			if resp.StatusCode != http.StatusOK {
-				return c.String(http.StatusInternalServerError, "Error: "+http.StatusText(resp.StatusCode)+" "+bodyString)
+			if statusCode != http.StatusOK {
+				return c.String(http.StatusInternalServerError, fmt.Sprintf("error: %s %s", http.StatusText(statusCode), bodyString))
 			} else {
 				println("MCP Ping Response: " + bodyString)
 			}
 
 			// try same request without authorization header
 			// to check that authorization is required
+			bodyString, statusCode, err = callPing("", client)
+			if err != nil {
+				return c.String(http.StatusInternalServerError, "Error calling MCP ping: "+err.Error())
+			}
 
-			req, err = http.NewRequest("GET", "http://localhost:8080/mcp", bytes.NewBuffer([]byte(`{"method":"ping","params":{},"id":0, "jsonrpc":"2.0"}`)))
-			if err != nil {
-				return c.String(http.StatusInternalServerError, "Error creating request: "+err.Error())
-			}
-			req.Header.Set("Content-Type", "application/json")
-			req.Header.Set("Accept", "application/json, text/event-stream")
-			resp, err = client.Do(req)
-			if err != nil {
-				return c.String(http.StatusInternalServerError, "Error sending request: "+err.Error())
-			}
-			defer resp.Body.Close()
-			if resp.StatusCode != http.StatusUnauthorized {
-				println("Expected 401 Unauthorized, got: " + http.StatusText(resp.StatusCode))
+			if statusCode != http.StatusUnauthorized {
+				println("Expected 401 Unauthorized, got: " + http.StatusText(statusCode))
 			} else {
-				println("MCP Ping Response without auth: " + http.StatusText(resp.StatusCode))
+				println("MCP Ping Response without auth: " + http.StatusText(statusCode))
 			}
 		}
+		return c.Redirect(http.StatusFound, "/ok")
+	})
+
+	e.GET("/ok", func(c echo.Context) error {
 		return c.String(http.StatusOK, "OK")
 	})
 
 	e.Start(":8081")
+}
+
+func callPing(token string, client *http.Client) (string, int, error) {
+	req, err := http.NewRequest("POST", "http://localhost:8080/mcp", bytes.NewBuffer([]byte(`{"method":"ping","params":{},"id":0, "jsonrpc":"2.0"}`)))
+	if err != nil {
+		return "", 0, fmt.Errorf("creating request: %w", err)
+	}
+	if token != "" {
+		req.Header.Set("Authorization", "Bearer "+token)
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json, text/event-stream")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", 0, fmt.Errorf("sending request: %w", err)
+	}
+	defer resp.Body.Close()
+	respBody := new(bytes.Buffer)
+	_, err = respBody.ReadFrom(resp.Body)
+	if err != nil {
+		return "", 0, fmt.Errorf("reading response: %w", err)
+	}
+	bodyString := respBody.String()
+
+	return bodyString, resp.StatusCode, nil
 }

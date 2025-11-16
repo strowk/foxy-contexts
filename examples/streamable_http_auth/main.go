@@ -28,13 +28,7 @@ func (m *MySessionData) String() string {
 	return "MySessionData"
 }
 
-// This example defines my-great-tool tool for MCP server that is using streamable http transport
-// , run it with:
-// go run main.go
-// then in another terminal run:
-// curl -X POST -H "Content-Type: application/json" -d '{"method":"tools/call", "params": {"name": "my-great-tool", "arguments": {}},"id":0}' http://localhost:8080/mcp
-// , then you should see the response:
-// {"jsonrpc":"2.0","result":{"content":[{"text":"Sup, saving greatness to session","type":"text"}]},"id":0}
+// This example defines my-great-tool tool for MCP server that is using streamable http transport with authentication via OAuth2.
 
 // --8<-- [start:tool]
 func NewGreatTool(sm *session.SessionManager) fxctx.Tool {
@@ -88,8 +82,6 @@ func main() {
 		RedirectURL:  redirectBackHere,
 		Scopes:       []string{"openid"},
 		Endpoint: oauth2.Endpoint{
-			// AuthURL:  "http://localhost:5553/dex/auth",
-			// TokenURL: "http://localhost:5553/dex/token",
 			AuthURL:   "http://localhost:5556/dex/auth",
 			TokenURL:  "http://localhost:5556/dex/token",
 			AuthStyle: oauth2.AuthStyleInHeader,
@@ -123,7 +115,6 @@ func main() {
 				streamable_http.EchoConfigurer{
 					Configure: func(e *echo.Echo) {
 						e.GET("/callback", func(c echo.Context) error {
-							log.Printf("callback called")
 							r := c.Request()
 							code := r.URL.Query().Get("code")
 
@@ -156,7 +147,6 @@ func main() {
 								}
 								delete(nonces, nonce)
 
-								log.Println("exchanging code for token")
 								tok, err := conf.Exchange(context.Background(), code)
 								if err != nil {
 									return err
