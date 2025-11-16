@@ -128,17 +128,6 @@ func (o *oauth2Auth) RegisterClient(_ context.Context, req *ClientRegistrationRe
 		return nil, fmt.Errorf("failed to register client: %w", err)
 	}
 
-	// TODO: support multiple redirect URIs. This depends on go-oauth2 supporting it:
-	// https://github.com/go-oauth2/oauth2/issues/257
-
-	if len(client.redirectUris) == 0 {
-		return nil, fmt.Errorf("%w: should have exactly one redirect uri, but none were provided", ErrInvalidRedirectURI)
-	}
-
-	if len(client.redirectUris) > 1 {
-		return nil, fmt.Errorf("%w: should have exactly one redirect uri, but multiple were provided", ErrInvalidRedirectURI)
-	}
-
 	err = o.clientStore.Set(client.clientId, &models.Client{
 		ID:     client.clientId,
 		Secret: client.clientSecret,

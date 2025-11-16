@@ -87,6 +87,7 @@ func (req *ClientRegistrationRequest) validateRedirectUris() error {
 	// TODO: allow for multiple redirect uris
 	// , note that the reason for this is that go-oauth2
 	// does not support multiple redirect uris
+	// https://github.com/go-oauth2/oauth2/issues/257
 	if len(req.RedirectUris) > 1 {
 		return fmt.Errorf("%w, only one redirect_uri is supported", ErrInvalidRedirectUri)
 	}
