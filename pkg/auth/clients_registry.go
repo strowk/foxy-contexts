@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"net"
@@ -9,7 +8,6 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
-	"github.com/lestrrat-go/jwx/v3/jwk"
 )
 
 var (
@@ -32,13 +30,7 @@ var (
 type oauthClient struct {
 	clientId     string
 	clientSecret string
-
-	defaultClientName string
-
 	redirectUris []string
-
-	// jwkCache jwk.Cache
-	jwks *jwk.Set
 }
 
 // TODO: should also support persisent storage of clients, so that they can be reused across server restarts?
@@ -51,8 +43,6 @@ type registeredClients struct {
 type ClientRegistrationRequest struct {
 	ClientName              *string  `json:"client_name"`
 	RedirectUris            []string `json:"redirect_uris"`
-	JWKSUri                 *string  `json:"jwks_uri"`
-	JWKs                    *jwk.Set `json:"jwks"`
 	TokenEndpointAuthMethod *string  `json:"token_endpoint_auth_method"`
 	GrantTypes              []string `json:"grant_types"`
 	ResponseTypes           []string `json:"response_types"`
@@ -75,27 +65,6 @@ func (req *ClientRegistrationRequest) validate() error {
 	err = req.validateResponseTypes()
 	if err != nil {
 		return err
-	}
-	return nil
-}
-
-func (req *ClientRegistrationRequest) resolveJWKs(ctx context.Context) error {
-	if req.JWKSUri != nil && req.JWKs != nil {
-		return ErrInvalidJWKs
-	}
-	if req.JWKSUri != nil {
-		parsed, err := url.Parse(*req.JWKSUri)
-		if err != nil {
-			return fmt.Errorf("%w: %s: %w", ErrInvalidRedirectUri, *req.JWKSUri, err)
-		}
-		if parsed.Scheme != "https" {
-			return fmt.Errorf("%w: %s", ErrInvalidRedirectUri, *req.JWKSUri)
-		}
-		jwkSet, err := jwk.Fetch(ctx, *req.JWKSUri)
-		if err != nil {
-			return fmt.Errorf("%w: %s: %w", ErrInvalidJWKs, *req.JWKSUri, err)
-		}
-		req.JWKs = &jwkSet
 	}
 	return nil
 }
@@ -163,12 +132,8 @@ type ClientRegistrationResponse struct {
 	ClientSecret string `json:"client_secret"`
 }
 
-func (c *registeredClients) registerClient(ctx context.Context, req *ClientRegistrationRequest) (*oauthClient, error) {
+func (c *registeredClients) registerClient(req *ClientRegistrationRequest) (*oauthClient, error) {
 	if err := req.validate(); err != nil {
-		return nil, err
-	}
-
-	if err := req.resolveJWKs(ctx); err != nil {
 		return nil, err
 	}
 
@@ -176,13 +141,6 @@ func (c *registeredClients) registerClient(ctx context.Context, req *ClientRegis
 		clientId:     uuid.NewString(),
 		clientSecret: uuid.NewString(),
 		redirectUris: req.RedirectUris,
-		jwks:         req.JWKs,
-	}
-
-	if req.ClientName == nil {
-		client.defaultClientName = client.clientId
-	} else {
-		client.defaultClientName = *req.ClientName
 	}
 
 	c.Clients.Store(client.clientId, &client)

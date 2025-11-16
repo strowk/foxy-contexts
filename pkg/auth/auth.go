@@ -141,8 +141,8 @@ type AuthorizeableTransport interface {
 	PlugInAuthorization(authorization Authorization) error
 }
 
-func (o *oauth2Auth) RegisterClient(ctx context.Context, req *ClientRegistrationRequest) (*ClientRegistrationResponse, error) {
-	client, err := o.registeredClients.registerClient(ctx, req)
+func (o *oauth2Auth) RegisterClient(_ context.Context, req *ClientRegistrationRequest) (*ClientRegistrationResponse, error) {
+	client, err := o.registeredClients.registerClient(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to register client: %w", err)
 	}
