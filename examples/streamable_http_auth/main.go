@@ -53,6 +53,12 @@ func NewGreatTool(sm *session.SessionManager) fxctx.Tool {
 				})
 			}
 
+			session, ok := sm.GetSessionFromContext(ctx)
+			if !ok {
+				panic("session not found in context")
+			}
+			fmt.Printf("Using remote token from session: %s\n", session.AuthUserId)
+
 			resp := "saving greatness to session"
 			if data != nil {
 				resp = "already great"
@@ -93,7 +99,6 @@ func main() {
 	// To make this production grade, we should store the state in a
 	// shared storage, probably with some TTL as well
 	nonces := make(map[string]string)
-	// tokens := make(map[*oauth2Client.Token]struct{})
 
 	server := app.
 		NewBuilder().
@@ -153,8 +158,7 @@ func main() {
 								}
 
 								log.Println("token: ", tok.AccessToken)
-
-								// tokens[tok] = struct{}{}
+								// this remote token can be used for making remote requests on behalf of the user
 
 								// redirect back to finish the flow
 								return c.Redirect(http.StatusFound, "http://localhost:8080"+authUrl+"&remote_token="+tok.AccessToken)
@@ -172,10 +176,9 @@ func main() {
 			auth.WithExcludedPaths("/callback"),
 			auth.WithAuthorizationHandler(
 				func(w http.ResponseWriter, r *http.Request) (userID string, err error) {
-
-					// TODO: does it actually make sense to save remote token as user id?
 					remoteToken := r.URL.Query().Get("remote_token")
 					if remoteToken != "" {
+						// remote token now would be availble as a user id and can be accessed in tools
 						return remoteToken, nil
 					}
 

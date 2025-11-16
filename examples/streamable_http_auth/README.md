@@ -2,6 +2,8 @@
 
 This is a simple example of how to use the streamable HTTP transport with the MCP server.
 
+It implements both OAuth2 protected server, authorization server as well as a client for another remote OAuth2.1 server, so that you can chain your authentication for example when your remote API also uses OAuth2, but it might not be OAuth2.1 compliant.
+
 You will need port 8080 to be free for this example to work.
 
 To start server, run this command:
@@ -58,7 +60,7 @@ MCP Ping Response without auth: Unauthorized
 You can then grab the access token from the output and use it to make authorized requests, like this:
 
 ```bash
-token=MJK1YTMWYWYTNDNIZS0ZMTAXLTK0NWUTYTAYOGIWYTU3M2FH
+token=ZWY1YJEXOGUTYJHIMS0ZOGFKLTHINJETNGMWNTVHNZHLMWRJ
 
 curl -X POST -i \
   -H "Content-Type: application/json" \
@@ -66,6 +68,10 @@ curl -X POST -i \
   -d '{"method":"tools/call", "params": {"name": "my-great-tool", "arguments": {}},"id":0}' \
   http://localhost:8080/mcp
 ```
+
+Note that whenever you do it, your server would print "Using remote token from session: <token>" in the console, showing that tool can access the remote token via session.
+
+In this example remote token is not actually used to make any requests, but you could easily extend the tool to do so.
 
 ## Using session
 
