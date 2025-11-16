@@ -34,11 +34,8 @@ type oauthClient struct {
 	clientSecret string
 
 	defaultClientName string
-	clientNames       map[string]string
 
-	redirectUris            []string
-	tokenEndpointAuthMethod string
-	policyUri               string
+	redirectUris []string
 
 	// jwkCache jwk.Cache
 	jwks *jwk.Set
