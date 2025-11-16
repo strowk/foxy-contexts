@@ -76,23 +76,6 @@ func NewOauth2Authorization(opts ...Oauth2AuthorizationOption) (*oauth2Auth, err
 		manager: manage.NewDefaultManager(),
 	}
 
-	// this thing would be potentially broken if two clients have put first redirect uri as the same
-	// theoretically could support multiple redirect uris for the same client, but only
-	// if go-auth2 would give us client id for this function, but it does not ATM
-	//
-	// auth.manager.SetValidateURIHandler(func(baseRedirectURI, redirectURI string) error {
-	// 	for _, client := range auth.registeredClients.Clients {
-	// 		if client.redirectUris[0] == baseRedirectURI {
-	// 			for _, uri := range client.redirectUris {
-	// 				if uri == redirectURI {
-	// 					return nil
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// 	return ErrInvalidRedirectURI
-	// })
-
 	tokenStore, err := store.NewMemoryTokenStore()
 	if err != nil {
 		return nil, err
@@ -113,8 +96,6 @@ func NewOauth2Authorization(opts ...Oauth2AuthorizationOption) (*oauth2Auth, err
 	auth.server.SetClientInfoHandler(server.ClientFormHandler)
 	auth.server.SetAllowedGrantType("authorization_code")
 	auth.server.SetAllowedResponseType("code")
-
-	// auth.manager.MapAccessGenerate()
 
 	for _, opt := range opts {
 		opt(auth)
@@ -145,6 +126,17 @@ func (o *oauth2Auth) RegisterClient(_ context.Context, req *ClientRegistrationRe
 	client, err := o.registeredClients.registerClient(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to register client: %w", err)
+	}
+
+	// TODO: support multiple redirect URIs. This depends on go-oauth2 supporting it:
+	// https://github.com/go-oauth2/oauth2/issues/257
+
+	if len(client.redirectUris) == 0 {
+		return nil, fmt.Errorf("%w: should have exactly one redirect uri, but none were provided", ErrInvalidRedirectURI)
+	}
+
+	if len(client.redirectUris) > 1 {
+		return nil, fmt.Errorf("%w: should have exactly one redirect uri, but multiple were provided", ErrInvalidRedirectURI)
 	}
 
 	err = o.clientStore.Set(client.clientId, &models.Client{
