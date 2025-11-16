@@ -36,7 +36,6 @@ Start dex server for testing auth:
 docker-compose up
 ```
 
-
 Now start client:
 
 ```bash
