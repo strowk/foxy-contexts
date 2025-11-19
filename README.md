@@ -7,8 +7,6 @@
    Foxy Contexts
 </h1>
 
-<!-- --8<-- [start:content] -->
-
 <h4 align="center">Build MCP Servers Declaratively in Golang</h4>
 
 <p align="center">
@@ -35,21 +33,25 @@ With this approach you can easily colocate call/read/get logic and definitions o
 
 Here is list of features that are implemented and planned:
 
+<!-- --8<-- [start:features] -->
 - [x] Base (lifecycle/ping)
 	- [ ] Progress (planned)
 - [x] Transports
 	- [x] Stdio Transport
 	- [x] SSE Transport
 	- [x] Streamable HTTP Transport (beta)
-	- [x] Authorization (beta)
+- [x] Auth (beta)
+    - [x] Built-in OAuth2.1 Authorization Server
+    - [x] Protected Resource metadata endpoint
+    - [ ] Protected Resource metadata without built-in server (planned)
 - [x] Tools
     - [x] Package toolinput helps define tools input schema and validate arriving input
 - [ ] Resources
-	- [x] Resources - static
-	- [x] Resources - dynamic via Resource Providers
-	- [ ] Resources - dynamic via Resource Templates (planned)
-	- [ ] Resource Templates completion (planned)
-	- [ ] Resource subscriptions (planned)
+    - [x] Resources - static
+    - [x] Resources - dynamic via Resource Providers
+    - [ ] Resources - dynamic via Resource Templates (planned)
+    - [ ] Resource Templates completion (planned)
+    - [ ] Resource subscriptions (planned)
 - [x] Prompts
 - [x] Prompts Completion
 - [x] Functional Testing package foxytest
@@ -60,6 +62,7 @@ Here is list of features that are implemented and planned:
 - [ ] Pagination (planned)
 - [ ] Notifications list_changed (planned)
 - [x] Testing - functional tests with foxytest package
+<!-- --8<-- [end:features] -->
 
 Check [docs](https://foxy-contexts.str4.io/) and [examples](https://github.com/strowk/foxy-contexts/tree/main/examples) to know more.
 

@@ -1,0 +1,16 @@
+{{- $input := split (.Get 0) ":" -}}
+{{- $file := index $input 0 -}}
+{{- $snippet := index $input 1 -}}
+{{- $start := printf "--8<-- [start:%s]" $snippet -}}
+{{- $end := printf "--8<-- [end:%s" $snippet -}}
+{{- with resources.Get $file -}}
+{{- $file := .Content -}}
+{{- $file := split $file $start -}}
+{{- $file := index $file 1 -}}
+{{- $file := split $file $end -}}
+{{- $file := index $file 0 -}}
+{{- $file := trim $file " " -}}
+{{- $file := strings.TrimPrefix "-->" $file -}}
+{{- $file := strings.TrimSuffix "<!--" $file -}}
+{{- trim $file "\r\n" -}}
+{{- end -}}

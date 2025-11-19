@@ -10,6 +10,11 @@ module:
     target: content
   - source: ../examples
     target: content/examples
+  - source: ../
+    target: assets
+    # has to disable watch, otherwise hugo would 
+    # match its own output dir and go into infinite loop
+    disableWatch: true
 
 markup:
   goldmark:

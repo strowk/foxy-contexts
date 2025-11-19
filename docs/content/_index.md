@@ -38,34 +38,7 @@ With this approach you can easily colocate call/read/get logic and definitions o
 
 Here is list of features that are implemented and planned:
 
-- [x] Base (lifecycle/ping)
-   - [ ] Progress (planned)
-- [x] Transports
-   - [x] Stdio Transport
-   - [x] SSE Transport
-   - [x] Streamable HTTP Transport
-- [x] Auth
-   - [x] Built-in OAuth2.1 Authorization Server
-   - [x] Protected Resource metadata endpoint
-   - [ ] Protected Resource metadata without built-in server (planned)
-- [x] Tools
-    - [x] Package toolinput helps define tools input schema and validate arriving input
-- [ ] Resources
-   - [x] Resources - static
-   - [x] Resources - dynamic via Resource Providers
-   - [ ] Resources - dynamic via Resource Templates (planned)
-   - [ ] Resource Templates completion (planned)
-   - [ ] Resource subscriptions (planned)
-- [x] Prompts
-- [x] Prompts Completion
-- [x] Functional Testing package foxytest
-- [x] Simple building of your MCP server with the power of Dependency Injection
-- [ ] Logging via MCP (planned)
-- [ ] Sampling (planned)
-- [ ] Roots (planned)
-- [ ] Pagination (planned)
-- [ ] Notifications list_changed (planned)
-- [x] Testing - functional tests with foxytest package
+{{% resource_snippet "README.md:features" %}}
 
 Check [docs](https://foxy-contexts.str4.io/) and [examples](https://github.com/strowk/foxy-contexts/tree/main/examples) to know more.
 
