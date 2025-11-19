@@ -38,7 +38,8 @@ func TestStreamableHttpTransportWithAuth(t *testing.T) {
 		}),
 	)
 	require.NoError(t, err)
-	tr.(auth.AuthorizeableTransport).PlugInAuthorization(oauth2Auth)
+	err = tr.(auth.AuthorizeableTransport).PlugInAuthorization(oauth2Auth)
+	require.NoError(t, err)
 
 	waitGroup := sync.WaitGroup{}
 	waitGroup.Add(1)
@@ -70,6 +71,7 @@ func TestStreamableHttpTransportWithAuth(t *testing.T) {
 		defer func() { assert.NoError(t, resp.Body.Close()) }()
 		require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
 		body, err := io.ReadAll(resp.Body)
+		require.NoError(t, err)
 		bodyStr := string(body)
 		require.Equal(t, "authorization header is missing", bodyStr)
 	})
@@ -83,6 +85,7 @@ func TestStreamableHttpTransportWithAuth(t *testing.T) {
 		require.NoError(t, err)
 		defer func() { assert.NoError(t, resp.Body.Close()) }()
 		body, err := io.ReadAll(resp.Body)
+		require.NoError(t, err)
 		bodyStr := string(body)
 		require.Equal(t, http.StatusOK, resp.StatusCode)
 		require.JSONEq(t, `{
@@ -100,6 +103,7 @@ func TestStreamableHttpTransportWithAuth(t *testing.T) {
 		require.NoError(t, err)
 		defer func() { assert.NoError(t, resp.Body.Close()) }()
 		body, err := io.ReadAll(resp.Body)
+		require.NoError(t, err)
 		bodyStr := string(body)
 		require.Equal(t, http.StatusOK, resp.StatusCode)
 		require.JSONEq(t, `{
@@ -140,6 +144,7 @@ func TestStreamableHttpTransportWithAuth(t *testing.T) {
 		require.NoError(t, err)
 		defer func() { assert.NoError(t, resp.Body.Close()) }()
 		body, err := io.ReadAll(resp.Body)
+		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, resp.StatusCode)
 
 		var registeredClient struct {
@@ -174,6 +179,7 @@ func TestStreamableHttpTransportWithAuth(t *testing.T) {
 		require.NoError(t, err)
 		defer func() { assert.NoError(t, resp.Body.Close()) }()
 		body, err := io.ReadAll(resp.Body)
+		require.NoError(t, err)
 		bodyStr := string(body)
 		assert.Equal(t, http.StatusFound, resp.StatusCode)
 		assert.Empty(t, bodyStr)
@@ -225,6 +231,7 @@ func TestStreamableHttpTransportWithAuth(t *testing.T) {
 		defer func() { assert.NoError(t, resp.Body.Close()) }()
 		require.Equal(t, http.StatusOK, resp.StatusCode)
 		body, err := io.ReadAll(resp.Body)
+		require.NoError(t, err)
 		bodyStr := string(body)
 		require.JSONEq(t, `{
 			"jsonrpc":"2.0",
