@@ -1,6 +1,6 @@
 module github.com/strowk/foxy-contexts/examples/hello_world_resource
 
-go 1.23.3
+go 1.23.12
 
 replace github.com/strowk/foxy-contexts => ../../
 

@@ -9,5 +9,6 @@ set -e
 ( cd examples/list_k8s_contexts_tool && go mod tidy )
 ( cd examples/streamable_http && go mod tidy )
 ( cd examples/streamable_http_auth && go mod tidy )
+( cd examples/resource_provider && go mod tidy )
 ( cd tests/lifecycle && go mod tidy )
 

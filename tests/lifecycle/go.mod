@@ -2,7 +2,7 @@ module github.com/strowk/foxy-contexts/tests/lifecycle
 
 replace github.com/strowk/foxy-contexts => ../../
 
-go 1.23.3
+go 1.23.12
 
 require github.com/strowk/foxy-contexts v0.0.0-00010101000000-000000000000
 

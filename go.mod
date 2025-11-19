@@ -1,6 +1,6 @@
 module github.com/strowk/foxy-contexts
 
-go 1.23.3
+go 1.23.12
 
 require (
 	github.com/go-oauth2/oauth2/v4 v4.5.3
