@@ -1,6 +1,10 @@
-# Streamable HTTP Example
+---
+title: Streamable HTTP
+---
 
 This is a simple example of how to use the streamable HTTP transport with the MCP server.
+
+Example location: https://github.com/strowk/foxy-contexts/tree/main/examples/streamable_http
 
 You will need port 8080 to be free for this example to work.
 

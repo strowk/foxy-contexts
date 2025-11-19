@@ -9,9 +9,6 @@ import (
 	"github.com/strowk/foxy-contexts/pkg/fxctx"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
 	"github.com/strowk/foxy-contexts/pkg/stdio"
-	"go.uber.org/fx"
-	"go.uber.org/fx/fxevent"
-	"go.uber.org/zap"
 )
 
 // This example defines resource tool for MCP server
@@ -68,20 +65,7 @@ func main() {
 		WithName("my-mcp-server").
 		WithVersion("0.0.1").
 		WithTransport(stdio.NewTransport()).
-		// Configuring fx logging to only show errors
-		WithFxOptions(
-			fx.Provide(func() *zap.Logger {
-				cfg := zap.NewDevelopmentConfig()
-				cfg.Level.SetLevel(zap.ErrorLevel)
-				logger, _ := cfg.Build()
-				return logger
-			}),
-			fx.Option(fx.WithLogger(
-				func(logger *zap.Logger) fxevent.Logger {
-					return &fxevent.ZapLogger{Logger: logger}
-				},
-			)),
-		).Run()
+		Run()
 	if err != nil {
 		log.Fatal(err)
 	}

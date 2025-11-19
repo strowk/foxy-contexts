@@ -91,6 +91,12 @@ type Session struct {
 	SessionID uuid.UUID
 	// SessionData is the state of the session.
 	SessionData SessionData
+
+	// AuthUserId is the ID of the user associated with the session.
+	//
+	// This will be set in case if authorization is used and user
+	// id can be used to resolve access information.
+	AuthUserId string
 }
 
 type SessionData interface {

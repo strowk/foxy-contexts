@@ -4,11 +4,14 @@ import (
 	"context"
 	"errors"
 
+	"github.com/strowk/foxy-contexts/pkg/auth"
 	"github.com/strowk/foxy-contexts/pkg/fxctx"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
 	"github.com/strowk/foxy-contexts/pkg/server"
 	"github.com/strowk/foxy-contexts/pkg/session"
 	"go.uber.org/fx"
+	"go.uber.org/fx/fxevent"
+	"go.uber.org/zap"
 )
 
 var (
@@ -46,6 +49,13 @@ type Builder struct {
 	options []fx.Option
 
 	extraServerOptions []server.ServerOption
+
+	logger *zap.Logger
+}
+
+func (f *Builder) WithAuthorization(authorization auth.Authorization) *Builder {
+	f.options = append(f.options, fx.Provide(func() auth.Authorization { return authorization }))
+	return f
 }
 
 // WithTool adds a tool to the app
@@ -136,6 +146,11 @@ func (f *Builder) WithExtraServerOptions(extraOptions ...server.ServerOption) *B
 	return f
 }
 
+func (f *Builder) WithLogger(logger *zap.Logger) *Builder {
+	f.logger = logger
+	return f
+}
+
 // BuildFxApp builds the fx.App instance as configured by `With*` methods
 func (f *Builder) BuildFxApp() (*fx.App, error) {
 	if f.transport == nil {
@@ -149,9 +164,43 @@ func (f *Builder) BuildFxApp() (*fx.App, error) {
 	f.options = append(f.options, fx.Provide(func() *session.SessionManager {
 		return f.transport.GetSessionManager()
 	}))
-	f.options = append(f.options, f.provideServerLifecycle(f.transport))
+	f.options = append(f.options, f.provideServerLifecycle())
 
-	return fx.New(fx.Options(f.options...)), nil
+	if f.logger == nil {
+		cfg := zap.NewDevelopmentConfig()
+		cfg.Level.SetLevel(zap.ErrorLevel)
+		logger, _ := cfg.Build()
+		f.logger = logger
+	}
+
+	fxEventLogger := fx.WithLogger(
+		func() fxevent.Logger {
+			return &fxevent.ZapLogger{Logger: f.logger}
+		},
+	)
+
+	return fx.New(
+		fxEventLogger,
+		fx.Module("transport",
+			fx.Provide(f.getTransportForFx),
+		),
+		fx.Module(
+			"mcp-server",
+			fx.Invoke(func(_ server.Transport) {
+				// this is a no-op, but it ensures that the transport is provided
+				// before the rest of application is prepared in order to avoid
+				// deadlocks when tools or their dependencies are blocking
+				// transport shutdown, like for example http server in streamable http
+				// transport would be blocked on waiting for all running requests to finish
+			}),
+			fx.Options(f.options...),
+		),
+	), nil
+}
+
+func (f *Builder) getTransportForFx(lc fx.Lifecycle) server.Transport {
+	lc.Append(fx.StopHook(f.transport.Shutdown))
+	return f.transport
 }
 
 // Run builds and runs the fx.App instance as configured by `With*` methods
@@ -180,6 +229,8 @@ type ServerLifecycleParams struct {
 	CompleteMux fxctx.CompleteMux `optional:"true"`
 
 	SessionManager *session.SessionManager
+
+	Authorization auth.Authorization `optional:"true"`
 }
 
 func (f *Builder) getServerCapabilities() *mcp.ServerCapabilities {
@@ -190,27 +241,34 @@ func (f *Builder) getServerCapabilities() *mcp.ServerCapabilities {
 	return serverCapabilities
 }
 
-func (f *Builder) provideServerLifecycle(transport server.Transport) fx.Option {
+func (f *Builder) provideServerLifecycle() fx.Option {
 	return fx.Invoke((func(
 		lc fx.Lifecycle,
-		p ServerLifecycleParams,
+		params ServerLifecycleParams,
 		shutdowner fx.Shutdowner,
+		transport server.Transport,
 	) {
 		lc.Append(fx.Hook{
 			OnStart: func(ctx context.Context) error {
+				if params.Authorization != nil {
+					err := plugAuthorizationInTransport(transport, params.Authorization)
+					if err != nil {
+						return err
+					}
+				}
 				serverStartOption := server.ServerStartCallbackOption{
 					Callback: func(s server.Server) {
-						if p.ToolMux != nil {
-							p.ToolMux.RegisterHandlers(s)
+						if params.ToolMux != nil {
+							params.ToolMux.RegisterHandlers(s)
 						}
-						if p.ResourceMux != nil {
-							p.ResourceMux.RegisterHandlers(s)
+						if params.ResourceMux != nil {
+							params.ResourceMux.RegisterHandlers(s)
 						}
-						if p.PromptMux != nil {
-							p.PromptMux.RegisterHandlers(s)
+						if params.PromptMux != nil {
+							params.PromptMux.RegisterHandlers(s)
 						}
-						if p.CompleteMux != nil {
-							p.CompleteMux.RegisterHandlers(s)
+						if params.CompleteMux != nil {
+							params.CompleteMux.RegisterHandlers(s)
 						}
 					},
 				}
@@ -230,9 +288,17 @@ func (f *Builder) provideServerLifecycle(transport server.Transport) fx.Option {
 				}()
 				return nil
 			},
-			OnStop: func(ctx context.Context) error {
-				return transport.Shutdown(ctx)
-			},
 		})
 	}))
+}
+
+func plugAuthorizationInTransport(
+	transport server.Transport,
+	authorization auth.Authorization,
+) error {
+	authorizeableTransport, ok := transport.(auth.AuthorizeableTransport)
+	if !ok {
+		return auth.ErrInvalidTransport
+	}
+	return authorizeableTransport.PlugInAuthorization(authorization)
 }

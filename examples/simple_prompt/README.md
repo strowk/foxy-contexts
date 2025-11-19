@@ -1,12 +1,16 @@
-# Simple Prompt Example
+---
+title: Simple Prompt
+---
 
 This example demonstrates how MCP resource could be defined using Foxy Contexts library.
 
 Further assumes that you have installed Golang and (only for inspector) - Node.js.
 
+Example location: https://github.com/strowk/foxy-contexts/tree/main/examples/simple_prompt
+
 ## Trying with inspector
 
-To try this example with inspector, run the following command:
+To try this example with inspector, run the following command in example folder:
 
 ```bash
 npx @modelcontextprotocol/inspector go run main.go

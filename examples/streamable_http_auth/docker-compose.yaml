@@ -1,0 +1,9 @@
+services:
+  dex:
+    image: dexidp/dex:latest
+    container_name: dex
+    ports:
+      - "5556:5556"
+    volumes:
+      - ./dex-config.yaml:/etc/dex/config.yaml
+    command: ["dex", "serve", "/etc/dex/config.yaml"]

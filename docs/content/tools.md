@@ -15,13 +15,13 @@ Foxy Contexts allows easy way to define a tool and register it within fx DI cont
 In order to create new tool you shall use `fxctx.NewTool` function. It accepts tool name, description and function that would be called when tool is called.
 
 
-```go { filename_uri_base="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/simple_great_tool/main.go" }
+```go { base_url="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/simple_great_tool/main.go" }
 {{< snippet "examples/simple_great_tool/main.go:tool" "go" >}}
 ```
 
 ## Register tool and start server
 
-```go { filename_uri_base="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/simple_great_tool/main.go" }
+```go { base_url="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/simple_great_tool/main.go" }
 {{< snippet "examples/simple_great_tool/main.go:server" "go" >}}
 ```
 
@@ -31,7 +31,7 @@ In order to define input schema for your tool, you can use `toolinput` package. 
 
 Here is an example of creating schema, giving it to the tool and validating input:
 
-```go { filename_uri_base="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/simple_great_tool/main.go" }
+```go { base_url="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/simple_great_tool/main.go" }
 {{< snippet "examples/list_k8s_contexts_tool/main.go:toolinput" "go" >}}
 ```
 

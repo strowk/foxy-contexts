@@ -2,6 +2,7 @@ package streamable_http
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/strowk/foxy-contexts/pkg/auth"
 	foxyevent "github.com/strowk/foxy-contexts/pkg/foxy_event"
 	"github.com/strowk/foxy-contexts/pkg/jsonrpc2"
 	"github.com/strowk/foxy-contexts/pkg/mcp"
@@ -27,7 +29,15 @@ type streamableHttpTransport struct {
 	hostname string
 	path     string
 
+	authScheme string
+	authHost   string
+
 	sessionManager *session.SessionManager
+
+	authorizationRequired bool
+	authorization         auth.Authorization
+
+	tlsConfig *tls.Config
 }
 
 func (t *streamableHttpTransport) Run(
@@ -35,9 +45,8 @@ func (t *streamableHttpTransport) Run(
 	serverInfo *mcp.Implementation,
 	serverOptions ...server.ServerOption,
 ) error {
-
-	e := echo.New()
-	t.e = e
+	e := t.e
+	t.configureTLS()
 
 	servers := sync.Map{}
 
@@ -92,9 +101,13 @@ func (t *streamableHttpTransport) Run(
 		}
 
 		w.Header().Set("MCP-Session-Id", sessionIdUsed.String())
-		ctx, _, err := t.sessionManager.ResolveSessionOrCreateNew(c.Request().Context(), sessionIdUsed)
+		ctx, resolvedSession, err := t.sessionManager.ResolveSessionOrCreateNew(c.Request().Context(), sessionIdUsed)
 		if err != nil {
 			return echo.NewHTTPError(404, "Failed to resolve session")
+		}
+
+		if userId, ok := c.Request().Context().Value(authUserIdKey).(string); ok {
+			resolvedSession.AuthUserId = userId
 		}
 
 		buf, err := io.ReadAll(c.Request().Body)
@@ -181,6 +194,12 @@ func NewTransport(options ...TransportOption) server.Transport {
 
 		sessionManager: session.NewSessionManager(),
 	}
+
+	e := echo.New()
+	e.HideBanner = true
+	e.HidePort = true
+	tp.e = e
+
 	for _, o := range options {
 		o.apply(tp)
 	}
@@ -191,6 +210,14 @@ type TransportOption interface {
 	apply(*streamableHttpTransport)
 }
 
-func (s *streamableHttpTransport) GetSessionManager() *session.SessionManager {
-	return s.sessionManager
+func (t *streamableHttpTransport) GetSessionManager() *session.SessionManager {
+	return t.sessionManager
+}
+
+func (t *streamableHttpTransport) configureTLS() {
+	t.e.Server.TLSConfig = t.tlsConfig
+}
+
+func (t *streamableHttpTransport) configureAuthMiddleware() {
+	t.e.Use(t.getAuthorizationMiddleware())
 }

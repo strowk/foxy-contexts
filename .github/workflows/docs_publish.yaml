@@ -25,7 +25,9 @@ jobs:
           extended: true
       # build the site
       - name: Build
-        run: hugo --minify
+        run: |
+          cd docs
+          hugo --minify
       - run: touch public/.nojekyll # this to make Github not treat this as Jekyll
       - run: echo 'foxy-contexts.str4.io' > ./public/CNAME
       # following I took from gh-pages docs:

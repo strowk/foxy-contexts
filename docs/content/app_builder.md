@@ -11,7 +11,7 @@ app.Builder is a builder around uber's fx that combines fx DI capabilities with 
 
 Simple example of wrapping one tool into an application, then running it with stdio transport:
 
-```go { filename_uri_base="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/simple_great_tool/main.go" }
+```go { base_url="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/simple_great_tool/main.go" }
 {{< snippet "examples/simple_great_tool/main.go:server" "go" >}}
 ```
 

@@ -14,8 +14,6 @@ import (
 	"github.com/strowk/foxy-contexts/pkg/stdio"
 	"github.com/strowk/foxy-contexts/pkg/toolinput"
 	"go.uber.org/fx"
-	"go.uber.org/fx/fxevent"
-	"go.uber.org/zap"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
 )
@@ -108,20 +106,6 @@ func main() {
 		WithTransport(stdio.NewTransport()).
 		WithName("list-k8s-contexts-tool").
 		WithVersion("0.0.1").
-		WithFxOptions(
-			// Just configuring fx logging to only show errors
-			fx.Provide(func() *zap.Logger {
-				cfg := zap.NewDevelopmentConfig()
-				cfg.Level.SetLevel(zap.ErrorLevel)
-				logger, _ := cfg.Build()
-				return logger
-			}),
-			fx.Option(fx.WithLogger(
-				func(logger *zap.Logger) fxevent.Logger {
-					return &fxevent.ZapLogger{Logger: logger}
-				},
-			)),
-		).
 		Run()
 }
 

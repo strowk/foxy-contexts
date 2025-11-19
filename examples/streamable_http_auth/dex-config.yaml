@@ -1,0 +1,22 @@
+oauth2:
+  responseTypes: [ "code" ]
+
+issuer: https://localhost:5556
+
+storage:
+  type: memory
+web:
+  http: 0.0.0.0:5556
+staticClients:
+  - id: example-app
+    redirectURIs:
+      - 'http://localhost:8080/callback'
+    name: 'Example App'
+    secret: ZXhhbXBsZS1hcHAtc2VjcmV0
+enablePasswordDB: true
+staticPasswords:
+  - email: "admin@example.com"
+  # testpwd
+    hash: "$2a$12$t1BT6cSOlXzGPh/plKNUj.3GACPH8byeX1aF7bvdlgp5dVKj2EJVe"
+    username: "admin"
+    userID: "1234"
