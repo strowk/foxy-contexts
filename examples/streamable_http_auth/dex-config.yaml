@@ -1,7 +1,7 @@
 oauth2:
   responseTypes: [ "code" ]
 
-issuer: https://caddy:443/dex
+issuer: https://localhost:5556
 
 storage:
   type: memory

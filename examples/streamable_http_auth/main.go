@@ -88,8 +88,8 @@ func main() {
 		RedirectURL:  redirectBackHere,
 		Scopes:       []string{"openid"},
 		Endpoint: oauth2.Endpoint{
-			AuthURL:   "http://localhost:5556/dex/auth",
-			TokenURL:  "http://localhost:5556/dex/token",
+			AuthURL:   "http://localhost:5556/auth",
+			TokenURL:  "http://localhost:5556/token",
 			AuthStyle: oauth2.AuthStyleInHeader,
 		},
 	}

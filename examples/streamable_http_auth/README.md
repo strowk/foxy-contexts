@@ -26,10 +26,11 @@ You should see output like this:
 ```
 HTTP/1.1 401 Unauthorized
 Content-Type: application/json
-Date: Sun, 16 Nov 2025 02:53:14 GMT
-Content-Length: 47
+Www-Authenticate: Bearer resource_metadata="/.well-known/oauth-protected-resource"
+Date: Wed, 19 Nov 2025 09:06:55 GMT
+Content-Length: 31
 
-{"message":"Authorization header is required"}
+authorization header is missing
 ```
 
 Start dex server for testing auth:
