@@ -1,8 +1,12 @@
-# List Current Directory Files Tool
+---
+title: List Current Directory Files Tool
+---
 
 This example demonstrates how MCP resource could be defined using Foxy Contexts library.
 
 Further assumes that you have installed Golang and (only for inspector) - Node.js.
+
+Example location: https://github.com/strowk/foxy-contexts/tree/main/examples/list_current_dir_files_tool
 
 ## Trying with inspector
 
@@ -54,4 +58,4 @@ This will run integration test:
 go test
 ```
 
-Check out testcase in [testdata/list_and_call_test.yaml](testdata/list_and_call_test.yaml) and test runner setup in [main_test.go](main_test.go).
+Check out testcase in [testdata/list_and_call_test.yaml](https://github.com/strowk/foxy-contexts/tree/main/examples/list_current_dir_files_tool/testdata/list_and_call_test.yaml) and test runner setup in [main_test.go](https://github.com/strowk/foxy-contexts/tree/main/examples/list_current_dir_files_tool/main_test.go).

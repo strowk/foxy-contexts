@@ -1,6 +1,10 @@
-# Streamable HTTP Example
+---
+title: Streamable HTTP with Auth
+---
 
 This is a simple example of how to use the streamable HTTP transport with the MCP server protected by Outh2.
+
+Example location: https://github.com/strowk/foxy-contexts/tree/main/examples/streamable_http_auth
 
 It implements both OAuth2 protected MCP server, authorization server as well as a client for another remote OAuth2 server, so that you can chain your authentication for example when your remote API also uses OAuth2, but it might not be OAuth2.1 compliant.
 

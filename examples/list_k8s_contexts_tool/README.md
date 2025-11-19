@@ -1,4 +1,6 @@
-# List K8s Contexts Tool
+---
+title: List K8s Contexts Tool
+---
 
 This example demonstrates how MCP tool could be defined using Foxy Contexts library.
 
@@ -6,9 +8,11 @@ Further assumes that you have installed Golang and (only for inspector) - Node.j
 
 The assumption is that you also have some k8s contexts configured on your machine.
 
+Example location: https://github.com/strowk/foxy-contexts/tree/main/examples/list_k8s_contexts_tool
+
 ## Trying with inspector
 
-To try this example with inspector, run the following command:
+To try this example with inspector, run the following command in example folder:
 
 ```bash
 npx @modelcontextprotocol/inspector go run main.go

@@ -35,9 +35,10 @@ Documentation is written in "docs" folder and is built using Hugo.
 
 See how install it here: https://gohugo.io/installation/
 
-To develop documentation, run:
+To develop documentation go to "docs" folder and there start Hugo server:
 
 ```bash
+cd docs
 hugo server
 ```
 
