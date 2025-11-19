@@ -37,5 +37,6 @@ func WithAuthorizationServers(uris []url.URL) Oauth2AuthorizationOption {
 		for _, uri := range uris {
 			authServers = append(authServers, uri.String())
 		}
+		o.authorizationServers = authServers
 	}
 }
