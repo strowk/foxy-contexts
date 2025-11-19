@@ -39,13 +39,13 @@ func NewGreatTool(sm *session.SessionManager) fxctx.Tool {
 			Description: Ptr("The great tool"),
 			InputSchema: mcp.ToolInputSchema{ // here we tell client what we expect as input
 				Type:       "object",
-				Properties: map[string]map[string]interface{}{},
+				Properties: map[string]map[string]any{},
 				Required:   []string{},
 			},
 		},
 
 		// This is the callback that would be executed when the tool is called:
-		func(ctx context.Context, args map[string]interface{}) *mcp.CallToolResult {
+		func(ctx context.Context, args map[string]any) *mcp.CallToolResult {
 			data := sm.GetSessionData(ctx)
 			if data == nil {
 				sm.SetSessionData(ctx, &MySessionData{
@@ -65,7 +65,7 @@ func NewGreatTool(sm *session.SessionManager) fxctx.Tool {
 			}
 			// here we can do anything we want
 			return &mcp.CallToolResult{
-				Content: []interface{}{
+				Content: []any{
 					mcp.TextContent{
 						Type: "text",
 						Text: fmt.Sprintf("Sup, %s", resp),

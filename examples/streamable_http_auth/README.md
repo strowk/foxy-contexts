@@ -1,10 +1,10 @@
 # Streamable HTTP Example
 
-This is a simple example of how to use the streamable HTTP transport with the MCP server.
+This is a simple example of how to use the streamable HTTP transport with the MCP server protected by Outh2.
 
-It implements both OAuth2 protected server, authorization server as well as a client for another remote OAuth2.1 server, so that you can chain your authentication for example when your remote API also uses OAuth2, but it might not be OAuth2.1 compliant.
+It implements both OAuth2 protected MCP server, authorization server as well as a client for another remote OAuth2 server, so that you can chain your authentication for example when your remote API also uses OAuth2, but it might not be OAuth2.1 compliant.
 
-You will need port 8080 to be free for this example to work.
+You will need ports 8080 and 8081 to be free for this example to work.
 
 To start server, run this command:
 
