@@ -5,6 +5,7 @@ go 1.23.3
 require (
 	github.com/go-oauth2/oauth2/v4 v4.5.3
 	github.com/google/uuid v1.6.0
+	github.com/grokify/go-pkce v0.2.4
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/fx v1.23.0
