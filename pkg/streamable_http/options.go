@@ -23,9 +23,15 @@ func (o KeepStreamAliveInterval) apply(t *streamableHttpTransport) {
 }
 
 type Endpoint struct {
+	// Hostname to listen, typically is 0.0.0.0 to bind to
+	// external networks or 127.0.0.1 if only local connectivity
+	// is required (for testing or when you deploy behind local
+	// proxy or mesh)
 	Hostname string
-	Port     int
-	Path     string
+	// Port to listen
+	Port int
+	// Path to route to MCP server from
+	Path string
 
 	// AuthHost is the host that will be used in
 	// authorization discovery as the host through which
