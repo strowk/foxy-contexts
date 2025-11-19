@@ -156,8 +156,6 @@ func TestStreamableHttpTransportWithAuth(t *testing.T) {
 		require.NoError(t, err)
 		clientId = registeredClient.ClientId
 		clientSecret = registeredClient.ClientSecret
-
-		t.Log(clientSecret)
 	})
 
 	var codeVerifier string
