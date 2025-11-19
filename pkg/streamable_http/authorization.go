@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -67,12 +68,13 @@ func (s *streamableHttpTransport) getAuthorizationMiddleware() echo.MiddlewareFu
 				c.Request().URL.Path == TokenPath ||
 				c.Request().URL.Path == RegisterPath ||
 				c.Request().URL.Path == auth.WellKnownDiscoveryPath ||
+				c.Request().URL.Path == auth.WellKnownOauthProtectedResource ||
 				s.pathExcludedFromAuth(c.Request().URL.Path) {
 				// Authorization endpoints, no need to check authorization
 				return next(c)
 			}
 			if err := s.checkAuthorization(c); err != nil {
-				return err
+				return handleAuthErr(c, err)
 			}
 			return next(c)
 		}
@@ -83,6 +85,17 @@ type authUserIdKeyType struct{}
 
 var authUserIdKey authUserIdKeyType = struct{}{}
 
+var errAuthorizationHeaderIsMissing = errors.New("authorization header is missing")
+var errAuthorizationIsInvalid = errors.New("authorization is invalid")
+
+func handleAuthErr(c echo.Context, err error) error {
+	c.Response().Header().Set(
+		"WWW-Authenticate",
+		fmt.Sprintf(`Bearer resource_metadata="%s"`, auth.WellKnownOauthProtectedResource),
+	)
+	return c.String(http.StatusUnauthorized, err.Error())
+}
+
 func (s *streamableHttpTransport) checkAuthorization(c echo.Context) error {
 	if !s.authorizationRequired {
 		return nil
@@ -91,10 +104,10 @@ func (s *streamableHttpTransport) checkAuthorization(c echo.Context) error {
 	}
 	authorizationHeader := c.Request().Header.Get("Authorization")
 	if authorizationHeader == "" {
-		return echo.NewHTTPError(401, "Authorization header is required")
+		return errAuthorizationHeaderIsMissing
 	}
 	if !s.isAuthorizationValid(authorizationHeader) {
-		return echo.NewHTTPError(401, "Invalid authorization")
+		return errAuthorizationIsInvalid
 	}
 
 	userId, err := s.authorization.ValidateToken(c.Request().Context(), strings.TrimPrefix(authorizationHeader, "Bearer "))
@@ -121,7 +134,6 @@ func (s *streamableHttpTransport) AsAuthorizeable() auth.AuthorizeableTransport 
 }
 
 func (s *streamableHttpTransport) PlugInAuthorization(authorization auth.Authorization) error {
-
 	s.authorization = authorization
 	s.authorizationRequired = authorization.IsRequired()
 
@@ -138,7 +150,6 @@ func (s *streamableHttpTransport) PlugInAuthorization(authorization auth.Authori
 			Issuer                                     string   `json:"issuer"`
 			AuthorizationEndpoint                      string   `json:"authorization_endpoint"`
 			TokenEndpoint                              string   `json:"token_endpoint"`
-			JWKSUri                                    string   `json:"jwks_uri"`
 			RegistrationEndpoint                       string   `json:"registration_endpoint"`
 			ScopesSupported                            []string `json:"scopes_supported"`
 			ResponseTypesSupported                     []string `json:"response_types_supported"`
@@ -162,6 +173,30 @@ func (s *streamableHttpTransport) PlugInAuthorization(authorization auth.Authori
 			TokenEndpointAuthMethodsSupported:          auth.TokenEndpointAuthMethodsSupported,
 			TokenEndpointAuthSigningAlgValuesSupported: auth.TokenEndpointAuthSigningAlgValuesSupported,
 			CodeChallengeMethodsSupported:              auth.CodeChallengeMethodsSupported,
+		})
+	})
+
+	s.e.GET(auth.WellKnownOauthProtectedResource, func(c echo.Context) error {
+		type ProtectedResourceMetadataResponse struct {
+			Resource             string   `json:"resource"`
+			AuthorizationServers []string `json:"authorization_servers"`
+		}
+
+		uri := authorization.ProtectedResourceURI()
+		if uri == "" {
+			uri = fmt.Sprintf("%s://%s%s", s.authScheme, s.authHost, s.path)
+		}
+
+		authServers := authorization.AuthorizationServers()
+		if authServers == nil {
+			authServers = []string{
+				fmt.Sprintf("%s://%s", s.authScheme, s.authHost),
+			}
+		}
+
+		return c.JSON(http.StatusOK, ProtectedResourceMetadataResponse{
+			Resource:             uri,
+			AuthorizationServers: authServers,
 		})
 	})
 

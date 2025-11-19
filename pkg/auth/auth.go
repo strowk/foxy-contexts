@@ -39,6 +39,8 @@ type Authorization interface {
 	ValidateToken(ctx context.Context, token string) (string, error)
 
 	ExcludedPaths() []string
+	ProtectedResourceURI() string
+	AuthorizationServers() []string
 }
 
 type AuthorizationHandler func(w http.ResponseWriter, r *http.Request) (userID string, err error)
@@ -54,7 +56,9 @@ type oauth2Auth struct {
 
 	authorizationHandler AuthorizationHandler
 
-	excludedPaths []string
+	excludedPaths        []string
+	protectedResourceURI string
+	authorizationServers []string
 }
 
 func Must(auth Authorization, err error) Authorization {
@@ -162,4 +166,12 @@ func (o *oauth2Auth) ValidateToken(ctx context.Context, token string) (string, e
 
 func (o *oauth2Auth) ExcludedPaths() []string {
 	return o.excludedPaths
+}
+
+func (o *oauth2Auth) ProtectedResourceURI() string {
+	return o.protectedResourceURI
+}
+
+func (o *oauth2Auth) AuthorizationServers() []string {
+	return o.authorizationServers
 }
