@@ -22,13 +22,13 @@ Approach with resource provider is more flexible and allows to provide resources
 In order to create new static resource you shall use `fxctx.NewResource` function.
 
 
-```go { filename_uri_base="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/hello_world_resource/main.go" }
+```go { base_url="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/hello_world_resource/main.go" }
 {{< snippet "examples/hello_world_resource/main.go:resource" "go" >}}
 ```
 
 ## Register resources and start server
 
-```go { filename_uri_base="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/hello_world_resource/main.go" }
+```go { base_url="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/hello_world_resource/main.go" }
 {{< snippet "examples/hello_world_resource/main.go:server" "go" >}}
 ```
 
@@ -36,7 +36,7 @@ In order to create new static resource you shall use `fxctx.NewResource` functio
 
 In order to create new resource provider that would be returning resources dynamically, you shall use `fxctx.NewResourceProvider` function. It would then take two functions - one in order to list resources and another to read them.
 
-```go { filename_uri_base="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/resource_provider/main.go" }
+```go { base_url="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/resource_provider/main.go" }
 {{< snippet "examples/resource_provider/main.go:provider" "go" >}}
 ```
 

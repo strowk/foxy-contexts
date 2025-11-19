@@ -15,13 +15,13 @@ Foxy Contexts allows easy way to define a prompt and register it within fx DI co
 
 In order to create new prompt you shall use `fxctx.NewPrompt` function. It accepts prompt name, description and function that would be called when prompt is called.
 
-```go { filename_uri_base="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/simple_prompt/main.go" }
+```go { base_url="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/simple_prompt/main.go" }
 {{< snippet "examples/simple_prompt/main.go:prompt" "go" >}}
 ```
 
 ## Register prompt and start server
 
-```go { filename_uri_base="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/simple_prompt/main.go" }
+```go { base_url="https://github.com/strowk/foxy-contexts/blob/main" filename="examples/simple_prompt/main.go" }
 {{< snippet "examples/simple_prompt/main.go:server" "go" >}}
 ```
 
