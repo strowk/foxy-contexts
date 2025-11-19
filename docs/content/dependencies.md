@@ -7,7 +7,7 @@ weight: 5
 
 The power of Foxy Contexts comes from being based on DI concept facilitated by [fx](https://github.com/uber-go/fx) library. This allows to easily extract common parts of your server into separate packages and reuse them in different tools, prompts and other parts of your server.
 
-You can learn more about fx in [official documentation](https://pkg.go.dev/go.uber.org/fx), here there are just some common patterns that you might find useful.
+You can learn more about fx in [official documentation](https://pkg.go.dev/go.uber.org/fx), here are just some common patterns that you might find useful.
 
 ## Extracting dependency
 
